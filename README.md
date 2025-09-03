@@ -8,13 +8,7 @@ This repository contains the **Python reimplementation** of the **GeneWeb** appl
 - Provide a modern deployment strategy (Docker, CI/CD).
 
 ## 🛠️ Installation (dev quick start)
-<!-- ```bash
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -U pip
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-``` -->
-WIP
+See [INSTALL.md](INSTALL.md).
 
 ## ✅ Run tests
 <!-- ```bash
