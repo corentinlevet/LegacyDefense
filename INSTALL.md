@@ -57,8 +57,8 @@ source .venv/bin/activate
 
 ### 2. Install dependencies
 ```bash
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
+pip install -r code/requirements.txt
+pip install -r code/requirements-dev.txt
 ```
 
 ### 3. Verify installation
