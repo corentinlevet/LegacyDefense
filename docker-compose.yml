@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: legacy-app
+    volumes:
+      - ./code:/app
+    stdin_open: true
+    tty: true
