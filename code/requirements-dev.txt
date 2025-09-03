@@ -1,0 +1,14 @@
+# Lint & Formatting
+black
+isort
+flake8==7.1.0
+
+# Typing
+mypy
+
+# Testing
+pytest
+pytest-cov
+
+# Pre-commit hooks
+pre-commit
