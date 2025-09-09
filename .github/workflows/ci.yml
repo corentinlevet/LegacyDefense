@@ -64,7 +64,6 @@ jobs:
       - name: Run linters
         run: |
           set -euo pipefail
-          python -m pip install -r code/requirements-dev.txt
           black --check code
           isort --check-only code
           flake8 code
