@@ -181,11 +181,11 @@ runs:
           duration_str=$(printf "%d min %02d s" "$mins" "$secs")
 
           if [ "$size" -ge 1073741824 ]; then
-            size_str=$(printf "%.1f Go" "$(echo "scale=1; $size/1073741824" | bc)")
+            size_str=$(printf "%.1f GB" "$(echo "scale=1; $size/1073741824" | bc)")
           elif [ "$size" -ge 1048576 ]; then
-            size_str=$(printf "%.1f Mo" "$(echo "scale=1; $size/1048576" | bc)")
+            size_str=$(printf "%.1f MB" "$(echo "scale=1; $size/1048576" | bc)")
           else
-            size_str=$(printf "%.1f Ko" "$(echo "scale=1; $size/1024" | bc)")
+            size_str=$(printf "%.1f KB" "$(echo "scale=1; $size/1024" | bc)")
           fi
 
           tests_passed=$(jq -r '.tests_passed // 0' "$f")
