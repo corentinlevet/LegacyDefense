@@ -22,7 +22,7 @@ jobs:
         python: [3.11, 3.13]
 
     outputs:
-      total_matrix_jobs: ${{ strategy.job-count || 0 }}
+      total_matrix_jobs: ${{ strategy.job-total || 0 }}
 
     steps:
       - name: Checkout code
