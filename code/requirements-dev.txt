@@ -1,7 +1,7 @@
 # Lint & Formatting
 black
 isort
-flake8==7.1.0
+flake8==7.3.0
 
 # Typing
 mypy
