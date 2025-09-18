@@ -31,15 +31,15 @@
                         <div class="person-info">
                             <h3>{{ person|person_name }}</h3>
                             <p class="person-dates">
-                                {% if person.birth_event %}
-                                    {% if person.birth_event.date %}
-                                        Born: {{ person.birth_event.date|format_date }}
+                                {% if person.birth %}
+                                    {% if person.birth.date %}
+                                        Born: {{ person.birth.date|date_format }}
                                     {% endif %}
                                 {% endif %}
                                 
-                                {% if person.death_event %}
-                                    {% if person.death_event.date %}
-                                        - Died: {{ person.death_event.date|format_date }}
+                                {% if person.death %}
+                                    {% if person.death.date %}
+                                        - Died: {{ person.death.date|date_format }}
                                     {% endif %}
                                 {% endif %}
                             </p>
@@ -66,14 +66,14 @@
                                                     </h5>
                                                     <p class="person-details">
                                                         <span class="sex-indicator">{{ ancestor|sex_symbol }}</span>
-                                                        {% if ancestor.birth_event %}
-                                                            {% if ancestor.birth_event.date %}
-                                                                Born: {{ ancestor.birth_event.date|format_date }}
+                                                        {% if ancestor.birth %}
+                                                            {% if ancestor.birth.date %}
+                                                                Born: {{ ancestor.birth.date|date_format }}
                                                             {% endif %}
                                                         {% endif %}
-                                                        {% if ancestor.death_event %}
-                                                            {% if ancestor.death_event.date %}
-                                                                - Died: {{ ancestor.death_event.date|format_date }}
+                                                        {% if ancestor.death %}
+                                                            {% if ancestor.death.date %}
+                                                                - Died: {{ ancestor.death.date|date_format }}
                                                             {% endif %}
                                                         {% endif %}
                                                     </p>

@@ -28,15 +28,15 @@
                         <div class="person-info">
                             <h3>{{ person|person_name }}</h3>
                             <p class="person-dates">
-                                {% if person.birth_event %}
-                                    {% if person.birth_event.date %}
-                                        Born: {{ person.birth_event.date|format_date }}
+                                {% if person.birth %}
+                                    {% if person.birth.date %}
+                                        Born: {{ person.birth.date|date_format }}
                                     {% endif %}
                                 {% endif %}
                                 
-                                {% if person.death_event %}
-                                    {% if person.death_event.date %}
-                                        - Died: {{ person.death_event.date|format_date }}
+                                {% if person.death %}
+                                    {% if person.death.date %}
+                                        - Died: {{ person.death.date|date_format }}
                                     {% endif %}
                                 {% endif %}
                             </p>
@@ -44,33 +44,41 @@
                     </div>
                     
                     {% if descendants %}
+                        <!-- Debug: Type et longueur de descendants -->
+                        <p>Debug: descendants type={{ descendants.__class__.__name__ }}, length={{ descendants|length }}</p>
                         <div class="children">
                             {% for generation in descendants %}
+                                <!-- Debug: Type de generation -->
+                                <p>Debug: generation type={{ generation.__class__.__name__ }}, is_list={{ generation is iterable }}</p>
                                 <div class="generation" data-generation="{{ loop.index }}">
                                     <h4>Generation {{ loop.index }}</h4>
                                     <div class="generation-members">
-                                        {% for descendant in generation %}
-                                            <div class="person-card descendant">
-                                                <div class="person-info">
-                                                    <h5>
-                                                        <a href="/person/{{ descendant.id }}">
-                                                            {{ descendant|person_name }}
-                                                        </a>
-                                                    </h5>
-                                                    <p class="person-details">
-                                                        <span class="sex-indicator">{{ descendant|sex_symbol }}</span>
-                                                        {% if descendant.birth_event %}
-                                                            {% if descendant.birth_event.date %}
-                                                                Born: {{ descendant.birth_event.date|format_date }}
+                                        {% if generation is iterable and generation.__class__.__name__ == 'list' %}
+                                            {% for descendant in generation %}
+                                                <div class="person-card descendant">
+                                                    <div class="person-info">
+                                                        <h5>
+                                                            <a href="/person/{{ descendant.id }}">
+                                                                {{ descendant|person_name }}
+                                                            </a>
+                                                        </h5>
+                                                        <p class="person-details">
+                                                            <span class="sex-indicator">{{ descendant|sex_symbol }}</span>
+                                                            {% if descendant.birth %}
+                                                                {% if descendant.birth.date %}
+                                                                    Born: {{ descendant.birth.date|date_format }}
+                                                                {% endif %}
                                                             {% endif %}
+                                                        </p>
+                                                        {% if descendant.occupation %}
+                                                            <p class="occupation">{{ descendant.occupation }}</p>
                                                         {% endif %}
-                                                    </p>
-                                                    {% if descendant.occupation %}
-                                                        <p class="occupation">{{ descendant.occupation }}</p>
-                                                    {% endif %}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        {% endfor %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <p>⚠️ Generation n'est pas une liste: {{ generation.__class__.__name__ }}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endfor %}

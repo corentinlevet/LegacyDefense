@@ -53,6 +53,22 @@
                 <span>{{ person.occupation }}</span>
             </div>
             {% endif %}
+            
+            {% if consanguinity and consanguinity.consanguinity > 0 %}
+            <div class="info-item consanguinity">
+                <strong><i class="fas fa-dna"></i> {{ _('consanguinity') }}:</strong>
+                <span>
+                    {{ (consanguinity.consanguinity * 100)|round(3) }}%
+                    {% if consanguinity.consanguinity >= 0.25 %}
+                        <span class="consanguinity-badge high">{{ _('high') }}</span>
+                    {% elif consanguinity.consanguinity >= 0.125 %}
+                        <span class="consanguinity-badge medium">{{ _('medium') }}</span>
+                    {% elif consanguinity.consanguinity > 0 %}
+                        <span class="consanguinity-badge low">{{ _('low') }}</span>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -95,6 +111,49 @@
         </div>
     </div>
 </div>
+
+<!-- Consanguinity Details -->
+{% if consanguinity and consanguinity.consanguinity > 0 %}
+<div class="card consanguinity-details">
+    <h3><i class="fas fa-dna"></i> {{ _('consanguinity_analysis') }}</h3>
+    <div class="consanguinity-info">
+        <div class="consanguinity-main">
+            <div class="consanguinity-value">
+                <span class="value">{{ (consanguinity.consanguinity * 100)|round(4) }}%</span>
+                <span class="description">{{ _('consanguinity_coefficient') }}</span>
+            </div>
+            <div class="consanguinity-interpretation">
+                {% if consanguinity.consanguinity >= 0.25 %}
+                    <p class="warning"><i class="fas fa-exclamation-triangle"></i> {{ _('high_consanguinity_warning') }}</p>
+                {% elif consanguinity.consanguinity >= 0.125 %}
+                    <p class="caution"><i class="fas fa-info-circle"></i> {{ _('medium_consanguinity_info') }}</p>
+                {% else %}
+                    <p class="normal"><i class="fas fa-check-circle"></i> {{ _('low_consanguinity_info') }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if consanguinity.common_ancestors %}
+        <div class="common-ancestors">
+            <h4><i class="fas fa-users"></i> {{ _('common_ancestors') }}</h4>
+            <p class="ancestor-count">{{ consanguinity.common_ancestors|length }} {{ _('common_ancestor_found') }}</p>
+            {% if consanguinity.relationship_paths %}
+            <div class="relationship-paths">
+                <h5>{{ _('relationship_paths') }}:</h5>
+                {% for path in consanguinity.relationship_paths %}
+                <div class="path-item">
+                    <i class="fas fa-route"></i>
+                    {{ _('through_ancestor') }} {{ path.common_ancestor_id }}
+                    ({{ _('distance') }}: {{ path.person1_distance + path.person2_distance }})
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 
 <!-- Family Relationships -->
 {% if parents or spouses or children %}
@@ -174,17 +233,20 @@
 <!-- Actions -->
 <div class="card">
     <h3><i class="fas fa-tools"></i> {{ _('actions') }}</h3>
-    <div class="grid grid-4">
-        <a href="{{ url_for('person_detail', id=person.id) }}/ancestors" class="btn btn-primary">
+    <div class="grid grid-5">
+        <a href="/persons/{{ person.id }}/ancestors" class="btn btn-primary">
             <i class="fas fa-arrow-up"></i> {{ _('view_ancestors') }}
         </a>
-        <a href="{{ url_for('person_detail', id=person.id) }}/descendants" class="btn btn-secondary">
+        <a href="/persons/{{ person.id }}/descendants" class="btn btn-secondary">
             <i class="fas fa-arrow-down"></i> {{ _('view_descendants') }}
         </a>
-        <a href="{{ url_for('search') }}" class="btn btn-success">
+        <a href="/persons/{{ person.id }}/relationships" class="btn btn-info">
+            <i class="fas fa-project-diagram"></i> {{ _('relationships') }}
+        </a>
+        <a href="/search" class="btn btn-success">
             <i class="fas fa-search"></i> {{ _('search') }}
         </a>
-        <a href="{{ url_for('home') }}" class="btn btn-primary">
+        <a href="/" class="btn btn-primary">
             <i class="fas fa-home"></i> {{ _('home') }}
         </a>
     </div>
@@ -233,6 +295,155 @@
         margin-right: 0.5rem;
         width: 16px;
         text-align: center;
+    }
+    
+    .info-item.consanguinity {
+        border-left-color: var(--warning-color);
+    }
+    
+    .consanguinity-badge {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-left: 0.5rem;
+    }
+    
+    .consanguinity-badge.high {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .consanguinity-badge.medium {
+        background-color: #f39c12;
+        color: white;
+    }
+    
+    .consanguinity-badge.low {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .consanguinity-details {
+        border-left: 4px solid var(--warning-color);
+    }
+    
+    .consanguinity-info {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+    
+    .consanguinity-main {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .consanguinity-value {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        border: 2px solid #dee2e6;
+    }
+    
+    .consanguinity-value .value {
+        display: block;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .consanguinity-value .description {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--muted-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .consanguinity-interpretation p {
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .consanguinity-interpretation .warning {
+        background-color: #ffeaa7;
+        color: #d63031;
+        border: 1px solid #fdcb6e;
+    }
+    
+    .consanguinity-interpretation .caution {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    .consanguinity-interpretation .normal {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .consanguinity-interpretation i {
+        margin-right: 0.5rem;
+    }
+    
+    .common-ancestors {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .common-ancestors h4 {
+        margin: 0 0 1rem 0;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+    }
+    
+    .ancestor-count {
+        margin: 0 0 1rem 0;
+        font-weight: 500;
+        color: var(--secondary-color);
+    }
+    
+    .relationship-paths h5 {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.95rem;
+        color: var(--primary-color);
+    }
+    
+    .path-item {
+        background: white;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 6px;
+        border-left: 3px solid var(--accent-color);
+        font-size: 0.9rem;
+    }
+    
+    .path-item i {
+        margin-right: 0.5rem;
+        color: var(--accent-color);
+    }
+    
+    @media (max-width: 768px) {
+        .consanguinity-info {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .consanguinity-value .value {
+            font-size: 2rem;
+        }
     }
     
     .timeline {

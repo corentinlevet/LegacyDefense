@@ -26,5 +26,19 @@
   "enter_name_to_search": "Enter name to search",
   "search_results_for": "Search results for",
   "found": "found",
-  "no_results_found": "No results found"
+  "no_results_found": "No results found",
+  "consanguinity": "Consanguinity",
+  "high": "High",
+  "medium": "Medium",
+  "low": "Low",
+  "consanguinity_analysis": "Consanguinity Analysis",
+  "consanguinity_coefficient": "Consanguinity Coefficient",
+  "high_consanguinity_warning": "High consanguinity detected. Parents share close common ancestors.",
+  "medium_consanguinity_info": "Moderate consanguinity. Parents have common ancestors.",
+  "low_consanguinity_info": "Low consanguinity. Distant family relationship between parents.",
+  "common_ancestors": "Common Ancestors",
+  "common_ancestor_found": "common ancestor(s) found",
+  "relationship_paths": "Relationship Paths",
+  "through_ancestor": "Through ancestor",
+  "distance": "distance"
 }

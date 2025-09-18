@@ -35,14 +35,19 @@ class GeneWebApp:
         self.db_manager.create_tables()
         
         # Template setup
-        self.template_env = initialize_templates("templates", "locales")
+        import os
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        templates_dir = os.path.join(base_dir, "templates")
+        locales_dir = os.path.join(base_dir, "locales")
+        self.template_env = initialize_templates(templates_dir, locales_dir)
         
         # Algorithms
         self.algorithms = GenealogyAlgorithms(self.db_manager)
         
         # Static files
-        os.makedirs("static", exist_ok=True)
-        self.app.mount("/static", StaticFiles(directory="static"), name="static")
+        static_dir = os.path.join(base_dir, "static")
+        os.makedirs(static_dir, exist_ok=True)
+        self.app.mount("/static", StaticFiles(directory=static_dir), name="static")
         
         # Setup routes
         self._setup_routes()
@@ -155,12 +160,25 @@ class GeneWebApp:
                 ).all()
                 children.extend(family_children)
             
+            # Calculate consanguinity
+            consanguinity_result = None
+            try:
+                consanguinity_result = self.algorithms.calculate_consanguinity_advanced(db, person_id)
+            except Exception as e:
+                # En cas d'erreur (boucles, etc.), on utilise l'algorithme de base
+                try:
+                    consanguinity_result = self.algorithms.calculate_consanguinity(db, person_id)
+                except Exception:
+                    # Si même l'algorithme de base échoue, on met 0
+                    consanguinity_result = None
+            
             context = {
                 "request": request,
                 "person": person,
                 "parents": parents,
                 "spouses": spouses,
-                "children": children
+                "children": children,
+                "consanguinity": consanguinity_result
             }
             
             return HTMLResponse(self.template_env.render_template("person_detail.html", **context))
@@ -221,18 +239,100 @@ class GeneWebApp:
             if not person:
                 raise HTTPException(status_code=404, detail="Person not found")
             
-            # Get descendants
-            descendant_ids = self.algorithms.get_descendants(db, person_id, generations)
-            descendants = db.query(PersonORM).filter(PersonORM.id.in_(descendant_ids)).all()
+            # Get descendants organized by generation
+            descendants_by_generation = self.algorithms.get_descendants_by_generation(db, person_id, generations)
             
             context = {
                 "request": request,
                 "person": person,
-                "descendants": descendants,
+                "descendants": descendants_by_generation,
                 "generations": generations
             }
             
             return HTMLResponse(self.template_env.render_template("descendants.html", **context))
+        
+        @self.app.get("/persons/{person_id}/relationships", response_class=HTMLResponse)
+        async def person_relationships(
+            request: Request,
+            person_id: int,
+            db: Session = Depends(self.get_db)
+        ):
+            """Show person's family relationships and genealogical context."""
+            person = db.query(PersonORM).filter(PersonORM.id == person_id).first()
+            if not person:
+                raise HTTPException(status_code=404, detail="Person not found")
+            
+            # Get complete family context
+            family_context = self.algorithms.get_person_family_context(db, person_id)
+            
+            # Find consanguinity information if person has consanguinity > 0
+            consanguinity_info = None
+            if person.consang > 0:
+                try:
+                    consanguinity_result = self.algorithms.calculate_consanguinity_advanced(db, person_id)
+                    consanguinity_info = {
+                        'consanguinity': consanguinity_result.consanguinity,
+                        'common_ancestors': list(consanguinity_result.common_ancestors),
+                        'relationship_paths': consanguinity_result.relationship_paths
+                    }
+                    
+                    # Get details about common ancestors
+                    if consanguinity_result.common_ancestors:
+                        ancestor_details = db.query(PersonORM).filter(
+                            PersonORM.id.in_(consanguinity_result.common_ancestors)
+                        ).all()
+                        consanguinity_info['ancestor_details'] = ancestor_details
+                        
+                        # Get detailed relationship paths to common ancestors
+                        detailed_paths = []
+                        for ancestor_id in list(consanguinity_result.common_ancestors)[:5]:  # Limit to 5 ancestors
+                            paths = self.algorithms.find_detailed_relationship_paths(db, person_id, ancestor_id)
+                            if paths:
+                                ancestor = db.query(PersonORM).filter(PersonORM.id == ancestor_id).first()
+                                detailed_paths.append({
+                                    'ancestor': ancestor,
+                                    'paths': paths
+                                })
+                        consanguinity_info['detailed_paths'] = detailed_paths
+                        
+                except Exception as e:
+                    print(f"Error calculating consanguinity details for person {person_id}: {e}")
+                    consanguinity_info = None
+            
+            context = {
+                "request": request,
+                "person": person,
+                "family_context": family_context,
+                "consanguinity_info": consanguinity_info
+            }
+            
+            return HTMLResponse(self.template_env.render_template("relationships.html", **context))
+        
+        @self.app.get("/persons/{person1_id}/relationship_with/{person2_id}", response_class=HTMLResponse)
+        async def relationship_between_persons(
+            request: Request,
+            person1_id: int,
+            person2_id: int,
+            db: Session = Depends(self.get_db)
+        ):
+            """Show detailed relationship between two specific persons."""
+            person1 = db.query(PersonORM).filter(PersonORM.id == person1_id).first()
+            person2 = db.query(PersonORM).filter(PersonORM.id == person2_id).first()
+            
+            if not person1 or not person2:
+                raise HTTPException(status_code=404, detail="Person not found")
+            
+            # Find relationship summary
+            relationship_summary = self.algorithms.find_relationship_summary(db, person1_id, person2_id)
+            
+            context = {
+                "request": request,
+                "person1": person1,
+                "person2": person2,
+                "relationship_summary": relationship_summary
+            }
+            
+            return HTMLResponse(self.template_env.render_template("relationship_between.html", **context))
         
         @self.app.get("/families", response_class=HTMLResponse)
         async def families_list(
@@ -284,9 +384,45 @@ class GeneWebApp:
             return HTMLResponse(self.template_env.render_template("search.html", **context))
         
         @self.app.get("/statistics", response_class=HTMLResponse)
-        async def statistics(request: Request, db: Session = Depends(self.get_db)):
+        async def statistics(
+            request: Request, 
+            db: Session = Depends(self.get_db),
+            message: str = "",
+            success: bool = True
+        ):
             """Statistics page."""
             stats = self.algorithms.get_statistics(db)
+            
+            # Calculate consanguinity statistics
+            consanguinity_stats = {}
+            try:
+                # Get all persons with consanguinity > 0
+                persons_with_consanguinity = db.query(PersonORM).filter(
+                    PersonORM.consang > 0
+                ).all()
+                
+                total_persons = db.query(PersonORM).count()
+                
+                consanguinity_stats = {
+                    'total_with_consanguinity': len(persons_with_consanguinity),
+                    'percentage_with_consanguinity': (len(persons_with_consanguinity) / total_persons * 100) if total_persons > 0 else 0,
+                    'high_consanguinity': len([p for p in persons_with_consanguinity if p.consang >= 0.25]),
+                    'medium_consanguinity': len([p for p in persons_with_consanguinity if 0.125 <= p.consang < 0.25]),
+                    'low_consanguinity': len([p for p in persons_with_consanguinity if 0 < p.consang < 0.125]),
+                    'average_consanguinity': sum(p.consang for p in persons_with_consanguinity) / len(persons_with_consanguinity) if persons_with_consanguinity else 0,
+                    'max_consanguinity': max(p.consang for p in persons_with_consanguinity) if persons_with_consanguinity else 0
+                }
+            except Exception as e:
+                print(f"Error calculating consanguinity stats: {e}")
+                consanguinity_stats = {
+                    'total_with_consanguinity': 0,
+                    'percentage_with_consanguinity': 0,
+                    'high_consanguinity': 0,
+                    'medium_consanguinity': 0,
+                    'low_consanguinity': 0,
+                    'average_consanguinity': 0,
+                    'max_consanguinity': 0
+                }
             
             # Get additional statistics
             stats.update({
@@ -298,14 +434,43 @@ class GeneWebApp:
                     .first(),
                 'most_children': None,  # TODO: Calculate
                 'most_common_surnames': [],  # TODO: Calculate
+                'consanguinity': consanguinity_stats
             })
             
             context = {
                 "request": request,
-                "stats": stats
+                "stats": stats,
+                "message": message,
+                "success": success
             }
             
             return HTMLResponse(self.template_env.render_template("statistics.html", **context))
+        
+        @self.app.post("/compute/consanguinity")
+        async def compute_consanguinity(
+            request: Request, 
+            db: Session = Depends(self.get_db)
+        ):
+            """Compute consanguinity for all persons."""
+            try:
+                results = self.algorithms.compute_all_consanguinity_advanced(
+                    db, 
+                    from_scratch=True, 
+                    verbosity=1
+                )
+                
+                message = f"Consanguinité calculée pour {len(results)} personnes"
+                success = True
+                
+            except Exception as e:
+                message = f"Erreur lors du calcul de consanguinité: {str(e)}"
+                success = False
+            
+            # Redirect back to statistics with message
+            return RedirectResponse(
+                url=f"/statistics?message={message}&success={success}", 
+                status_code=303
+            )
         
         @self.app.get("/import", response_class=HTMLResponse)
         async def import_page(request: Request):
