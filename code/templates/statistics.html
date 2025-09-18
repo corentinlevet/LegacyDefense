@@ -144,6 +144,92 @@
 </div>
 {% endif %}
 
+<!-- Consanguinity Analysis -->
+{% if stats.consanguinity %}
+<div class="card consanguinity-stats">
+    <h3><i class="fas fa-dna"></i> Consanguinity Analysis</h3>
+    
+    {% if message %}
+    <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+        <i class="fas {{ 'fa-check' if success else 'fa-exclamation-triangle' }}"></i>
+        {{ message }}
+    </div>
+    {% endif %}
+    
+    <div class="grid grid-3">
+        <div class="stat-item consanguinity-total">
+            <div class="stat-number">{{ stats.consanguinity.total_with_consanguinity }}</div>
+            <div class="stat-label">
+                <i class="fas fa-users"></i> 
+                Persons with Consanguinity
+            </div>
+            <div class="stat-sublabel">
+                {{ stats.consanguinity.percentage_with_consanguinity|round(1) }}% of total
+            </div>
+        </div>
+        
+        <div class="stat-item consanguinity-avg">
+            <div class="stat-number">{{ (stats.consanguinity.average_consanguinity * 100)|round(3) }}%</div>
+            <div class="stat-label">
+                <i class="fas fa-calculator"></i> 
+                Average Coefficient
+            </div>
+        </div>
+        
+        <div class="stat-item consanguinity-max">
+            <div class="stat-number">{{ (stats.consanguinity.max_consanguinity * 100)|round(3) }}%</div>
+            <div class="stat-label">
+                <i class="fas fa-arrow-up"></i> 
+                Maximum Coefficient
+            </div>
+        </div>
+    </div>
+    
+    <div class="consanguinity-breakdown">
+        <h4><i class="fas fa-chart-pie"></i> Consanguinity Distribution</h4>
+        <div class="grid grid-3">
+            <div class="consanguinity-level high">
+                <div class="level-count">{{ stats.consanguinity.high_consanguinity }}</div>
+                <div class="level-label">High (≥25%)</div>
+                <div class="level-bar">
+                    {% set high_percentage = (stats.consanguinity.high_consanguinity / stats.consanguinity.total_with_consanguinity * 100) if stats.consanguinity.total_with_consanguinity > 0 else 0 %}
+                    <div class="level-fill high-fill" style="width: {{ high_percentage|round(1) }}%"></div>
+                </div>
+            </div>
+            
+            <div class="consanguinity-level medium">
+                <div class="level-count">{{ stats.consanguinity.medium_consanguinity }}</div>
+                <div class="level-label">Medium (12.5-25%)</div>
+                <div class="level-bar">
+                    {% set medium_percentage = (stats.consanguinity.medium_consanguinity / stats.consanguinity.total_with_consanguinity * 100) if stats.consanguinity.total_with_consanguinity > 0 else 0 %}
+                    <div class="level-fill medium-fill" style="width: {{ medium_percentage|round(1) }}%"></div>
+                </div>
+            </div>
+            
+            <div class="consanguinity-level low">
+                <div class="level-count">{{ stats.consanguinity.low_consanguinity }}</div>
+                <div class="level-label">Low (<12.5%)</div>
+                <div class="level-bar">
+                    {% set low_percentage = (stats.consanguinity.low_consanguinity / stats.consanguinity.total_with_consanguinity * 100) if stats.consanguinity.total_with_consanguinity > 0 else 0 %}
+                    <div class="level-fill low-fill" style="width: {{ low_percentage|round(1) }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="consanguinity-actions">
+        <form method="post" action="/compute/consanguinity" style="display: inline;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-calculator"></i> Recalculate All Consanguinity
+            </button>
+        </form>
+        <small class="text-muted">
+            This will recalculate consanguinity for all persons using the advanced algorithm
+        </small>
+    </div>
+</div>
+{% endif %}
+
 <!-- Data Quality -->
 <div class="card">
     <h3><i class="fas fa-check-circle"></i> Data Quality</h3>
@@ -310,6 +396,155 @@
         margin-right: 0.5rem;
         width: 16px;
         text-align: center;
+    }
+    
+    /* Consanguinity Styles */
+    .consanguinity-stats {
+        border-left: 4px solid #e74c3c;
+    }
+    
+    .consanguinity-total .stat-number {
+        color: #e74c3c;
+    }
+    
+    .consanguinity-avg .stat-number {
+        color: #f39c12;
+    }
+    
+    .consanguinity-max .stat-number {
+        color: #8e44ad;
+    }
+    
+    .stat-sublabel {
+        font-size: 0.8rem;
+        color: var(--muted-color);
+        margin-top: 0.25rem;
+    }
+    
+    .consanguinity-breakdown {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .consanguinity-breakdown h4 {
+        margin: 0 0 1.5rem 0;
+        color: var(--primary-color);
+    }
+    
+    .consanguinity-level {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .consanguinity-level:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .level-count {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .level-label {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+    
+    .level-bar {
+        position: relative;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .level-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+        border-radius: 4px;
+    }
+    
+    .high-fill {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+    }
+    
+    .medium-fill {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+    }
+    
+    .low-fill {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+    }
+    
+    .consanguinity-level.high .level-count {
+        color: #e74c3c;
+    }
+    
+    .consanguinity-level.medium .level-count {
+        color: #f39c12;
+    }
+    
+    .consanguinity-level.low .level-count {
+        color: #27ae60;
+    }
+    
+    .consanguinity-actions {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #dee2e6;
+        text-align: center;
+    }
+    
+    .consanguinity-actions .btn {
+        margin-right: 1rem;
+    }
+    
+    .consanguinity-actions small {
+        display: block;
+        margin-top: 1rem;
+        color: var(--muted-color);
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border: 1px solid;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+    
+    @media (max-width: 768px) {
+        .consanguinity-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .consanguinity-actions .btn {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
     }
 </style>
 {% endblock %}
