@@ -50,7 +50,7 @@
     <div class="alphabet-nav">
         <div class="alphabet-letters">
             {% for letter in range(65, 91) %}
-                {% set char = letter|chr %}
+                {% set char = letter %}
                 <a href="#letter-{{ char }}" class="letter-link" data-letter="{{ char }}">{{ char }}</a>
             {% endfor %}
             <a href="#letter-other" class="letter-link" data-letter="other">Other</a>
