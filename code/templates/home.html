@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}GeneWeb - Modern Family Tree Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Welcome to GeneWeb</h1>
+    <p class="page-subtitle">Discover your family history with modern genealogy tools</p>
+</div>
+
+<div class="grid grid-3">
+    <!-- Quick Stats Card -->
+    <div class="card pulse">
+        <h3><i class="fas fa-chart-line"></i> Quick Statistics</h3>
+        <div class="stat-item">
+            <div class="stat-number">{{ total_persons or 0 }}</div>
+            <div class="stat-label">Total Persons</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ total_families or 0 }}</div>
+            <div class="stat-label">Families</div>
+        </div>
+        <a href="/statistics" class="btn btn-primary">
+            <i class="fas fa-chart-bar"></i> View Details
+        </a>
+    </div>
+
+    <!-- Browse People Card -->
+    <div class="card">
+        <h3><i class="fas fa-users"></i> Browse People</h3>
+        <p>Explore all persons in your family tree. View detailed information, relationships, and family connections.</p>
+        <div style="margin-top: 1.5rem;">
+            <a href="/persons" class="btn btn-secondary">
+                <i class="fas fa-search"></i> Browse Persons
+            </a>
+        </div>
+        {% if recent_persons %}
+        <div style="margin-top: 1.5rem;">
+            <h4>Recently Added:</h4>
+            {% for person in recent_persons[:3] %}
+            <div style="margin: 0.5rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">
+                <strong>{{ person.first_name }} {{ person.surname }}</strong>
+                {% if person.birth_date %}
+                <br><small><i class="fas fa-birthday-cake"></i> Born: {{ person.birth_date }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Family Connections Card -->
+    <div class="card">
+        <h3><i class="fas fa-heart"></i> Family Connections</h3>
+        <p>Discover family relationships, marriages, and lineages that connect your ancestors.</p>
+        <div style="margin-top: 1.5rem;">
+            <a href="/families" class="btn btn-success">
+                <i class="fas fa-sitemap"></i> View Families
+            </a>
+        </div>
+        {% if total_families and total_families > 0 %}
+        <div style="margin-top: 1.5rem;">
+            <div style="background: #e8f5e8; padding: 1rem; border-radius: 6px;">
+                <strong><i class="fas fa-info-circle"></i> Family Insights</strong>
+                <br>Your tree contains {{ total_families }} family units
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Search Section -->
+<div class="card" style="margin-top: 2rem;">
+    <h2><i class="fas fa-search"></i> Quick Search</h2>
+    <p>Find specific persons or families in your genealogy database</p>
+    
+    <form action="/search" method="GET" style="margin-top: 1.5rem;">
+        <div class="grid grid-2">
+            <div class="form-group">
+                <input type="text" 
+                       name="query" 
+                       class="form-control" 
+                       placeholder="Enter name to search..."
+                       style="margin-bottom: 0;">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fas fa-search"></i> Search Family Tree
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Features Section -->
+<div class="grid grid-2" style="margin-top: 2rem;">
+    <div class="card">
+        <h3><i class="fas fa-upload"></i> Import Data</h3>
+        <p>Import your genealogy data from GEDCOM files or other family tree formats.</p>
+        <a href="/import" class="btn btn-primary">
+            <i class="fas fa-file-import"></i> Import Data
+        </a>
+    </div>
+
+    <div class="card">
+        <h3><i class="fas fa-download"></i> Export Data</h3>
+        <p>Export your family tree data in various formats for backup or sharing.</p>
+        <a href="/export" class="btn btn-primary">
+            <i class="fas fa-file-export"></i> Export Data
+        </a>
+    </div>
+</div>
+
+<!-- Recent Persons Section -->
+{% if recent_persons %}
+<div class="card" style="margin-top: 2rem;">
+    <h2><i class="fas fa-clock"></i> Recent Additions</h2>
+    <div class="grid grid-2">
+        {% for person in recent_persons %}
+        <div class="person-card">
+            <div class="person-name">{{ person.first_name }} {{ person.surname }}</div>
+            <div class="person-details">
+                {% if person.birth_date %}
+                <i class="fas fa-birthday-cake"></i> Born: {{ person.birth_date }}
+                {% endif %}
+                {% if person.death_date %}
+                <br><i class="fas fa-cross"></i> Died: {{ person.death_date }}
+                {% endif %}
+                {% if not person.birth_date and not person.death_date %}
+                <i class="fas fa-user"></i> Person in database
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="card" style="margin-top: 2rem; text-align: center;">
+    <h2><i class="fas fa-plus-circle"></i> Get Started</h2>
+    <p>Your family tree is empty. Start by adding your first person or importing existing data.</p>
+    <div style="margin-top: 1.5rem;">
+        <a href="/persons" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Add First Person
+        </a>
+        <a href="/import" class="btn btn-secondary" style="margin-left: 1rem;">
+            <i class="fas fa-file-import"></i> Import Data
+        </a>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 3rem 0;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 12px;
+        margin-bottom: 3rem;
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .quick-action {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Surnames{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-main">
+                <h1><i class="fas fa-users"></i> Surnames</h1>
+                <p class="lead">Browse all family names in the genealogy database</p>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" id="surname-search" placeholder="Search surnames..." 
+                           class="form-control" onkeyup="filterSurnames()">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number">{{ surnames|length }}</div>
+            <div class="stat-label">Total Surnames</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">
+                {% set total_persons = surnames|map(attribute='1')|sum %}
+                {{ total_persons }}
+            </div>
+            <div class="stat-label">Total Persons</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">
+                {% if surnames %}
+                    {{ (surnames|map(attribute='1')|sum / surnames|length)|round(1) }}
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+            <div class="stat-label">Average per Surname</div>
+        </div>
+    </div>
+
+    <!-- Alphabet Navigation -->
+    <div class="alphabet-nav">
+        <div class="alphabet-letters">
+            {% for letter in range(65, 91) %}
+                {% set char = letter|chr %}
+                <a href="#letter-{{ char }}" class="letter-link" data-letter="{{ char }}">{{ char }}</a>
+            {% endfor %}
+            <a href="#letter-other" class="letter-link" data-letter="other">Other</a>
+        </div>
+    </div>
+
+    <!-- Surnames List -->
+    <div class="surnames-container">
+        {% if surnames %}
+            {% set current_letter = '' %}
+            {% for surname, count in surnames|sort %}
+                {% set first_letter = surname[0]|upper if surname else 'Other' %}
+                {% if first_letter != current_letter %}
+                    {% if current_letter != '' %}
+                        </div> <!-- Close previous letter section -->
+                    {% endif %}
+                    {% set current_letter = first_letter %}
+                    <div class="letter-section" id="letter-{{ first_letter }}">
+                        <h2 class="letter-header">{{ first_letter }}</h2>
+                        <div class="surnames-grid">
+                {% endif %}
+                
+                <div class="surname-card" data-surname="{{ surname|lower }}">
+                    <div class="surname-info">
+                        <h3 class="surname-name">
+                            <a href="/persons?surname={{ surname|urlencode }}">{{ surname }}</a>
+                        </h3>
+                        <div class="surname-stats">
+                            <span class="person-count">
+                                <i class="fas fa-user{% if count > 1 %}s{% endif %}"></i>
+                                {{ count }} person{% if count != 1 %}s{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="surname-actions">
+                        <a href="/persons?surname={{ surname|urlencode }}" 
+                           class="btn btn-sm btn-outline" title="View all persons with this surname">
+                            <i class="fas fa-list"></i>
+                        </a>
+                        <a href="/search?q={{ surname|urlencode }}" 
+                           class="btn btn-sm btn-outline" title="Search for this surname">
+                            <i class="fas fa-search"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+            {% if current_letter != '' %}
+                </div> <!-- Close last letter section -->
+            {% endif %}
+        {% else %}
+            <div class="no-data">
+                <div class="no-data-content">
+                    <i class="fas fa-users fa-3x"></i>
+                    <h3>No Surnames Found</h3>
+                    <p>No surnames have been recorded in the database yet.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function filterSurnames() {
+    const searchTerm = document.getElementById('surname-search').value.toLowerCase();
+    const surnameCards = document.querySelectorAll('.surname-card');
+    
+    surnameCards.forEach(card => {
+        const surname = card.dataset.surname;
+        if (surname.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Hide/show letter sections based on visible cards
+    document.querySelectorAll('.letter-section').forEach(section => {
+        const visibleCards = section.querySelectorAll('.surname-card[style="display: block"], .surname-card:not([style*="display: none"])');
+        if (visibleCards.length === 0) {
+            section.style.display = 'none';
+        } else {
+            section.style.display = 'block';
+        }
+    });
+}
+
+// Smooth scrolling for alphabet navigation
+document.querySelectorAll('.letter-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+</script>
+
+<style>
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.alphabet-nav {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+}
+
+.alphabet-letters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.letter-link {
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    text-align: center;
+    background: #f8f9fa;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.letter-link:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.surnames-container {
+    margin-top: 2rem;
+}
+
+.letter-section {
+    margin-bottom: 3rem;
+}
+
+.letter-header {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+}
+
+.surnames-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.surname-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.surname-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.surname-info {
+    flex-grow: 1;
+}
+
+.surname-name {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.surname-name a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.surname-name a:hover {
+    color: var(--primary-color);
+}
+
+.surname-stats {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.person-count {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.surname-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    min-width: auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-box {
+    position: relative;
+    max-width: 300px;
+}
+
+.search-box input {
+    padding-right: 2.5rem;
+}
+
+.search-box i {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.no-data {
+    text-align: center;
+    padding: 4rem;
+}
+
+.no-data-content i {
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+.no-data-content h3 {
+    color: #666;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.no-data-content p {
+    color: #888;
+}
+
+@media (max-width: 768px) {
+    .alphabet-letters {
+        gap: 0.25rem;
+    }
+    
+    .letter-link {
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 0.85rem;
+    }
+    
+    .surnames-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .surname-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .surname-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+</style>
+{% endblock %}
