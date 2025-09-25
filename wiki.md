@@ -356,5 +356,3 @@ python -m uvicorn core.webapp:app --reload --host 0.0.0.0 --port 8000
 ✅ **Déploiement Simplifié** : Installation en une commande Docker
 
 ✅ **Évolutivité** : Base de code Python maintenable et extensible
-
-**Le projet Geneweb Python est maintenant prêt pour la production et l'utilisation par la communauté généalogique !**

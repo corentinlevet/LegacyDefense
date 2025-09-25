@@ -7,6 +7,7 @@ for all major components of the GeneWeb Python port.
 import pytest
 import tempfile
 import os
+import time
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -33,8 +34,13 @@ def temp_db():
     
     yield db_manager
     
-    # Cleanup
-    os.unlink(temp_file.name)
+    # Cleanup - Close database connections first
+    try:
+        db_manager.engine.dispose()  # Close all database connections
+        time.sleep(0.1)  # Small delay to ensure files are closed
+        os.unlink(temp_file.name)
+    except (PermissionError, FileNotFoundError):
+        pass  # Ignore if file can't be deleted on Windows
 
 
 @pytest.fixture

@@ -8,6 +8,7 @@ behavior and guide development.
 import pytest
 import tempfile
 import os
+import time
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -29,8 +30,13 @@ def temp_db():
     
     yield db_manager
     
-    # Cleanup
-    os.unlink(temp_file.name)
+    # Cleanup - Close database connections first
+    try:
+        db_manager.engine.dispose()  # Close all database connections
+        time.sleep(0.1)  # Small delay to ensure files are closed
+        os.unlink(temp_file.name)
+    except (PermissionError, FileNotFoundError):
+        pass  # Ignore if file can't be deleted on Windows
 
 
 class TestSosaNumbering:
@@ -87,7 +93,7 @@ class TestSosaNumbering:
         child = father.child()
         
         assert child.value == 3
-        assert child.generation() == 0  # One generation down
+        assert child.generation() == 1  # Child is closer to root (higher in hierarchy)
         
         mother = SosaNumber(7)
         child = mother.child()
@@ -200,7 +206,9 @@ class TestConsanguinityCalculation:
             result = algorithms.calculate_consanguinity(session, 5)
             
             assert result.person_id == 5
-            assert abs(result.consanguinity - 0.125) < 0.001  # 1/8 for sibling parents
+            # For siblings with TWO common ancestors (both grandparents):
+            # Consanguinity = (1/2)^3 + (1/2)^3 = 1/8 + 1/8 = 1/4 = 0.25
+            assert abs(result.consanguinity - 0.25) < 0.001  # 1/4 for sibling parents with 2 common ancestors
             assert len(result.relationship_paths) > 0
             assert len(result.common_ancestors) > 0
             
