@@ -272,7 +272,7 @@ stateDiagram-v2
 
 ## 4. Architecture de Test
 
-### 4.1 Stratégie TDD Multi-niveaux
+### 4.1 Stratégie Multi-niveaux
 
 ```mermaid
 graph TD
