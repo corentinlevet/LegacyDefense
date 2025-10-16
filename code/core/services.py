@@ -244,7 +244,7 @@ class GenealogyService:
         self.session = session
         self.algorithms = GenealogyAlgorithms(session)
         self.relationship_detector = RelationshipDetector(session)
-        self.sosa_calculator = SosaCalculator(session)
+        self.sosa_calculator = SosaCalculator()
 
     def calculate_consanguinity(
         self, person_id: int, use_cache: bool = True
