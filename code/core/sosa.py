@@ -592,7 +592,7 @@ class SosaCalculator:
                 )
                 if person:
                     name = f"{person.first_name} {person.surname}"
-                    sex_indicator = "♂" if person.sex.value == "male" else "♀"
+                    sex_value = getattr(person.sex, "value", person.sex)
                     lines.append(
                         f"  [{sosa.to_string_sep()}] {sex_indicator} {name}"
                     )
