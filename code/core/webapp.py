@@ -53,6 +53,10 @@ class GeneWebApp:
 
         # Setup routes
         self._setup_routes()
+        
+        # Add tree visualization routes
+        from .tree_routes import add_tree_routes
+        add_tree_routes(self)
 
     def get_db(self):
         """Database dependency."""

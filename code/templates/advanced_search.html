@@ -1,0 +1,557 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Search - GeneWeb{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title"><i class="fas fa-search"></i> Advanced Search</h1>
+    <p class="page-subtitle">Find persons using multiple criteria</p>
+</div>
+
+<div class="search-container">
+    <!-- Search Form -->
+    <div class="card search-form">
+        <h3><i class="fas fa-filter"></i> Search Criteria</h3>
+        <form method="GET" action="{{ url_for('advanced_search') }}" id="searchForm">
+            <div class="grid grid-2">
+                <!-- Name Search -->
+                <div class="form-group">
+                    <label for="first_name"><i class="fas fa-user"></i> First Name</label>
+                    <input 
+                        type="text" 
+                        id="first_name" 
+                        name="first_name" 
+                        placeholder="Enter first name..."
+                        value="{{ request.args.get('first_name', '') }}"
+                        class="form-control">
+                    <div class="form-hint">
+                        <input type="checkbox" id="fuzzy_first_name" name="fuzzy_first_name" 
+                               {{ 'checked' if request.args.get('fuzzy_first_name') else '' }}>
+                        <label for="fuzzy_first_name">Fuzzy matching</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="surname"><i class="fas fa-signature"></i> Surname</label>
+                    <input 
+                        type="text" 
+                        id="surname" 
+                        name="surname" 
+                        placeholder="Enter surname..."
+                        value="{{ request.args.get('surname', '') }}"
+                        class="form-control">
+                    <div class="form-hint">
+                        <input type="checkbox" id="fuzzy_surname" name="fuzzy_surname"
+                               {{ 'checked' if request.args.get('fuzzy_surname') else '' }}>
+                        <label for="fuzzy_surname">Fuzzy matching</label>
+                    </div>
+                </div>
+
+                <!-- Date Search -->
+                <div class="form-group">
+                    <label for="birth_year_from"><i class="fas fa-birthday-cake"></i> Birth Year (From)</label>
+                    <input 
+                        type="number" 
+                        id="birth_year_from" 
+                        name="birth_year_from" 
+                        placeholder="e.g., 1800"
+                        value="{{ request.args.get('birth_year_from', '') }}"
+                        class="form-control"
+                        min="1000"
+                        max="2100">
+                </div>
+
+                <div class="form-group">
+                    <label for="birth_year_to"><i class="fas fa-birthday-cake"></i> Birth Year (To)</label>
+                    <input 
+                        type="number" 
+                        id="birth_year_to" 
+                        name="birth_year_to" 
+                        placeholder="e.g., 1900"
+                        value="{{ request.args.get('birth_year_to', '') }}"
+                        class="form-control"
+                        min="1000"
+                        max="2100">
+                </div>
+
+                <!-- Place Search -->
+                <div class="form-group">
+                    <label for="birth_place"><i class="fas fa-map-marker-alt"></i> Birth Place</label>
+                    <input 
+                        type="text" 
+                        id="birth_place" 
+                        name="birth_place" 
+                        placeholder="City, Country..."
+                        value="{{ request.args.get('birth_place', '') }}"
+                        class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="death_place"><i class="fas fa-map-marker-alt"></i> Death Place</label>
+                    <input 
+                        type="text" 
+                        id="death_place" 
+                        name="death_place" 
+                        placeholder="City, Country..."
+                        value="{{ request.args.get('death_place', '') }}"
+                        class="form-control">
+                </div>
+
+                <!-- Other Criteria -->
+                <div class="form-group">
+                    <label for="occupation"><i class="fas fa-briefcase"></i> Occupation</label>
+                    <input 
+                        type="text" 
+                        id="occupation" 
+                        name="occupation" 
+                        placeholder="e.g., Farmer, Merchant..."
+                        value="{{ request.args.get('occupation', '') }}"
+                        class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="sex"><i class="fas fa-venus-mars"></i> Sex</label>
+                    <select id="sex" name="sex" class="form-control">
+                        <option value="">Any</option>
+                        <option value="M" {{ 'selected' if request.args.get('sex') == 'M' else '' }}>Male</option>
+                        <option value="F" {{ 'selected' if request.args.get('sex') == 'F' else '' }}>Female</option>
+                        <option value="U" {{ 'selected' if request.args.get('sex') == 'U' else '' }}>Unknown</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="advanced-options">
+                <h4><i class="fas fa-cogs"></i> Advanced Options</h4>
+                
+                <div class="form-group">
+                    <input type="checkbox" id="soundex" name="soundex"
+                           {{ 'checked' if request.args.get('soundex') else '' }}>
+                    <label for="soundex">
+                        <i class="fas fa-volume-up"></i> 
+                        Phonetic Search (Soundex)
+                        <span class="hint">Find similar sounding names</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="living_only" name="living_only"
+                           {{ 'checked' if request.args.get('living_only') else '' }}>
+                    <label for="living_only">
+                        <i class="fas fa-heartbeat"></i> 
+                        Living Persons Only
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="consanguinity_min">
+                        <i class="fas fa-dna"></i> Minimum Consanguinity:
+                    </label>
+                    <input 
+                        type="range" 
+                        id="consanguinity_min" 
+                        name="consanguinity_min" 
+                        min="0" 
+                        max="0.5" 
+                        step="0.01"
+                        value="{{ request.args.get('consanguinity_min', 0) }}"
+                        oninput="this.nextElementSibling.value = (this.value * 100).toFixed(1) + '%'">
+                    <output>0%</output>
+                </div>
+
+                <div class="form-group">
+                    <label for="results_per_page"><i class="fas fa-list"></i> Results per page:</label>
+                    <select id="results_per_page" name="limit" class="form-control">
+                        <option value="10" {{ 'selected' if request.args.get('limit') == '10' else '' }}>10</option>
+                        <option value="25" {{ 'selected' if request.args.get('limit') == '25' else '' }}>25</option>
+                        <option value="50" {{ 'selected' if request.args.get('limit') == '50' else '' }}>50</option>
+                        <option value="100" {{ 'selected' if request.args.get('limit') == '100' else '' }}>100</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button type="button" class="btn btn-info" id="saveSearchBtn">
+                    <i class="fas fa-save"></i> Save Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    {% if results is defined %}
+    <div class="card search-results">
+        <div class="results-header">
+            <h3>
+                <i class="fas fa-list"></i> 
+                Search Results
+                <span class="results-count">{{ results|length }} found</span>
+            </h3>
+            
+            {% if results|length > 0 %}
+            <div class="export-options">
+                <button class="btn btn-sm" onclick="exportResults('csv')">
+                    <i class="fas fa-file-csv"></i> Export CSV
+                </button>
+                <button class="btn btn-sm" onclick="exportResults('gedcom')">
+                    <i class="fas fa-download"></i> Export GEDCOM
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if results|length == 0 %}
+        <div class="no-results">
+            <i class="fas fa-search-minus"></i>
+            <p>No persons found matching your criteria.</p>
+            <p class="hint">Try adjusting your search parameters or enabling fuzzy matching.</p>
+        </div>
+        {% else %}
+        <div class="results-grid">
+            {% for person in results %}
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="sex-icon {{ person.sex|lower }}">
+                        {% if person.sex == 'M' %}
+                            <i class="fas fa-mars"></i>
+                        {% elif person.sex == 'F' %}
+                            <i class="fas fa-venus"></i>
+                        {% else %}
+                            <i class="fas fa-question"></i>
+                        {% endif %}
+                    </span>
+                    <h4>
+                        <a href="{{ url_for('person_detail', id=person.id) }}">
+                            {{ person|person_name }}
+                        </a>
+                    </h4>
+                </div>
+
+                <div class="result-details">
+                    {% if person.birth_date or person.birth_place %}
+                    <div class="detail-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        <strong>Born:</strong>
+                        {% if person.birth_date %}{{ person.birth_date|date_format }}{% endif %}
+                        {% if person.birth_place %}in {{ person.birth_place }}{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if person.death_date or person.death_place %}
+                    <div class="detail-item">
+                        <i class="fas fa-cross"></i>
+                        <strong>Died:</strong>
+                        {% if person.death_date %}{{ person.death_date|date_format }}{% endif %}
+                        {% if person.death_place %}in {{ person.death_place }}{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if person.occupation %}
+                    <div class="detail-item">
+                        <i class="fas fa-briefcase"></i>
+                        <strong>Occupation:</strong> {{ person.occupation }}
+                    </div>
+                    {% endif %}
+
+                    {% if person.consang and person.consang > 0 %}
+                    <div class="detail-item consanguinity">
+                        <i class="fas fa-dna"></i>
+                        <strong>Consanguinity:</strong>
+                        <span class="badge">{{ (person.consang * 100)|round(2) }}%</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="result-actions">
+                    <a href="{{ url_for('person_detail', id=person.id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-user"></i> View Details
+                    </a>
+                    <a href="{{ url_for('tree_view', root=person.id) }}" class="btn btn-sm btn-secondary">
+                        <i class="fas fa-sitemap"></i> View Tree
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination %}
+        <div class="pagination">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('advanced_search', page=pagination.prev_num, **request.args) }}" class="page-link">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+            {% endif %}
+
+            <span class="page-info">
+                Page {{ pagination.page }} of {{ pagination.pages }}
+            </span>
+
+            {% if pagination.has_next %}
+            <a href="{{ url_for('advanced_search', page=pagination.next_num, **request.args) }}" class="page-link">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Saved Searches -->
+    <div class="card saved-searches">
+        <h3><i class="fas fa-star"></i> Saved Searches</h3>
+        <div id="savedSearchesList">
+            <p class="hint">No saved searches yet. Click "Save Search" to bookmark your queries.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-form {
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-hint {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.advanced-options {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #ecf0f1;
+}
+
+.advanced-options h4 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.results-count {
+    background: #3498db;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.result-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.sex-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+}
+
+.sex-icon.m {
+    background: #3498db;
+    color: white;
+}
+
+.sex-icon.f {
+    background: #e74c3c;
+    color: white;
+}
+
+.sex-icon.u {
+    background: #95a5a6;
+    color: white;
+}
+
+.result-details {
+    margin: 1rem 0;
+}
+
+.detail-item {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 5px;
+}
+
+.result-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem;
+    color: #7f8c8d;
+}
+
+.no-results i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #ecf0f1;
+}
+
+.page-link {
+    padding: 0.75rem 1.5rem;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.page-link:hover {
+    background: #2980b9;
+}
+</style>
+
+<script>
+function resetForm() {
+    document.getElementById('searchForm').reset();
+    window.location.href = '{{ url_for("advanced_search") }}';
+}
+
+function exportResults(format) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('export', format);
+    window.location.href = `{{ url_for('advanced_search') }}?${params.toString()}`;
+}
+
+// Save search functionality
+document.getElementById('saveSearchBtn')?.addEventListener('click', function() {
+    const params = new URLSearchParams(window.location.search);
+    const searchName = prompt('Enter a name for this search:');
+    
+    if (searchName) {
+        const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+        savedSearches.push({
+            name: searchName,
+            params: params.toString(),
+            date: new Date().toISOString()
+        });
+        localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
+        loadSavedSearches();
+        alert('Search saved successfully!');
+    }
+});
+
+function loadSavedSearches() {
+    const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+    const container = document.getElementById('savedSearchesList');
+    
+    if (savedSearches.length === 0) {
+        container.innerHTML = '<p class="hint">No saved searches yet.</p>';
+        return;
+    }
+    
+    container.innerHTML = savedSearches.map((search, index) => `
+        <div class="saved-search-item">
+            <strong>${search.name}</strong>
+            <small>${new Date(search.date).toLocaleDateString()}</small>
+            <button onclick="loadSearch(${index})">Load</button>
+            <button onclick="deleteSearch(${index})">Delete</button>
+        </div>
+    `).join('');
+}
+
+function loadSearch(index) {
+    const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+    window.location.href = `{{ url_for('advanced_search') }}?${savedSearches[index].params}`;
+}
+
+function deleteSearch(index) {
+    const savedSearches = JSON.parse(localStorage.getItem('savedSearches') || '[]');
+    savedSearches.splice(index, 1);
+    localStorage.setItem('savedSearches', JSON.stringify(savedSearches));
+    loadSavedSearches();
+}
+
+// Load saved searches on page load
+document.addEventListener('DOMContentLoaded', loadSavedSearches);
+</script>
+{% endblock %}

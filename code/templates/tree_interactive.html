@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Family Tree - GeneWeb</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            overflow: hidden;
+        }
+
+        .tree-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .controls h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .controls button {
+            display: block;
+            width: 100%;
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .controls button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .controls button.active {
+            background: #27ae60;
+        }
+
+        .controls select,
+        .controls input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+        }
+
+        .person-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .person-info.active {
+            display: block;
+        }
+
+        .person-info h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .person-info .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .person-info .info-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+        }
+
+        .person-info .info-item strong {
+            color: #34495e;
+        }
+
+        #tree-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node circle {
+            fill: #fff;
+            stroke: #3498db;
+            stroke-width: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node circle:hover {
+            fill: #3498db;
+            stroke-width: 5px;
+        }
+
+        .node.male circle {
+            stroke: #3498db;
+        }
+
+        .node.female circle {
+            stroke: #e74c3c;
+        }
+
+        .node.unknown circle {
+            stroke: #95a5a6;
+        }
+
+        .node text {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 12px;
+            fill: #2c3e50;
+            cursor: pointer;
+        }
+
+        .link {
+            fill: none;
+            stroke: #bdc3c7;
+            stroke-width: 2px;
+            stroke-opacity: 0.6;
+        }
+
+        .link.parent {
+            stroke: #3498db;
+        }
+
+        .link.spouse {
+            stroke: #e74c3c;
+            stroke-dasharray: 5, 5;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+        }
+
+        .zoom-controls button {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .zoom-controls button:hover {
+            background: #2980b9;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .legend-icon.male {
+            border: 3px solid #3498db;
+            background: white;
+        }
+
+        .legend-icon.female {
+            border: 3px solid #e74c3c;
+            background: white;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="tree-container">
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Loading family tree...</p>
+        </div>
+
+        <!-- Tree Controls -->
+        <div class="controls">
+            <h3><i class="fas fa-cog"></i> Tree Controls</h3>
+            
+            <label for="treeType">Tree Type:</label>
+            <select id="treeType">
+                <option value="ancestors">Ancestors</option>
+                <option value="descendants">Descendants</option>
+                <option value="hourglass">Hourglass (Both)</option>
+                <option value="full">Full Family</option>
+            </select>
+
+            <label for="maxGenerations">Max Generations:</label>
+            <input type="number" id="maxGenerations" value="4" min="1" max="10">
+
+            <label for="rootPerson">Root Person ID:</label>
+            <input type="number" id="rootPerson" value="1" min="1">
+
+            <button id="redrawBtn"><i class="fas fa-sync-alt"></i> Redraw Tree</button>
+            <button id="expandAllBtn"><i class="fas fa-expand"></i> Expand All</button>
+            <button id="collapseAllBtn"><i class="fas fa-compress"></i> Collapse All</button>
+            <button id="centerBtn"><i class="fas fa-crosshairs"></i> Center View</button>
+            <button id="downloadBtn"><i class="fas fa-download"></i> Download SVG</button>
+        </div>
+
+        <!-- Person Info Panel -->
+        <div class="person-info" id="personInfo">
+            <button class="close-btn" id="closeInfo">&times;</button>
+            <h3 id="personName">Person Details</h3>
+            <div class="info-item">
+                <strong><i class="fas fa-id-card"></i> ID:</strong> <span id="personId"></span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-venus-mars"></i> Sex:</strong> <span id="personSex"></span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-birthday-cake"></i> Birth:</strong> <span id="personBirth"></span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-cross"></i> Death:</strong> <span id="personDeath"></span>
+            </div>
+            <div class="info-item">
+                <strong><i class="fas fa-briefcase"></i> Occupation:</strong> <span id="personOccupation"></span>
+            </div>
+            <button id="viewDetailBtn" class="btn-detail">
+                <i class="fas fa-user"></i> View Full Profile
+            </button>
+        </div>
+
+        <!-- SVG Canvas -->
+        <svg id="tree-svg"></svg>
+
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button id="zoomIn"><i class="fas fa-plus"></i></button>
+            <button id="resetZoom"><i class="fas fa-undo"></i></button>
+            <button id="zoomOut"><i class="fas fa-minus"></i></button>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h4>Legend</h4>
+            <div class="legend-item">
+                <div class="legend-icon male"></div>
+                <span>Male</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon female"></div>
+                <span>Female</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tree visualization using D3.js
+        class FamilyTreeVisualization {
+            constructor() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.svg = d3.select("#tree-svg");
+                this.g = this.svg.append("g");
+                
+                // Zoom behavior
+                this.zoom = d3.zoom()
+                    .scaleExtent([0.1, 3])
+                    .on("zoom", (event) => {
+                        this.g.attr("transform", event.transform);
+                    });
+                
+                this.svg.call(this.zoom);
+                
+                // Tree layout
+                this.treeLayout = d3.tree()
+                    .size([this.width - 200, this.height - 200])
+                    .separation((a, b) => a.parent === b.parent ? 1 : 1.2);
+                
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById("redrawBtn").addEventListener("click", () => this.redrawTree());
+                document.getElementById("expandAllBtn").addEventListener("click", () => this.expandAll());
+                document.getElementById("collapseAllBtn").addEventListener("click", () => this.collapseAll());
+                document.getElementById("centerBtn").addEventListener("click", () => this.centerView());
+                document.getElementById("downloadBtn").addEventListener("click", () => this.downloadSVG());
+                document.getElementById("closeInfo").addEventListener("click", () => this.closePersonInfo());
+                
+                // Zoom controls
+                document.getElementById("zoomIn").addEventListener("click", () => this.zoomBy(1.2));
+                document.getElementById("zoomOut").addEventListener("click", () => this.zoomBy(0.8));
+                document.getElementById("resetZoom").addEventListener("click", () => this.resetZoom());
+            }
+
+            async redrawTree() {
+                const rootId = document.getElementById("rootPerson").value;
+                const treeType = document.getElementById("treeType").value;
+                const maxGen = document.getElementById("maxGenerations").value;
+                
+                document.getElementById("loading").style.display = "block";
+                
+                try {
+                    const response = await fetch(`/api/tree/${treeType}/${rootId}?max_gen=${maxGen}`);
+                    const data = await response.json();
+                    
+                    this.drawTree(data);
+                } catch (error) {
+                    console.error("Error loading tree:", error);
+                    alert("Failed to load family tree. Please try again.");
+                } finally {
+                    document.getElementById("loading").style.display = "none";
+                }
+            }
+
+            drawTree(data) {
+                // Clear existing tree
+                this.g.selectAll("*").remove();
+                
+                // Create hierarchy
+                const root = d3.hierarchy(data);
+                
+                // Compute tree layout
+                this.treeLayout(root);
+                
+                // Draw links
+                this.g.selectAll(".link")
+                    .data(root.links())
+                    .enter()
+                    .append("path")
+                    .attr("class", "link parent")
+                    .attr("d", d3.linkVertical()
+                        .x(d => d.x)
+                        .y(d => d.y)
+                    );
+                
+                // Draw nodes
+                const node = this.g.selectAll(".node")
+                    .data(root.descendants())
+                    .enter()
+                    .append("g")
+                    .attr("class", d => `node ${d.data.sex || 'unknown'}`)
+                    .attr("transform", d => `translate(${d.x},${d.y})`)
+                    .on("click", (event, d) => this.showPersonInfo(d.data));
+                
+                node.append("circle")
+                    .attr("r", 20);
+                
+                node.append("text")
+                    .attr("dy", 35)
+                    .attr("text-anchor", "middle")
+                    .text(d => d.data.name || "Unknown");
+                
+                this.centerView();
+            }
+
+            showPersonInfo(person) {
+                const panel = document.getElementById("personInfo");
+                panel.classList.add("active");
+                
+                document.getElementById("personName").textContent = person.name || "Unknown";
+                document.getElementById("personId").textContent = person.id || "N/A";
+                document.getElementById("personSex").textContent = person.sex || "Unknown";
+                document.getElementById("personBirth").textContent = person.birth || "Unknown";
+                document.getElementById("personDeath").textContent = person.death || "Living";
+                document.getElementById("personOccupation").textContent = person.occupation || "N/A";
+                
+                document.getElementById("viewDetailBtn").onclick = () => {
+                    window.location.href = `/person/${person.id}`;
+                };
+            }
+
+            closePersonInfo() {
+                document.getElementById("personInfo").classList.remove("active");
+            }
+
+            centerView() {
+                const transform = d3.zoomIdentity.translate(100, 100).scale(1);
+                this.svg.transition().duration(750).call(this.zoom.transform, transform);
+            }
+
+            zoomBy(factor) {
+                this.svg.transition().call(this.zoom.scaleBy, factor);
+            }
+
+            resetZoom() {
+                this.centerView();
+            }
+
+            expandAll() {
+                // Implement expand all nodes
+            }
+
+            collapseAll() {
+                // Implement collapse all nodes
+            }
+
+            downloadSVG() {
+                const svgData = this.svg.node().outerHTML;
+                const blob = new Blob([svgData], {type: "image/svg+xml"});
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "family_tree.svg";
+                link.click();
+            }
+        }
+
+        // Initialize visualization
+        const treeViz = new FamilyTreeVisualization();
+        
+        // Load initial tree
+        window.addEventListener("load", () => {
+            treeViz.redrawTree();
+        });
+    </script>
+</body>
+</html>
