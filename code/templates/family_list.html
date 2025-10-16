@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Families - GeneWeb{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-heart"></i> Family Units
+    </h1>
+    <p class="page-subtitle">Browse all family connections in your genealogy database</p>
+</div>
+
+{% if families %}
+    <div class="card">
+        <h3><i class="fas fa-list"></i> All Families ({{ families|length }})</h3>
+        <div class="grid grid-1">
+            {% for family in families %}
+            <div class="family-card">
+                <div class="family-header">
+                    <h4>
+                        <i class="fas fa-users"></i> 
+                        Family {{ family.id }}
+                    </h4>
+                </div>
+                
+                <div class="family-members">
+                    {% if family.father %}
+                    <div class="family-member">
+                        <i class="fas fa-mars"></i>
+                        <strong>Father:</strong> 
+                        <a href="/person/{{ family.father.id }}">
+                            {{ family.father.first_name }} {{ family.father.surname }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if family.mother %}
+                    <div class="family-member">
+                        <i class="fas fa-venus"></i>
+                        <strong>Mother:</strong> 
+                        <a href="/person/{{ family.mother.id }}">
+                            {{ family.mother.first_name }} {{ family.mother.surname }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if family.children %}
+                    <div class="family-member">
+                        <i class="fas fa-baby"></i>
+                        <strong>Children:</strong>
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            {% for child in family.children %}
+                            <li>
+                                <a href="/person/{{ child.id }}">
+                                    {{ child.first_name }} {{ child.surname }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if family.marriage_date or family.marriage_place %}
+                <div class="family-details">
+                    <h5><i class="fas fa-ring"></i> Marriage</h5>
+                    {% if family.marriage_date %}
+                    <p><strong>Date:</strong> {{ family.marriage_date }}</p>
+                    {% endif %}
+                    {% if family.marriage_place %}
+                    <p><strong>Place:</strong> {{ family.marriage_place }}</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if current_page > 1 or families|length >= 20 %}
+    <div class="card" style="text-align: center;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem;">
+            {% if current_page > 1 %}
+                <a href="?page={{ current_page - 1 }}" 
+                   class="btn btn-primary">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            {% endif %}
+            
+            <span style="padding: 0.75rem 1.5rem; background: var(--light-color); border-radius: 25px; font-weight: bold;">
+                <i class="fas fa-file-alt"></i> Page {{ current_page }}
+            </span>
+            
+            {% if families|length >= 20 %}
+                <a href="?page={{ current_page + 1 }}" 
+                   class="btn btn-primary">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+{% else %}
+    <div class="card" style="text-align: center;">
+        <h3><i class="fas fa-heart-broken"></i> No Families Yet</h3>
+        <p>No family units have been created in your genealogy database.</p>
+        <p>Families are automatically created when you add relationships between persons.</p>
+        <div style="margin-top: 1.5rem;">
+            <a href="/persons" class="btn btn-primary">
+                <i class="fas fa-users"></i> Browse Persons
+            </a>
+            <a href="/import" class="btn btn-secondary" style="margin-left: 1rem;">
+                <i class="fas fa-file-import"></i> Import Data
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="card">
+    <h3><i class="fas fa-tools"></i> Quick Actions</h3>
+    <div class="grid grid-3">
+        <a href="/persons" class="btn btn-secondary">
+            <i class="fas fa-users"></i> View Persons
+        </a>
+        <a href="/statistics" class="btn btn-primary">
+            <i class="fas fa-chart-bar"></i> Statistics
+        </a>
+        <a href="/" class="btn btn-success">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .family-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        border-left: 4px solid var(--accent-color);
+        transition: all 0.3s ease;
+    }
+    
+    .family-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .family-header h4 {
+        margin: 0 0 1rem 0;
+        color: var(--primary-color);
+        font-size: 1.3rem;
+    }
+    
+    .family-members {
+        margin-bottom: 1rem;
+    }
+    
+    .family-member {
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid var(--secondary-color);
+    }
+    
+    .family-member i {
+        width: 20px;
+        text-align: center;
+        margin-right: 0.5rem;
+        color: var(--secondary-color);
+    }
+    
+    .family-member a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .family-member a:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+    }
+    
+    .family-details {
+        background: #e8f5e8;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .family-details h5 {
+        margin: 0 0 0.5rem 0;
+        color: var(--success-color);
+    }
+    
+    .family-details p {
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

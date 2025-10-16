@@ -1,0 +1,550 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - GeneWeb{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-chart-bar"></i> Genealogy Statistics
+    </h1>
+    <p class="page-subtitle">Comprehensive analysis of your family tree data</p>
+</div>
+
+<!-- Main Statistics -->
+<div class="grid grid-3">
+    <div class="card pulse">
+        <div class="stat-item">
+            <div class="stat-number">{{ stats.total_persons or 0 }}</div>
+            <div class="stat-label"><i class="fas fa-users"></i> Total Persons</div>
+        </div>
+    </div>
+    
+    <div class="card pulse">
+        <div class="stat-item">
+            <div class="stat-number">{{ stats.total_families or 0 }}</div>
+            <div class="stat-label"><i class="fas fa-heart"></i> Total Families</div>
+        </div>
+    </div>
+    
+    <div class="card pulse">
+        <div class="stat-item">
+            <div class="stat-number">{{ stats.generations or 0 }}</div>
+            <div class="stat-label"><i class="fas fa-layer-group"></i> Generations</div>
+        </div>
+    </div>
+</div>
+
+<!-- Gender Distribution -->
+<div class="card">
+    <h3><i class="fas fa-venus-mars"></i> Gender Distribution</h3>
+    <div class="grid grid-2">
+        <div class="stat-group">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.male_count or 0 }}</div>
+                <div class="stat-label"><i class="fas fa-mars"></i> Males</div>
+            </div>
+        </div>
+        <div class="stat-group">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.female_count or 0 }}</div>
+                <div class="stat-label"><i class="fas fa-venus"></i> Females</div>
+            </div>
+        </div>
+    </div>
+    
+    {% if stats.male_count and stats.female_count %}
+    <div style="margin-top: 1rem;">
+        <div class="progress-bar">
+            <div class="progress-male" style="width: {{ (stats.male_count / (stats.male_count + stats.female_count) * 100)|round(1) }}%;">
+                {{ (stats.male_count / (stats.male_count + stats.female_count) * 100)|round(1) }}% Male
+            </div>
+            <div class="progress-female" style="width: {{ (stats.female_count / (stats.male_count + stats.female_count) * 100)|round(1) }}%;">
+                {{ (stats.female_count / (stats.male_count + stats.female_count) * 100)|round(1) }}% Female
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Birth/Death Statistics -->
+<div class="grid grid-2">
+    <div class="card">
+        <h3><i class="fas fa-birthday-cake"></i> Birth Records</h3>
+        <div class="stat-item">
+            <div class="stat-number">{{ stats.persons_with_birth_date or 0 }}</div>
+            <div class="stat-label">Persons with Birth Date</div>
+        </div>
+        {% if stats.earliest_birth_year %}
+        <div style="margin-top: 1rem; background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <p><strong>Earliest Birth:</strong> {{ stats.earliest_birth_year }}</p>
+            <p><strong>Latest Birth:</strong> {{ stats.latest_birth_year or 'Unknown' }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h3><i class="fas fa-cross"></i> Death Records</h3>
+        <div class="stat-item">
+            <div class="stat-number">{{ stats.persons_with_death_date or 0 }}</div>
+            <div class="stat-label">Persons with Death Date</div>
+        </div>
+        {% if stats.earliest_death_year %}
+        <div style="margin-top: 1rem; background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <p><strong>Earliest Death:</strong> {{ stats.earliest_death_year }}</p>
+            <p><strong>Latest Death:</strong> {{ stats.latest_death_year or 'Unknown' }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Family Statistics -->
+<div class="card">
+    <h3><i class="fas fa-sitemap"></i> Family Structure</h3>
+    <div class="grid grid-3">
+        <div class="stat-group">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.families_with_children or 0 }}</div>
+                <div class="stat-label">Families with Children</div>
+            </div>
+        </div>
+        
+        <div class="stat-group">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.average_children|round(1) if stats.average_children else 0 }}</div>
+                <div class="stat-label">Avg Children per Family</div>
+            </div>
+        </div>
+        
+        <div class="stat-group">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.largest_family_size or 0 }}</div>
+                <div class="stat-label">Largest Family Size</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Names Statistics -->
+{% if stats.most_common_surnames %}
+<div class="card">
+    <h3><i class="fas fa-signature"></i> Most Common Surnames</h3>
+    <div class="grid grid-2">
+        {% for surname, count in stats.most_common_surnames[:10] %}
+        <div class="surname-stat">
+            <div class="surname-name">{{ surname }}</div>
+            <div class="surname-count">{{ count }} person{{ 's' if count > 1 else '' }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <div style="margin-top: 1rem; text-align: center;">
+        <a href="/surnames" class="btn btn-secondary">
+            <i class="fas fa-list"></i> View All Surnames
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Consanguinity Analysis -->
+{% if stats.consanguinity %}
+<div class="card consanguinity-stats">
+    <h3><i class="fas fa-dna"></i> Consanguinity Analysis</h3>
+    
+    {% if message %}
+    <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+        <i class="fas {{ 'fa-check' if success else 'fa-exclamation-triangle' }}"></i>
+        {{ message }}
+    </div>
+    {% endif %}
+    
+    <div class="grid grid-3">
+        <div class="stat-item consanguinity-total">
+            <div class="stat-number">{{ stats.consanguinity.total_with_consanguinity }}</div>
+            <div class="stat-label">
+                <i class="fas fa-users"></i> 
+                Persons with Consanguinity
+            </div>
+            <div class="stat-sublabel">
+                {{ stats.consanguinity.percentage_with_consanguinity|round(1) }}% of total
+            </div>
+        </div>
+        
+        <div class="stat-item consanguinity-avg">
+            <div class="stat-number">{{ (stats.consanguinity.average_consanguinity * 100)|round(3) }}%</div>
+            <div class="stat-label">
+                <i class="fas fa-calculator"></i> 
+                Average Coefficient
+            </div>
+        </div>
+        
+        <div class="stat-item consanguinity-max">
+            <div class="stat-number">{{ (stats.consanguinity.max_consanguinity * 100)|round(3) }}%</div>
+            <div class="stat-label">
+                <i class="fas fa-arrow-up"></i> 
+                Maximum Coefficient
+            </div>
+        </div>
+    </div>
+    
+    <div class="consanguinity-breakdown">
+        <h4><i class="fas fa-chart-pie"></i> Consanguinity Distribution</h4>
+        <div class="grid grid-3">
+            <div class="consanguinity-level high">
+                <div class="level-count">{{ stats.consanguinity.high_consanguinity }}</div>
+                <div class="level-label">High (≥25%)</div>
+                <div class="level-bar">
+                    {% set high_percentage = (stats.consanguinity.high_consanguinity / stats.consanguinity.total_with_consanguinity * 100) if stats.consanguinity.total_with_consanguinity > 0 else 0 %}
+                    <div class="level-fill high-fill" style="width: {{ high_percentage|round(1) }}%"></div>
+                </div>
+            </div>
+            
+            <div class="consanguinity-level medium">
+                <div class="level-count">{{ stats.consanguinity.medium_consanguinity }}</div>
+                <div class="level-label">Medium (12.5-25%)</div>
+                <div class="level-bar">
+                    {% set medium_percentage = (stats.consanguinity.medium_consanguinity / stats.consanguinity.total_with_consanguinity * 100) if stats.consanguinity.total_with_consanguinity > 0 else 0 %}
+                    <div class="level-fill medium-fill" style="width: {{ medium_percentage|round(1) }}%"></div>
+                </div>
+            </div>
+            
+            <div class="consanguinity-level low">
+                <div class="level-count">{{ stats.consanguinity.low_consanguinity }}</div>
+                <div class="level-label">Low (<12.5%)</div>
+                <div class="level-bar">
+                    {% set low_percentage = (stats.consanguinity.low_consanguinity / stats.consanguinity.total_with_consanguinity * 100) if stats.consanguinity.total_with_consanguinity > 0 else 0 %}
+                    <div class="level-fill low-fill" style="width: {{ low_percentage|round(1) }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="consanguinity-actions">
+        <form method="post" action="/compute/consanguinity" style="display: inline;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-calculator"></i> Recalculate All Consanguinity
+            </button>
+        </form>
+        <small class="text-muted">
+            This will recalculate consanguinity for all persons using the advanced algorithm
+        </small>
+    </div>
+</div>
+{% endif %}
+
+<!-- Data Quality -->
+<div class="card">
+    <h3><i class="fas fa-check-circle"></i> Data Quality</h3>
+    <div class="grid grid-2">
+        <div class="quality-metric">
+            <div class="quality-label">Persons with Birth Info</div>
+            <div class="quality-bar">
+                {% set birth_percentage = (stats.persons_with_birth_date / stats.total_persons * 100) if stats.total_persons > 0 else 0 %}
+                <div class="quality-fill" style="width: {{ birth_percentage|round(1) }}%"></div>
+                <span class="quality-text">{{ birth_percentage|round(1) }}%</span>
+            </div>
+        </div>
+        
+        <div class="quality-metric">
+            <div class="quality-label">Families with Complete Info</div>
+            <div class="quality-bar">
+                {% set family_percentage = (stats.families_with_children / stats.total_families * 100) if stats.total_families > 0 else 0 %}
+                <div class="quality-fill" style="width: {{ family_percentage|round(1) }}%"></div>
+                <span class="quality-text">{{ family_percentage|round(1) }}%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Database Info -->
+<div class="card">
+    <h3><i class="fas fa-database"></i> Database Information</h3>
+    <div class="grid grid-2">
+        <div class="info-item">
+            <strong><i class="fas fa-calendar"></i> Last Updated:</strong>
+            <span>{{ stats.last_update or 'Unknown' }}</span>
+        </div>
+        <div class="info-item">
+            <strong><i class="fas fa-hdd"></i> Records:</strong>
+            <span>{{ (stats.total_persons + stats.total_families)|default(0) }} total</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card">
+    <h3><i class="fas fa-tools"></i> Analysis Tools</h3>
+    <div class="grid grid-4">
+        <a href="/persons" class="btn btn-primary">
+            <i class="fas fa-users"></i> Browse Persons
+        </a>
+        <a href="/families" class="btn btn-secondary">
+            <i class="fas fa-heart"></i> View Families
+        </a>
+        <a href="/surnames" class="btn btn-success">
+            <i class="fas fa-signature"></i> Surname Index
+        </a>
+        <a href="/export/gedcom" class="btn btn-primary">
+            <i class="fas fa-download"></i> Export Data
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-group {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid var(--secondary-color);
+    }
+    
+    .progress-bar {
+        display: flex;
+        height: 30px;
+        background: #e9ecef;
+        border-radius: 15px;
+        overflow: hidden;
+        font-size: 0.9rem;
+        line-height: 30px;
+        text-align: center;
+    }
+    
+    .progress-male {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white;
+        font-weight: bold;
+    }
+    
+    .progress-female {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        font-weight: bold;
+    }
+    
+    .surname-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid var(--accent-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .surname-name {
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+    
+    .surname-count {
+        color: var(--secondary-color);
+        font-size: 0.9rem;
+    }
+    
+    .quality-metric {
+        margin-bottom: 1rem;
+    }
+    
+    .quality-label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+    
+    .quality-bar {
+        position: relative;
+        height: 25px;
+        background: #e9ecef;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .quality-fill {
+        height: 100%;
+        background: linear-gradient(45deg, var(--success-color), #27ae60);
+        transition: width 0.5s ease;
+    }
+    
+    .quality-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: bold;
+        color: var(--dark-color);
+        font-size: 0.9rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid var(--warning-color);
+    }
+    
+    .info-item strong {
+        color: var(--primary-color);
+    }
+    
+    .info-item i {
+        margin-right: 0.5rem;
+        width: 16px;
+        text-align: center;
+    }
+    
+    /* Consanguinity Styles */
+    .consanguinity-stats {
+        border-left: 4px solid #e74c3c;
+    }
+    
+    .consanguinity-total .stat-number {
+        color: #e74c3c;
+    }
+    
+    .consanguinity-avg .stat-number {
+        color: #f39c12;
+    }
+    
+    .consanguinity-max .stat-number {
+        color: #8e44ad;
+    }
+    
+    .stat-sublabel {
+        font-size: 0.8rem;
+        color: var(--muted-color);
+        margin-top: 0.25rem;
+    }
+    
+    .consanguinity-breakdown {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .consanguinity-breakdown h4 {
+        margin: 0 0 1.5rem 0;
+        color: var(--primary-color);
+    }
+    
+    .consanguinity-level {
+        text-align: center;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .consanguinity-level:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .level-count {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .level-label {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+    
+    .level-bar {
+        position: relative;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .level-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+        border-radius: 4px;
+    }
+    
+    .high-fill {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+    }
+    
+    .medium-fill {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+    }
+    
+    .low-fill {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+    }
+    
+    .consanguinity-level.high .level-count {
+        color: #e74c3c;
+    }
+    
+    .consanguinity-level.medium .level-count {
+        color: #f39c12;
+    }
+    
+    .consanguinity-level.low .level-count {
+        color: #27ae60;
+    }
+    
+    .consanguinity-actions {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #dee2e6;
+        text-align: center;
+    }
+    
+    .consanguinity-actions .btn {
+        margin-right: 1rem;
+    }
+    
+    .consanguinity-actions small {
+        display: block;
+        margin-top: 1rem;
+        color: var(--muted-color);
+    }
+    
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border: 1px solid;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+    
+    @media (max-width: 768px) {
+        .consanguinity-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .consanguinity-actions .btn {
+            margin-right: 0;
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}
