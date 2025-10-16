@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Search - GeneWeb{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-search"></i> Search Family Tree
+    </h1>
+    <p class="page-subtitle">Find persons and families in your genealogy database</p>
+</div>
+
+<!-- Search Form -->
+<div class="card">
+    <h3><i class="fas fa-search"></i> Advanced Search</h3>
+    <form method="GET" action="/search">
+        <div class="grid grid-2">
+            <div class="form-group">
+                <label for="q">Search Terms:</label>
+                <input type="text" 
+                       id="q"
+                       name="q" 
+                       value="{{ query or '' }}" 
+                       class="form-control"
+                       placeholder="Enter name, place, occupation..."
+                       autofocus>
+            </div>
+            <div class="form-group" style="display: flex; align-items: end;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Search Results -->
+{% if query %}
+    <div class="card">
+        <h3><i class="fas fa-list"></i> 
+            Search Results for "{{ query }}"
+        </h3>
+        
+        {% if results %}
+            <div style="margin-bottom: 1rem;">
+                <span class="badge" style="background: var(--success-color); color: white; padding: 0.5rem 1rem; border-radius: 15px;">
+                    {{ results|length }} result{{ 's' if results|length != 1 else '' }} found
+                </span>
+            </div>
+            
+            <div class="grid grid-2">
+                {% for person in results %}
+                <div class="person-card">
+                    <div class="person-name">
+                        <a href="/person/{{ person.id }}" style="color: inherit; text-decoration: none;">
+                            {{ person.first_name }} {{ person.surname }}
+                        </a>
+                    </div>
+                    <div class="person-details">
+                        {% if person.sex %}
+                            <i class="fas {% if person.sex.value.lower() == 'male' %}fa-mars{% elif person.sex.value.lower() == 'female' %}fa-venus{% else %}fa-user{% endif %}"></i>
+                            {{ person.sex.value|title }}
+                        {% endif %}
+                        
+                        {% if person.birth_date %}
+                            <br><i class="fas fa-birthday-cake"></i> Born: {{ person.birth_date }}
+                        {% endif %}
+                        
+                        {% if person.death_date %}
+                            <br><i class="fas fa-cross"></i> Died: {{ person.death_date }}
+                        {% endif %}
+                        
+                        {% if person.occupation %}
+                            <br><i class="fas fa-briefcase"></i> {{ person.occupation }}
+                        {% endif %}
+                        
+                        {% if person.birth_place %}
+                            <br><i class="fas fa-map-marker-alt"></i> {{ person.birth_place }}
+                        {% endif %}
+                    </div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <a href="/person/{{ person.id }}" class="btn btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem;">
+                <h4><i class="fas fa-search"></i> No Results Found</h4>
+                <p>No persons found matching your search: "<em>{{ query }}</em>"</p>
+                <p>Try:</p>
+                <ul style="list-style: none; padding: 0;">
+                    <li>• Checking your spelling</li>
+                    <li>• Using fewer keywords</li>
+                    <li>• Searching for partial names</li>
+                    <li>• Using different search terms</li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <!-- Search Tips -->
+    <div class="card">
+        <h3><i class="fas fa-lightbulb"></i> Search Tips</h3>
+        <div class="grid grid-2">
+            <div>
+                <h4>Name Search</h4>
+                <ul>
+                    <li>Search by first name, surname, or both</li>
+                    <li>Use partial names (e.g., "John" for "Jonathan")</li>
+                    <li>Search is case-insensitive</li>
+                </ul>
+            </div>
+            <div>
+                <h4>Advanced Search</h4>
+                <ul>
+                    <li>Search by occupation or profession</li>
+                    <li>Include place names</li>
+                    <li>Use multiple search terms</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="card">
+    <h3><i class="fas fa-tools"></i> Browse Options</h3>
+    <div class="grid grid-4">
+        <a href="/persons" class="btn btn-primary">
+            <i class="fas fa-users"></i> All Persons
+        </a>
+        <a href="/families" class="btn btn-secondary">
+            <i class="fas fa-heart"></i> All Families
+        </a>
+        <a href="/surnames" class="btn btn-success">
+            <i class="fas fa-signature"></i> Surnames
+        </a>
+        <a href="/statistics" class="btn btn-primary">
+            <i class="fas fa-chart-bar"></i> Statistics
+        </a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-form {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .search-tips {
+        background: #e8f4f8;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--secondary-color);
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: var(--dark-color);
+        opacity: 0.8;
+    }
+    
+    .results-count {
+        margin-bottom: 1.5rem;
+        font-weight: bold;
+        color: var(--success-color);
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
