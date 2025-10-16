@@ -298,16 +298,9 @@ async def list_persons(
         List of persons
     """
     service = get_person_service(db)
-    # NOTE: Would need to implement list method in service
-    # For now, use search with no criteria
+    persons = service.list_persons(limit=limit, offset=offset)
 
-    search_engine = PersonSearchEngine(db)
-    criteria = SearchCriteria(limit=limit, offset=offset)
-    results = search_engine.search(criteria)
-
-    return [PersonSchema.model_validate(r.person) for r in results]
-
-
+    return [PersonSchema.model_validate(person) for person in persons]
 # ==============================================================================
 # Search Endpoints
 # ==============================================================================
