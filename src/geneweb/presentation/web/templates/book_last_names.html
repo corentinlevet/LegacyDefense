@@ -22,8 +22,11 @@
                 <h5>Tous les noms</h5>
             </div>
             <div class="card-body">
-                <p>Cette page affichera la liste de tous les noms de la généalogie.</p>
-                <!-- Le contenu sera ajouté ici -->
+                <ul class="list-group">
+                    {% for name in last_names %}
+                    <li class="list-group-item">{{ name }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
 

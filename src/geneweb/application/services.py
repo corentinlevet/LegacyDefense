@@ -538,3 +538,38 @@ class ApplicationService:
         person_count = self.genealogy_repo.count_persons(genealogy.id)
 
         return GenealogyDetails(name=genealogy.name, person_count=person_count)
+
+    async def get_first_names(self, genealogy_name: str) -> list[str] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        return self.genealogy_repo.get_first_names(genealogy.id)
+
+    async def get_last_names(self, genealogy_name: str) -> list[str] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        return self.genealogy_repo.get_last_names(genealogy.id)
+
+    async def get_places(self, genealogy_name: str) -> list[str] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        return self.genealogy_repo.get_places(genealogy.id)
+
+    async def get_occupations(self, genealogy_name: str) -> list[str] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        return self.genealogy_repo.get_occupations(genealogy.id)
+
+    async def get_sources(self, genealogy_name: str) -> list[str] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        return self.genealogy_repo.get_sources(genealogy.id)

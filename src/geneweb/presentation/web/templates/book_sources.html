@@ -22,8 +22,11 @@
                 <h5>Toutes les sources</h5>
             </div>
             <div class="card-body">
-                <p>Cette page affichera la liste de toutes les sources de la généalogie.</p>
-                <!-- Le contenu sera ajouté ici -->
+                <ul class="list-group">
+                    {% for source in sources %}
+                    <li class="list-group-item">{{ source }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
 

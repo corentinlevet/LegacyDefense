@@ -93,55 +93,115 @@ async def export_gedcom_page(genealogy_name: str, request: Request):
 
 
 @router.get("/genealogy/{genealogy_name}/book/first_names", response_class=HTMLResponse)
-async def book_first_names(genealogy_name: str, request: Request):
+async def book_first_names(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
     """
     Affiche le livre des prénoms pour une généalogie.
     """
+    first_names = await app_service.get_first_names(genealogy_name)
+    if first_names is None:
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
     return templates.TemplateResponse(
         "book_first_names.html",
-        {"request": request, "genealogy_name": genealogy_name},
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "first_names": first_names,
+        },
     )
 
 
 @router.get("/genealogy/{genealogy_name}/book/last_names", response_class=HTMLResponse)
-async def book_last_names(genealogy_name: str, request: Request):
+async def book_last_names(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
     """
     Affiche le livre des noms pour une généalogie.
     """
+    last_names = await app_service.get_last_names(genealogy_name)
+    if last_names is None:
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
     return templates.TemplateResponse(
         "book_last_names.html",
-        {"request": request, "genealogy_name": genealogy_name},
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "last_names": last_names,
+        },
     )
 
 
 @router.get("/genealogy/{genealogy_name}/book/places", response_class=HTMLResponse)
-async def book_places(genealogy_name: str, request: Request):
+async def book_places(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
     """
     Affiche le livre des lieux pour une généalogie.
     """
+    places = await app_service.get_places(genealogy_name)
+    if places is None:
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
     return templates.TemplateResponse(
         "book_places.html",
-        {"request": request, "genealogy_name": genealogy_name},
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "places": places,
+        },
     )
 
 
 @router.get("/genealogy/{genealogy_name}/book/occupations", response_class=HTMLResponse)
-async def book_occupations(genealogy_name: str, request: Request):
+async def book_occupations(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
     """
     Affiche le livre des occupations pour une généalogie.
     """
+    occupations = await app_service.get_occupations(genealogy_name)
+    if occupations is None:
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
     return templates.TemplateResponse(
         "book_occupations.html",
-        {"request": request, "genealogy_name": genealogy_name},
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "occupations": occupations,
+        },
     )
 
 
 @router.get("/genealogy/{genealogy_name}/book/sources", response_class=HTMLResponse)
-async def book_sources(genealogy_name: str, request: Request):
+async def book_sources(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
     """
     Affiche le livre des sources pour une généalogie.
     """
+    sources = await app_service.get_sources(genealogy_name)
+    if sources is None:
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
     return templates.TemplateResponse(
         "book_sources.html",
-        {"request": request, "genealogy_name": genealogy_name},
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "sources": sources,
+        },
     )
