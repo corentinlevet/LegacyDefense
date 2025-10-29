@@ -1,6 +1,6 @@
 from sqlalchemy import func
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from .. import models
 
@@ -153,3 +153,80 @@ class SQLGenealogyRepository:
         all_sources = set(event_sources) | set(family_sources)
 
         return sorted(list(all_sources))
+
+    def get_last_births(
+        self, genealogy_id: int, limit: int = 20
+    ) -> list[models.Person]:
+        return (
+            self.db.query(models.Person)
+            .filter(
+                models.Person.genealogy_id == genealogy_id,
+                models.Person.birth_date.isnot(None),
+            )
+            .order_by(models.Person.birth_date.desc())
+            .limit(limit)
+            .all()
+        )
+
+    def get_last_deaths(
+        self, genealogy_id: int, limit: int = 20
+    ) -> list[models.Person]:
+        return (
+            self.db.query(models.Person)
+            .filter(
+                models.Person.genealogy_id == genealogy_id,
+                models.Person.death_date.isnot(None),
+            )
+            .order_by(models.Person.death_date.desc())
+            .limit(limit)
+        )
+
+    def get_longest_lived(self, genealogy_id: int) -> list[models.Person]:
+        return (
+            self.db.query(models.Person)
+            .filter(
+                models.Person.genealogy_id == genealogy_id,
+                models.Person.birth_date.isnot(None),
+                models.Person.death_date.isnot(None),
+            )
+            .all()
+        )
+
+    def get_oldest_alive(self, genealogy_id: int) -> list[models.Person]:
+        return (
+            self.db.query(models.Person)
+            .filter(
+                models.Person.genealogy_id == genealogy_id,
+                models.Person.birth_date.isnot(None),
+                models.Person.death_date.is_(None),
+            )
+            .all()
+        )
+
+    def get_last_marriages(
+        self, genealogy_id: int, limit: int = 20
+    ) -> list[models.Family]:
+        return (
+            self.db.query(models.Family)
+            .filter(
+                models.Family.genealogy_id == genealogy_id,
+                models.Family.marriage_date.isnot(None),
+            )
+            .options(joinedload(models.Family.father), joinedload(models.Family.mother))
+            .order_by(models.Family.marriage_date.desc())
+            .limit(limit)
+            .all()
+        )
+
+    def get_oldest_couples(self, genealogy_id: int) -> list[models.Family]:
+
+        return (
+            self.db.query(models.Family)
+            .filter(
+                models.Family.genealogy_id == genealogy_id,
+                models.Family.marriage_date.isnot(None),
+                models.Family.divorce_date.is_(None),
+            )
+            .options(joinedload(models.Family.father), joinedload(models.Family.mother))
+            .all()
+        )

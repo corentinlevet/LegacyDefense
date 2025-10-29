@@ -199,9 +199,42 @@ async def book_sources(
 
     return templates.TemplateResponse(
         "book_sources.html",
+        {"request": request, "genealogy_name": genealogy_name, "sources": sources},
+    )
+
+
+@router.get("/genealogy/{genealogy_name}/stats", response_class=HTMLResponse)
+async def statistics_page(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    """
+    Affiche la page des statistiques pour une généalogie.
+    """
+    last_births = await app_service.get_last_births(genealogy_name)
+    last_deaths = await app_service.get_last_deaths(genealogy_name)
+    last_marriages = await app_service.get_last_marriages(genealogy_name)
+    oldest_couples = await app_service.get_oldest_couples(genealogy_name)
+    oldest_alive = await app_service.get_oldest_alive(genealogy_name)
+    if (
+        last_births is None
+        or last_deaths is None
+        or last_marriages is None
+        or oldest_couples is None
+        or oldest_alive is None
+    ):
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
+    return templates.TemplateResponse(
+        "statistics.html",
         {
             "request": request,
             "genealogy_name": genealogy_name,
-            "sources": sources,
+            "last_births": last_births,
+            "last_deaths": last_deaths,
+            "last_marriages": last_marriages,
+            "oldest_couples": oldest_couples,
+            "oldest_alive": oldest_alive,
         },
     )

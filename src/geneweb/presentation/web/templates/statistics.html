@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques - {{ genealogy_name }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Statistiques</h1>
+            <a href="/genealogy/{{ genealogy_name }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Retour à la généalogie
+            </a>
+        </div>
+
+        <!-- Last Births -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-baby mr-2"></i>20 dernières naissances</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Prénom</th>
+                            <th>Nom</th>
+                            <th>Date de naissance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in last_births %}
+                        <tr>
+                            <td>{{ person.first_name }}</td>
+                            <td>{{ person.surname }}</td>
+                            <td>{{ person.birth_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Last Deaths -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-cross mr-2"></i>20 derniers décès</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Prénom</th>
+                            <th>Nom</th>
+                            <th>Date de décès</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in last_deaths %}
+                        <tr>
+                            <td>{{ person.first_name }}</td>
+                            <td>{{ person.surname }}</td>
+                            <td>{{ person.death_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Last Marriages -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-ring mr-2"></i>20 derniers mariages</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Époux</th>
+                            <th>Épouse</th>
+                            <th>Date de mariage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for family in last_marriages %}
+                        <tr>
+                            <td>{{ family.father_first_name }} {{ family.father_surname }}</td>
+                            <td>{{ family.mother_first_name }} {{ family.mother_surname }}</td>
+                            <td>{{ family.marriage_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Oldest Couples -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-user-clock mr-2"></i>20 plus anciens couples peut-être encore en vie et mariés</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Époux</th>
+                            <th>Épouse</th>
+                            <th>Date de mariage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for family in oldest_couples %}
+                        <tr>
+                            <td>{{ family.father_first_name }} {{ family.father_surname }}</td>
+                            <td>{{ family.mother_first_name }} {{ family.mother_surname }}</td>
+                            <td>{{ family.marriage_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Oldest Alive -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-birthday-cake mr-2"></i>20 plus âgés peut-être encore en vie</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Prénom</th>
+                            <th>Nom</th>
+                            <th>Date de naissance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in oldest_alive %}
+                        <tr>
+                            <td>{{ person.first_name }}</td>
+                            <td>{{ person.surname }}</td>
+                            <td>{{ person.birth_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Longest Lived -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-hourglass-end mr-2"></i>20 qui ont vécu le plus longtemps</h5>
+            </div>
+            <div class="card-body">
+                <!-- Le contenu sera ajouté ici -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-5 mb-3">
+            <p class="text-muted">
+                GeneWeb v.1.0.0 &copy; 2025
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

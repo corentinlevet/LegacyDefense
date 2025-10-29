@@ -14,6 +14,7 @@ from ..infrastructure.models import Event, Family, Genealogy, Person
 from ..infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )
+from ..presentation.web.formatters import format_date_natural, parse_date_to_year
 
 
 def _format_date_for_gedcom(d: Optional[object]) -> Optional[str]:
@@ -573,3 +574,159 @@ class ApplicationService:
             return None
 
         return self.genealogy_repo.get_sources(genealogy.id)
+
+    async def get_last_births(
+        self, genealogy_name: str, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        persons = self.genealogy_repo.get_last_births(genealogy.id, limit)
+        for person in persons:
+            print(format_date_natural(person.birth_date))
+        return [
+            {
+                "id": person.id,
+                "first_name": person.first_name,
+                "surname": person.surname,
+                "birth_date": format_date_natural(person.birth_date),
+            }
+            for person in persons
+        ]
+
+    async def get_last_deaths(
+        self, genealogy_name: str, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        persons = self.genealogy_repo.get_last_deaths(genealogy.id, limit)
+        return [
+            {
+                "id": person.id,
+                "first_name": person.first_name,
+                "surname": person.surname,
+            }
+            for person in persons
+        ]
+
+    async def get_last_marriages(
+        self, genealogy_name: str, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        families = self.genealogy_repo.get_last_marriages(genealogy.id, limit)
+        return [
+            {
+                "id": family.id,
+                "father_first_name": family.father.first_name if family.father else "",
+                "father_surname": family.father.surname if family.father else "",
+                "mother_first_name": family.mother.first_name if family.mother else "",
+                "mother_surname": family.mother.surname if family.mother else "",
+                "marriage_date": format_date_natural(family.marriage_date),
+            }
+            for family in families
+        ]
+
+    async def get_oldest_couples(
+        self, genealogy_name: str, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        families = self.genealogy_repo.get_oldest_couples(genealogy.id)
+        alive_couples = []
+        for family in families:
+            if (
+                family.father
+                and family.mother
+                and not family.father.death_date
+                and not family.mother.death_date
+            ):
+                marriage_year = parse_date_to_year(family.marriage_date)
+                if marriage_year:
+                    alive_couples.append(
+                        {
+                            "id": family.id,
+                            "father_first_name": family.father.first_name,
+                            "father_surname": family.father.surname,
+                            "mother_first_name": family.mother.first_name,
+                            "mother_surname": family.mother.surname,
+                            "marriage_date": format_date_natural(family.marriage_date),
+                            "marriage_year": marriage_year,
+                        }
+                    )
+
+                    # Sort by marriage year, oldest first
+                    sorted_couples = sorted(
+                        alive_couples, key=lambda x: x["marriage_year"]
+                    )
+
+                    return sorted_couples[:limit]
+
+    async def get_oldest_alive(
+        self, genealogy_name: str, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        persons = self.genealogy_repo.get_oldest_alive(genealogy.id)
+
+        alive_persons = []
+        for person in persons:
+            birth_year = parse_date_to_year(person.birth_date)
+            if birth_year:
+                alive_persons.append(
+                    {
+                        "id": person.id,
+                        "first_name": person.first_name,
+                        "surname": person.surname,
+                        "birth_date": format_date_natural(person.birth_date),
+                        "birth_year": birth_year,
+                    }
+                )
+
+        # Sort by birth year, oldest first
+        sorted_persons = sorted(alive_persons, key=lambda x: x["birth_year"])
+
+        return sorted_persons[:limit]
+
+    async def get_longest_lived(
+        self, genealogy_name: str, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        persons = self.genealogy_repo.get_longest_lived(genealogy.id)
+
+        longest_lived_persons = []
+        for person in persons:
+            birth_year = parse_date_to_year(person.birth_date)
+            death_year = parse_date_to_year(person.death_date)
+
+            if birth_year and death_year:
+                age = death_year - birth_year
+                longest_lived_persons.append(
+                    {
+                        "id": person.id,
+                        "first_name": person.first_name,
+                        "surname": person.surname,
+                        "birth_date": format_date_natural(person.birth_date),
+                        "death_date": format_date_natural(person.death_date),
+                        "age": age,
+                    }
+                )
+
+        # Sort by age, longest lived first
+        sorted_persons = sorted(
+            longest_lived_persons, key=lambda x: x["age"], reverse=True
+        )
+
+        return sorted_persons[:limit]
