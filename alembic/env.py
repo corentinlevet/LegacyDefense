@@ -5,6 +5,10 @@ from pathlib import Path
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+
+# Import all models to ensure they are registered with SQLAlchemy
+from geneweb.infrastructure import config_models  # noqa: F401
+from geneweb.infrastructure import models  # noqa: F401
 from geneweb.infrastructure.database import Base
 
 # Add the src directory to the Python path
@@ -23,10 +27,6 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-
-# Import all models to ensure they are registered with SQLAlchemy
-from geneweb.infrastructure import config_models  # noqa: F401
-from geneweb.infrastructure import models  # noqa: F401
 
 target_metadata = Base.metadata
 
