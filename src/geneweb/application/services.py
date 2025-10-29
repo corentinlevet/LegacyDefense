@@ -1,5 +1,6 @@
 import os
 import tempfile
+from dataclasses import dataclass
 from datetime import date
 from typing import Optional
 
@@ -10,6 +11,9 @@ from sqlalchemy.orm import Session
 
 from ..infrastructure.database import SessionLocal
 from ..infrastructure.models import Event, Family, Genealogy, Person
+from ..infrastructure.repositories.sql_genealogy_repository import (
+    SQLGenealogyRepository,
+)
 
 
 def _format_date_for_gedcom(d: Optional[object]) -> Optional[str]:
@@ -514,3 +518,23 @@ class GenealogyService:
         # Join with CRLF or LF: GEDCOM accepte LF. On utilise \n.
         gedcom_text = "\n".join(lines) + "\n"
         return gedcom_text
+
+
+@dataclass
+class GenealogyDetails:
+    name: str
+    person_count: int
+
+
+class ApplicationService:
+    def __init__(self, genealogy_repo: SQLGenealogyRepository):
+        self.genealogy_repo = genealogy_repo
+
+    async def get_genealogy_details(self, name: str) -> GenealogyDetails | None:
+        genealogy = self.genealogy_repo.get_by_name(name)
+        if not genealogy:
+            return None
+
+        person_count = self.genealogy_repo.count_persons(genealogy.id)
+
+        return GenealogyDetails(name=genealogy.name, person_count=person_count)

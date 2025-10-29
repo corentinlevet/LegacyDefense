@@ -77,7 +77,7 @@
                     const listItem = document.createElement('li');
                     listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                     listItem.innerHTML = `
-                        <a href="/genealogy/${genealogy.name}">${genealogy.name}</a>
+                        <a href="/genealogy/${genealogy.name}" title="Ouvrir la généalogie ${genealogy.name}">${genealogy.name}</a>
                         <div>
                             <a href="/genealogies/${genealogy.name}/import" class="btn btn-sm btn-info mr-2">
                                 <i class="fas fa-upload mr-1"></i> Importer GEDCOM
