@@ -111,11 +111,11 @@
                 </div>
                 <h6 class="mt-4">Livres</h6>
                 <div class="list-group">
-                    <a href="#" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Prénoms</a>
-                    <a href="#" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Noms</a>
-                    <a href="#" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Lieux</a>
-                    <a href="#" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Occupations</a>
-                    <a href="#" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Sources</a>
+                    <a href="#" id="book-first-names-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Prénoms</a>
+                    <a href="#" id="book-last-names-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Noms</a>
+                    <a href="#" id="book-places-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Lieux</a>
+                    <a href="#" id="book-occupations-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Occupations</a>
+                    <a href="#" id="book-sources-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Sources</a>
                 </div>
             </div>
         </div>
@@ -162,6 +162,31 @@
                         // Add other tool links here
                     }
                 });
+
+                const bookFirstNamesLink = document.getElementById('book-first-names-link');
+                if (bookFirstNamesLink) {
+                    bookFirstNamesLink.href = `/genealogy/${genealogyName}/book/first_names`;
+                }
+
+                const bookLastNamesLink = document.getElementById('book-last-names-link');
+                if (bookLastNamesLink) {
+                    bookLastNamesLink.href = `/genealogy/${genealogyName}/book/last_names`;
+                }
+
+                const bookPlacesLink = document.getElementById('book-places-link');
+                if (bookPlacesLink) {
+                    bookPlacesLink.href = `/genealogy/${genealogyName}/book/places`;
+                }
+
+                const bookOccupationsLink = document.getElementById('book-occupations-link');
+                if (bookOccupationsLink) {
+                    bookOccupationsLink.href = `/genealogy/${genealogyName}/book/occupations`;
+                }
+
+                const bookSourcesLink = document.getElementById('book-sources-link');
+                if (bookSourcesLink) {
+                    bookSourcesLink.href = `/genealogy/${genealogyName}/book/sources`;
+                }
             }
         });
     </script>

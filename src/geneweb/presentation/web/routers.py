@@ -90,3 +90,58 @@ async def export_gedcom_page(genealogy_name: str, request: Request):
     return templates.TemplateResponse(
         "export_gedcom.html", {"request": request, "genealogy_name": genealogy_name}
     )
+
+
+@router.get("/genealogy/{genealogy_name}/book/first_names", response_class=HTMLResponse)
+async def book_first_names(genealogy_name: str, request: Request):
+    """
+    Affiche le livre des prénoms pour une généalogie.
+    """
+    return templates.TemplateResponse(
+        "book_first_names.html",
+        {"request": request, "genealogy_name": genealogy_name},
+    )
+
+
+@router.get("/genealogy/{genealogy_name}/book/last_names", response_class=HTMLResponse)
+async def book_last_names(genealogy_name: str, request: Request):
+    """
+    Affiche le livre des noms pour une généalogie.
+    """
+    return templates.TemplateResponse(
+        "book_last_names.html",
+        {"request": request, "genealogy_name": genealogy_name},
+    )
+
+
+@router.get("/genealogy/{genealogy_name}/book/places", response_class=HTMLResponse)
+async def book_places(genealogy_name: str, request: Request):
+    """
+    Affiche le livre des lieux pour une généalogie.
+    """
+    return templates.TemplateResponse(
+        "book_places.html",
+        {"request": request, "genealogy_name": genealogy_name},
+    )
+
+
+@router.get("/genealogy/{genealogy_name}/book/occupations", response_class=HTMLResponse)
+async def book_occupations(genealogy_name: str, request: Request):
+    """
+    Affiche le livre des occupations pour une généalogie.
+    """
+    return templates.TemplateResponse(
+        "book_occupations.html",
+        {"request": request, "genealogy_name": genealogy_name},
+    )
+
+
+@router.get("/genealogy/{genealogy_name}/book/sources", response_class=HTMLResponse)
+async def book_sources(genealogy_name: str, request: Request):
+    """
+    Affiche le livre des sources pour une généalogie.
+    """
+    return templates.TemplateResponse(
+        "book_sources.html",
+        {"request": request, "genealogy_name": genealogy_name},
+    )
