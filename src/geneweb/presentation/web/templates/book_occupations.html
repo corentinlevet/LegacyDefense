@@ -22,8 +22,11 @@
                 <h5>Toutes les occupations</h5>
             </div>
             <div class="card-body">
-                <p>Cette page affichera la liste de toutes les occupations de la généalogie.</p>
-                <!-- Le contenu sera ajouté ici -->
+                <ul class="list-group">
+                    {% for occupation in occupations %}
+                    <li class="list-group-item">{{ occupation }}</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
 
