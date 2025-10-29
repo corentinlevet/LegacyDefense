@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang=%l>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="gw/images/favicon_gwd.png">
+  <title>GeneWeb</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: url('gw/images/gwback.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .card {
+      max-width: 800px;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .card-body {
+      padding: 2rem;
+    }
+    .list-group-item {
+      border: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .list-group-item i {
+      margin-right: 0.75rem;
+      color: #6c757d;
+    }
+    .lang-switcher {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+  </style>
+  <script>
+    const supportedLangs = ["de", "en", "es", "fr", "it", "lv", "nl", "no", "fi", "sv"];
+
+    function showContentFor(lang) {
+      supportedLangs.forEach(l => {
+        const el = document.getElementById(l);
+        if (el) {
+          el.style.display = (l === lang) ? 'block' : 'none';
+        }
+      });
+      // Update dropdown button text
+      const langName = document.querySelector(`#lang-menu a[data-lang="${lang}"]`).textContent;
+      document.getElementById('lang-dropdown').textContent = langName;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let userLang = (navigator.language || navigator.userLanguage || 'en').substring(0, 2);
+      if (!supportedLangs.includes(userLang)) {
+        userLang = 'en'; // fallback to English
+      }
+      showContentFor(userLang);
+
+      document.getElementById('lang-menu').addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+          const lang = e.target.getAttribute('data-lang');
+          if (lang) {
+            showContentFor(lang);
+          }
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4 d-none d-md-flex align-items-center justify-content-center">
+          <img src="static/tree.png" alt="Tree" class="img-fluid">
+        </div>
+        <div class="col-md-8">
+
+          <div class="dropdown lang-switcher">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="lang-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Language
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="lang-dropdown" id="lang-menu">
+              <a class="dropdown-item" href="#" data-lang="de">Deutsch</a>
+              <a class="dropdown-item" href="#" data-lang="en">English</a>
+              <a class="dropdown-item" href="#" data-lang="es">Español</a>
+              <a class="dropdown-item" href="#" data-lang="fr">Français</a>
+              <a class="dropdown-item" href="#" data-lang="it">Italiano</a>
+              <a class="dropdown-item" href="#" data-lang="lv">Latvian</a>
+              <a class="dropdown-item" href="#" data-lang="nl">Nederlands</a>
+              <a class="dropdown-item" href="#" data-lang="no">Norsk</a>
+              <a class="dropdown-item" href="#" data-lang="fi">Suomi</a>
+              <a class="dropdown-item" href="#" data-lang="sv">Svenska</a>
+            </div>
+          </div>
+
+          <!-- German -->
+          <div id="de" style="display: none;">
+      <ul class="doc">
+        <li><a href="/static/README.txt" target="_blank">README.txt</a></li>
+      </ul>
+          </div>
+
+          <!-- English -->
+          <div id="en" style="display: none;">
+            <h4>Welcome to GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Family Tree</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Management and creation</a> (gwsetup)</li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">License</a></p>
+          </div>
+
+          <!-- Spanish -->
+          <div id="es" style="display: none;">
+            <h4>Bienvenido a GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Acceso a los árboles</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gestión y Creación</a> (gwsetup)</li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">Licencia</a></p>
+          </div>
+
+          <!-- French -->
+          <div id="fr" style="display: none;">
+            <h4>Bienvenue sur GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Ouvrir une généalogie</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gestion et création</a> (gwsetup)</li>
+      </ul>
+      <ul class="doc">
+        <li><a href="/static/README.txt" target="_blank">LISEZMOI.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">Licence</a></p>
+          </div>
+
+          <!-- Italian -->
+          <div id="it" style="display: none;">
+            <h4>Benvenuti in GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Accesso agli alberi</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gestione e la creazione</a> (gwsetup)</li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">Licenza</a></p>
+          </div>
+
+          <!-- Latvian -->
+          <div id="lv" style="display: none;">
+            <h4>Laipni lūdzam GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Family Tree</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gwsetup</a></li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">License</a></p>
+          </div>
+
+          <!-- Dutch -->
+          <div id="nl" style="display: none;">
+            <h4>Welkom bij GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Family Tree</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gwsetup</a></li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">License</a></p>
+          </div>
+
+          <!-- Norwegian -->
+          <div id="no" style="display: none;">
+            <h4>Velkommen til GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Family Tree</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gwsetup</a></li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">License</a></p>
+          </div>
+
+          <!-- Finnish -->
+          <div id="fi" style="display: none;">
+            <h4>Tervetuloa GeneWebiin</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Family Tree</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Gwsetup</a></li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">License</a></p>
+          </div>
+
+          <!-- Swedish -->
+          <div id="sv" style="display: none;">
+            <h4>Välkommen till GeneWeb</h4>
+            <ul class="list-group list-group-flush">
+        <li><a href="gwd" target="_blank">Family Tree</a> (gwd)</li>
+        <li><a href="gwsetup" target="_blank">Ledning och skapande</a> (gwsetup)</li>
+      </ul>
+      <ul class="doc">
+        <li><a href="README.txt" target="_blank">README.txt</a></li>
+      </ul>
+            <p class="text-muted mt-4"><a href="https://github.com/geneweb/geneweb/blob/master/LICENSE" target="_blank">License</a></p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
