@@ -158,7 +158,32 @@
                 <h5><i class="fas fa-hourglass-end mr-2"></i>20 qui ont vécu le plus longtemps</h5>
             </div>
             <div class="card-body">
-                <!-- Le contenu sera ajouté ici -->
+                {% if longest_lived %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Prénom</th>
+                            <th>Nom</th>
+                            <th>Date de naissance</th>
+                            <th>Date de décès</th>
+                            <th>Âge <i class="fas fa-sort-down"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for person in longest_lived %}
+                        <tr>
+                            <td>{{ person.first_name }}</td>
+                            <td>{{ person.surname }}</td>
+                            <td>{{ person.birth_date }}</td>
+                            <td>{{ person.death_date }}</td>
+                            <td><strong>{{ person.age }} ans</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">Aucune donnée disponible.</p>
+                {% endif %}
             </div>
         </div>
 

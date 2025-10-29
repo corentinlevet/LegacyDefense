@@ -16,7 +16,7 @@ from ..infrastructure.models import Event, Family, Genealogy, Person
 from ..infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )
-from ..presentation.web.formatters import format_date_natural, parse_date_to_year
+from ..presentation.web.formatters import format_date_natural
 
 
 def _format_date_for_gedcom(d: Optional[object]) -> Optional[str]:
@@ -89,6 +89,31 @@ def parse_date_for_sorting(date_str: str | None) -> tuple[int, int, int]:
         return (year, 1, 1)
 
     return (9999, 12, 31)
+
+
+def is_possibly_alive(birth_date_str: str | None, death_date_str: str | None) -> bool:
+    """
+    Détermine si une personne peut plausiblement être encore en vie.
+
+    Critères:
+    - Pas de date de décès enregistrée
+    - Date de naissance dans les 120 dernières années (âge maximum plausible)
+    """
+    if death_date_str:
+        return False
+
+    if not birth_date_str:
+        return False
+
+    birth_tuple = parse_date_for_sorting(birth_date_str)
+    if birth_tuple[0] == 9999:  # Date invalide
+        return False
+
+    current_year = datetime.now().year
+    age = current_year - birth_tuple[0]
+
+    # Une personne de plus de 120 ans est considérée comme décédée
+    return age <= 120
 
 
 class GenealogyService:
@@ -767,17 +792,33 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        families = self.genealogy_repo.get_oldest_couples(genealogy.id)
-        alive_couples = []
-        for family in families:
-            if (
-                family.father
-                and family.mother
-                and not family.father.death_date
-                and not family.mother.death_date
-            ):
-                marriage_year = parse_date_to_year(family.marriage_date)
-                if marriage_year:
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            # Récupère toutes les familles avec date de mariage
+            all_families = (
+                db.query(Family)
+                .filter(
+                    Family.genealogy_id == genealogy.id,
+                    Family.marriage_date.isnot(None),
+                )
+                .all()
+            )
+
+            alive_couples = []
+            for family in all_families:
+                # Vérifie que les deux conjoints existent et peuvent être en vie
+                if (
+                    family.father
+                    and family.mother
+                    and is_possibly_alive(
+                        family.father.birth_date, family.father.death_date
+                    )
+                    and is_possibly_alive(
+                        family.mother.birth_date, family.mother.death_date
+                    )
+                ):
                     alive_couples.append(
                         {
                             "id": family.id,
@@ -786,16 +827,19 @@ class ApplicationService:
                             "mother_first_name": family.mother.first_name,
                             "mother_surname": family.mother.surname,
                             "marriage_date": format_date_natural(family.marriage_date),
-                            "marriage_year": marriage_year,
                         }
                     )
 
-                    # Sort by marriage year, oldest first
-                    sorted_couples = sorted(
-                        alive_couples, key=lambda x: x["marriage_year"]
-                    )
+            # Trie par date de mariage croissante (les plus anciens mariages en premier)
+            sorted_couples = sorted(
+                alive_couples,
+                key=lambda x: parse_date_for_sorting(x["marriage_date"]),
+                reverse=False,
+            )
 
-                    return sorted_couples[:limit]
+            return sorted_couples[:limit]
+        finally:
+            db.close()
 
     async def get_oldest_alive(
         self, genealogy_name: str, limit: int = 20
@@ -804,26 +848,52 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        persons = self.genealogy_repo.get_oldest_alive(genealogy.id)
+        from ..infrastructure.database import SessionLocal
 
-        alive_persons = []
-        for person in persons:
-            birth_year = parse_date_to_year(person.birth_date)
-            if birth_year:
-                alive_persons.append(
-                    {
-                        "id": person.id,
-                        "first_name": person.first_name,
-                        "surname": person.surname,
-                        "birth_date": format_date_natural(person.birth_date),
-                        "birth_year": birth_year,
-                    }
+        db = SessionLocal()
+        try:
+            # Récupère toutes les personnes avec date de naissance
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id,
+                    Person.birth_date.isnot(None),
                 )
+                .all()
+            )
 
-        # Sort by birth year, oldest first
-        sorted_persons = sorted(alive_persons, key=lambda x: x["birth_year"])
+            # Filtre les personnes qui peuvent plausiblement être en vie
+            alive_persons = [
+                p for p in all_persons if is_possibly_alive(p.birth_date, p.death_date)
+            ]
 
-        return sorted_persons[:limit]
+            # Trie par date de naissance croissante (les plus vieux en premier)
+            sorted_persons = sorted(
+                alive_persons,
+                key=lambda p: parse_date_for_sorting(p.birth_date),
+                reverse=False,
+            )
+
+            # Limite aux N premiers et élimine les doublons par ID
+            seen_ids = set()
+            unique_persons = []
+            for person in sorted_persons:
+                if person.id not in seen_ids:
+                    seen_ids.add(person.id)
+                    unique_persons.append(
+                        {
+                            "id": person.id,
+                            "first_name": person.first_name,
+                            "surname": person.surname,
+                            "birth_date": format_date_natural(person.birth_date),
+                        }
+                    )
+                if len(unique_persons) >= limit:
+                    break
+
+            return unique_persons
+        finally:
+            db.close()
 
     async def get_longest_lived(
         self, genealogy_name: str, limit: int = 20
@@ -832,29 +902,50 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        persons = self.genealogy_repo.get_longest_lived(genealogy.id)
+        from ..infrastructure.database import SessionLocal
 
-        longest_lived_persons = []
-        for person in persons:
-            birth_year = parse_date_to_year(person.birth_date)
-            death_year = parse_date_to_year(person.death_date)
-
-            if birth_year and death_year:
-                age = death_year - birth_year
-                longest_lived_persons.append(
-                    {
-                        "id": person.id,
-                        "first_name": person.first_name,
-                        "surname": person.surname,
-                        "birth_date": format_date_natural(person.birth_date),
-                        "death_date": format_date_natural(person.death_date),
-                        "age": age,
-                    }
+        db = SessionLocal()
+        try:
+            # Récupère toutes les personnes avec date de naissance ET de décès
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id,
+                    Person.birth_date.isnot(None),
+                    Person.death_date.isnot(None),
                 )
+                .all()
+            )
 
-        # Sort by age, longest lived first
-        sorted_persons = sorted(
-            longest_lived_persons, key=lambda x: x["age"], reverse=True
-        )
+            longest_lived = []
+            for person in all_persons:
+                birth_tuple = parse_date_for_sorting(person.birth_date)
+                death_tuple = parse_date_for_sorting(person.death_date)
 
-        return sorted_persons[:limit]
+                # Calcule l'âge approximatif en années
+                if birth_tuple[0] != 9999 and death_tuple[0] != 9999:
+                    age = death_tuple[0] - birth_tuple[0]
+                    # Ajuste si le mois/jour de décès est avant le mois/jour de naissance
+                    if (death_tuple[1], death_tuple[2]) < (
+                        birth_tuple[1],
+                        birth_tuple[2],
+                    ):
+                        age -= 1
+
+                    longest_lived.append(
+                        {
+                            "id": person.id,
+                            "first_name": person.first_name,
+                            "surname": person.surname,
+                            "birth_date": format_date_natural(person.birth_date),
+                            "death_date": format_date_natural(person.death_date),
+                            "age": age,
+                        }
+                    )
+
+            # Trie par âge décroissant (les plus vieux en premier)
+            sorted_persons = sorted(longest_lived, key=lambda x: x["age"], reverse=True)
+
+            return sorted_persons[:limit]
+        finally:
+            db.close()

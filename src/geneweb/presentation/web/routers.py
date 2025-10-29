@@ -1,6 +1,6 @@
 import pathlib
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, logger
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -209,35 +209,39 @@ async def statistics_page(
     request: Request,
     app_service: ApplicationService = Depends(get_app_service),
 ):
-    """
-    Affiche la page des statistiques pour une généalogie.
-    """
-    last_births = await app_service.get_last_births(genealogy_name)
-    last_deaths = await app_service.get_last_deaths(genealogy_name)
-    last_marriages = await app_service.get_last_marriages(genealogy_name)
-    oldest_couples = await app_service.get_oldest_couples(genealogy_name)
-    oldest_alive = await app_service.get_oldest_alive(genealogy_name)
-    if (
-        last_births is None
-        or last_deaths is None
-        or last_marriages is None
-        or oldest_couples is None
-        or oldest_alive is None
-    ):
-        raise HTTPException(status_code=404, detail="Genealogy not found")
+    """Page des statistiques pour une généalogie"""
+    try:
+        # Récupère toutes les statistiques
+        last_births = await app_service.get_last_births(genealogy_name)
+        last_deaths = await app_service.get_last_deaths(genealogy_name)
+        last_marriages = await app_service.get_last_marriages(genealogy_name)
+        oldest_couples = await app_service.get_oldest_couples(genealogy_name)
+        oldest_alive = await app_service.get_oldest_alive(genealogy_name)
+        longest_lived = await app_service.get_longest_lived(genealogy_name)
 
-    return templates.TemplateResponse(
-        "statistics.html",
-        {
-            "request": request,
-            "genealogy_name": genealogy_name,
-            "last_births": last_births,
-            "last_deaths": last_deaths,
-            "last_marriages": last_marriages,
-            "oldest_couples": oldest_couples,
-            "oldest_alive": oldest_alive,
-        },
-    )
+        return templates.TemplateResponse(
+            "statistics.html",
+            {
+                "request": request,
+                "genealogy_name": genealogy_name,
+                "last_births": last_births or [],
+                "last_deaths": last_deaths or [],
+                "last_marriages": last_marriages or [],
+                "oldest_couples": oldest_couples or [],
+                "oldest_alive": oldest_alive or [],
+                "longest_lived": longest_lived or [],
+            },
+        )
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération des statistiques: {e}")
+        return templates.TemplateResponse(
+            "statistics.html",
+            {
+                "request": request,
+                "genealogy_name": genealogy_name,
+                "error": "Impossible de charger les statistiques",
+            },
+        )
 
 
 @router.get("/genealogy/{name}/config", response_class=HTMLResponse)
