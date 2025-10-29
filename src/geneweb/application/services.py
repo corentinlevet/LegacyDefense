@@ -1,9 +1,11 @@
 import os
+import re
 import tempfile
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
+from fastapi import logger
 from gedcom.element.family import FamilyElement
 from gedcom.element.individual import IndividualElement
 from gedcom.parser import Parser as GedcomParser
@@ -32,6 +34,61 @@ def _format_date_for_gedcom(d: Optional[object]) -> Optional[str]:
         pass
     # Sinon on suppose que c'est une string
     return str(d)
+
+
+def parse_date_for_sorting(date_str: str | None) -> tuple[int, int, int]:
+    """
+    Parse une date stockée en texte et retourne un tuple (année, mois, jour) pour le tri.
+    Gère les formats: "Avant YYYY", "Entre YYYY et YYYY", "Estimé YYYY", "DD Month YYYY", etc.
+
+    Retourne (9999, 12, 31) pour les dates invalides (les mettra en dernier)
+    """
+    if not date_str:
+        return (9999, 12, 31)
+
+    date_str = date_str.strip()
+
+    # Avant YYYY -> utilise l'année moins 1
+    if date_str.startswith("Avant") or date_str.startswith("Before"):
+        match = re.search(r"\d{4}", date_str)
+        if match:
+            year = int(match.group()) - 1
+            return (year, 12, 31)
+
+    # Estimé YYYY / About YYYY -> utilise l'année
+    if date_str.startswith("Estimé") or date_str.startswith("About"):
+        match = re.search(r"\d{4}", date_str)
+        if match:
+            year = int(match.group())
+            return (year, 6, 15)  # Milieu de l'année
+
+    # Entre YYYY et YYYY -> utilise la première année
+    if date_str.startswith("Entre") or date_str.startswith("Between"):
+        match = re.search(r"\d{4}", date_str)
+        if match:
+            year = int(match.group())
+            return (year, 1, 1)
+
+    # Format complet: "DD Month YYYY" ou "DD/MM/YYYY"
+    try:
+        # Essaie différents formats de date
+        for fmt in ["%d %B %Y", "%d %b %Y", "%d/%m/%Y", "%Y-%m-%d"]:
+            try:
+                dt = datetime.strptime(date_str, fmt)
+                return (dt.year, dt.month, dt.day)
+            except ValueError:
+                continue
+    except:
+        logger.exception("Error parsing date")
+        pass
+
+    # Juste une année: "YYYY"
+    match = re.search(r"\b(\d{4})\b", date_str)
+    if match:
+        year = int(match.group(1))
+        return (year, 1, 1)
+
+    return (9999, 12, 31)
 
 
 class GenealogyService:
@@ -582,18 +639,41 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        persons = self.genealogy_repo.get_last_births(genealogy.id, limit)
-        for person in persons:
-            print(format_date_natural(person.birth_date))
-        return [
-            {
-                "id": person.id,
-                "first_name": person.first_name,
-                "surname": person.surname,
-                "birth_date": format_date_natural(person.birth_date),
-            }
-            for person in persons
-        ]
+        # Utilise SessionLocal pour créer une session
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            # Récupère TOUTES les personnes avec date de naissance
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id, Person.birth_date.isnot(None)
+                )
+                .all()
+            )
+
+            # Trie par date de naissance décroissante (plus récent en premier)
+            sorted_persons = sorted(
+                all_persons,
+                key=lambda p: parse_date_for_sorting(p.birth_date),
+                reverse=True,
+            )
+
+            # Limite aux N premiers
+            persons = sorted_persons[:limit]
+
+            return [
+                {
+                    "id": person.id,
+                    "first_name": person.first_name,
+                    "surname": person.surname,
+                    "birth_date": format_date_natural(person.birth_date),
+                }
+                for person in persons
+            ]
+        finally:
+            db.close()
 
     async def get_last_deaths(
         self, genealogy_name: str, limit: int = 20
@@ -602,15 +682,37 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        persons = self.genealogy_repo.get_last_deaths(genealogy.id, limit)
-        return [
-            {
-                "id": person.id,
-                "first_name": person.first_name,
-                "surname": person.surname,
-            }
-            for person in persons
-        ]
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id, Person.death_date.isnot(None)
+                )
+                .all()
+            )
+
+            sorted_persons = sorted(
+                all_persons,
+                key=lambda p: parse_date_for_sorting(p.death_date),
+                reverse=True,
+            )
+
+            persons = sorted_persons[:limit]
+
+            return [
+                {
+                    "id": person.id,
+                    "first_name": person.first_name,
+                    "surname": person.surname,
+                    "death_date": format_date_natural(person.death_date),
+                }
+                for person in persons
+            ]
+        finally:
+            db.close()
 
     async def get_last_marriages(
         self, genealogy_name: str, limit: int = 20
@@ -619,18 +721,44 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        families = self.genealogy_repo.get_last_marriages(genealogy.id, limit)
-        return [
-            {
-                "id": family.id,
-                "father_first_name": family.father.first_name if family.father else "",
-                "father_surname": family.father.surname if family.father else "",
-                "mother_first_name": family.mother.first_name if family.mother else "",
-                "mother_surname": family.mother.surname if family.mother else "",
-                "marriage_date": format_date_natural(family.marriage_date),
-            }
-            for family in families
-        ]
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            all_families = (
+                db.query(Family)
+                .filter(
+                    Family.genealogy_id == genealogy.id,
+                    Family.marriage_date.isnot(None),
+                )
+                .all()
+            )
+
+            sorted_families = sorted(
+                all_families,
+                key=lambda f: parse_date_for_sorting(f.marriage_date),
+                reverse=True,
+            )
+
+            families = sorted_families[:limit]
+
+            return [
+                {
+                    "id": family.id,
+                    "father_first_name": (
+                        family.father.first_name if family.father else ""
+                    ),
+                    "father_surname": family.father.surname if family.father else "",
+                    "mother_first_name": (
+                        family.mother.first_name if family.mother else ""
+                    ),
+                    "mother_surname": family.mother.surname if family.mother else "",
+                    "marriage_date": format_date_natural(family.marriage_date),
+                }
+                for family in families
+            ]
+        finally:
+            db.close()
 
     async def get_oldest_couples(
         self, genealogy_name: str, limit: int = 20
