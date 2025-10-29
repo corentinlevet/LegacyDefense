@@ -48,3 +48,17 @@ async def create_genealogy_form(request: Request):
 @router.get("/genealogies", response_class=HTMLResponse)
 async def list_genealogies_page(request: Request):
     return templates.TemplateResponse("list_genealogies.html", {"request": request})
+
+
+@router.get("/genealogy/{name}", response_class=HTMLResponse)
+async def view_genealogy(name: str, request: Request):
+    return HTMLResponse(
+        f"<h1>Viewing Genealogy: {name}</h1><p>Details for {name} would go here.</p>"
+    )
+
+
+@router.get("/genealogies/{genealogy_name}/import", response_class=HTMLResponse)
+async def import_gedcom_page(genealogy_name: str, request: Request):
+    return templates.TemplateResponse(
+        "import_gedcom.html", {"request": request, "genealogy_name": genealogy_name}
+    )

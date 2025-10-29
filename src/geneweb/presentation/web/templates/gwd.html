@@ -20,9 +20,9 @@
           </div>
           <div class="card-body">
             <p class="text-muted">Entrez le nom de la base de données que vous souhaitez consulter.</p>
-            <form class="form-inline">
+            <form class="form-inline" id="openGenealogyForm">
               <div class="input-group w-100">
-                <input type="text" class="form-control" placeholder="Nom de la base" aria-label="Nom de la base">
+                <input type="text" class="form-control" id="genealogyNameInput" placeholder="Nom de la base" aria-label="Nom de la base" required>
                 <div class="input-group-append">
                   <button class="btn btn-primary" type="submit">Ouvrir</button>
                 </div>
@@ -30,18 +30,67 @@
             </form>
             <hr>
             <h6 class="mt-4">Bases disponibles :</h6>
-            <p class="text-muted">(La liste des bases de données apparaîtra ici prochainement)</p>
-            <ul class="list-group">
-              <!-- Exemple (sera rempli dynamiquement) -->
-              <!-- 
-              <li class="list-group-item"><a href="#">ma_base_de_test</a></li>
-              <li class="list-group-item"><a href="#">base_principale</a></li>
-              -->
+            <ul class="list-group" id="genealogyList">
+              <!-- Les généalogies seront chargées ici par JavaScript -->
+              <li class="list-group-item text-center">Chargement des généalogies...</li>
             </ul>
+            <hr>
+            <a href="/genealogies/create" class="btn btn-success mt-3">
+                <i class="fas fa-plus-circle mr-2"></i> Créer une nouvelle généalogie
+            </a>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchGenealogies();
+
+        document.getElementById('openGenealogyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const genealogyName = document.getElementById('genealogyNameInput').value;
+            if (genealogyName) {
+                window.location.href = `/genealogy/${genealogyName}`;
+            }
+        });
+    });
+
+    async function fetchGenealogies() {
+        const genealogyList = document.getElementById('genealogyList');
+        genealogyList.innerHTML = '<li class="list-group-item text-center">Chargement des généalogies...</li>';
+
+        try {
+            const response = await fetch('/api/genealogies');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const genealogies = await response.json();
+
+            genealogyList.innerHTML = ''; // Clear loading message
+
+            if (genealogies.length === 0) {
+                genealogyList.innerHTML = '<li class="list-group-item text-center text-muted">Aucune généalogie trouvée.</li>';
+            } else {
+                genealogies.forEach(genealogy => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `
+                        <a href="/genealogy/${genealogy.name}">${genealogy.name}</a>
+                        <a href="/genealogies/${genealogy.name}/import" class="btn btn-sm btn-info">
+                            <i class="fas fa-upload mr-1"></i> Importer GEDCOM
+                        </a>
+                    `;
+                    genealogyList.appendChild(listItem);
+                });
+            }
+
+        } catch (error) {
+            console.error('Erreur lors du chargement des généalogies:', error);
+            genealogyList.innerHTML = '<li class="list-group-item text-center text-danger">Erreur lors du chargement. Veuillez réessayer.</li>';
+        }
+    }
+  </script>
 </body>
 </html>
