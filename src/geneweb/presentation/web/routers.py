@@ -62,3 +62,10 @@ async def import_gedcom_page(genealogy_name: str, request: Request):
     return templates.TemplateResponse(
         "import_gedcom.html", {"request": request, "genealogy_name": genealogy_name}
     )
+
+
+@router.get("/genealogies/{genealogy_name}/export", response_class=HTMLResponse)
+async def export_gedcom_page(genealogy_name: str, request: Request):
+    return templates.TemplateResponse(
+        "export_gedcom.html", {"request": request, "genealogy_name": genealogy_name}
+    )

@@ -1,11 +1,13 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ...application.services import GenealogyService
 from ...infrastructure.database import SessionLocal
+from ...infrastructure.models import Genealogy
 
 router = APIRouter(prefix="/api")
 
@@ -106,3 +108,34 @@ async def import_gedcom_file(
         raise HTTPException(
             status_code=500, detail=f"Erreur lors de l'importation: {str(e)}"
         )
+
+
+@router.get("/genealogies/{genealogy_name}/export", response_class=Response)
+async def export_gedcom_api(
+    genealogy_name: str,
+    service: GenealogyService = Depends(GenealogyService),
+):
+    db: Session = SessionLocal()
+    try:
+        genealogy = db.query(Genealogy).filter(Genealogy.name == genealogy_name).first()
+
+        if not genealogy:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Genealogy '{genealogy_name}' not found.",
+            )
+
+        gedcom_content = service.export_gedcom(genealogy.id, db)
+
+        response = Response(content=gedcom_content, media_type="application/x-gedcom")
+        response.headers["Content-Disposition"] = (
+            f"attachment; filename={genealogy_name}.ged"
+        )
+        return response
+    except Exception as e:
+        print("Error during GEDCOM export:", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
+    finally:
+        db.close()
