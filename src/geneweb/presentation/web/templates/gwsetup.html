@@ -94,10 +94,9 @@
               <i class="fas fa-database mr-2"></i>
               Généalogies existantes
             </a>
-            <a href="#" class="list-group-item list-group-item-action disabled">
-              <i class="fas fa-chart-line mr-2"></i>
+            <a href="/admin/errors-stats" class="list-group-item list-group-item-action">
+              <i class="fas fa-chart-line mr-2 text-info"></i>
               Historique des erreurs et statistiques
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
           </ul>
         </div>
@@ -204,15 +203,13 @@
             <i class="fas fa-sliders-h mr-2"></i>Configurer
           </div>
           <ul class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action disabled">
-              <i class="fas fa-database mr-2"></i>
+            <a href="#" id="database-config-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-database mr-2 text-warning"></i>
               Paramètres d'une base de données
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
-            <a href="#" class="list-group-item list-group-item-action disabled">
-              <i class="fas fa-server mr-2"></i>
+            <a href="/config/server" class="list-group-item list-group-item-action">
+              <i class="fas fa-server mr-2 text-warning"></i>
               Paramètres du service gwd
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
           </ul>
         </div>
@@ -252,8 +249,79 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+  
+  <script>
+    $(document).ready(function() {
+      // Gestionnaire pour le lien "Paramètres d'une base de données"
+      $('#database-config-link').on('click', function(e) {
+        e.preventDefault();
+        
+        // Charger la liste des généalogies
+        $.get('/api/genealogies')
+          .done(function(genealogies) {
+            if (genealogies.length === 0) {
+              alert('Aucune généalogie disponible. Créez d\'abord une généalogie.');
+              return;
+            }
+            
+            // Créer une modale pour sélectionner la généalogie
+            let modalHtml = `
+              <div class="modal fade" id="selectGenealogyModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">
+                        <i class="fas fa-database mr-2"></i>
+                        Sélectionner une généalogie
+                      </h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p class="text-muted">
+                        Choisissez la généalogie à configurer :
+                      </p>
+                      <div class="list-group">
+                        ${genealogies.map(g => `
+                          <a href="/genealogy/${g.name}/config/database" 
+                             class="list-group-item list-group-item-action">
+                            <i class="fas fa-database mr-2 text-primary"></i>
+                            ${g.name}
+                          </a>
+                        `).join('')}
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            // Supprimer l'ancienne modale si elle existe
+            $('#selectGenealogyModal').remove();
+            
+            // Ajouter et afficher la modale
+            $('body').append(modalHtml);
+            $('#selectGenealogyModal').modal('show');
+            
+            // Supprimer la modale du DOM après fermeture
+            $('#selectGenealogyModal').on('hidden.bs.modal', function() {
+              $(this).remove();
+            });
+          })
+          .fail(function() {
+            alert('Erreur lors du chargement des généalogies');
+          });
+      });
+    });
+  </script>
 </body>
 </html>

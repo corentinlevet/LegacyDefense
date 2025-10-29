@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des erreurs et statistiques</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-chart-line text-info"></i>
+                Historique des erreurs et statistiques
+            </h1>
+            <a href="/gwsetup" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+
+        <!-- Global Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-database fa-3x mb-3"></i>
+                        <h3 id="total-genealogies">0</h3>
+                        <p class="mb-0">Généalogies</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <h3 id="total-persons">0</h3>
+                        <p class="mb-0">Personnes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-warning text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                        <h3 id="total-warnings">0</h3>
+                        <p class="mb-0">Avertissements</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-times-circle fa-3x mb-3"></i>
+                        <h3 id="total-errors">0</h3>
+                        <p class="mb-0">Erreurs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Genealogies List -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list mr-2"></i>
+                    Détails par généalogie
+                </h5>
+            </div>
+            <div class="card-body" id="genealogies-list">
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p class="mt-2">Chargement...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-server mr-2"></i>
+                    Informations système
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-6">Version:</dt>
+                            <dd class="col-sm-6">GeneWeb 1.0 (Python)</dd>
+                            
+                            <dt class="col-sm-6">Base de données:</dt>
+                            <dd class="col-sm-6">SQLite</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-6">État:</dt>
+                            <dd class="col-sm-6">
+                                <span class="badge badge-success">Opérationnel</span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $.get('/api/genealogies').done(function(genealogies) {
+                $('#total-genealogies').text(genealogies.length);
+                
+                let totalPersons = 0;
+                let html = '';
+
+                if (genealogies.length === 0) {
+                    $('#genealogies-list').html(
+                        '<p class="text-center text-muted">' +
+                        '<i class="fas fa-inbox fa-3x mb-3 d-block"></i>' +
+                        'Aucune généalogie disponible' +
+                        '</p>'
+                    );
+                    return;
+                }
+
+                genealogies.forEach(g => {
+                    $.get(`/api/genealogies/${g.name}/statistics`).done(function(stats) {
+                        totalPersons += stats.total_persons || 0;
+                        $('#total-persons').text(totalPersons);
+
+                        html += `
+                            <div class="mb-3 p-3 border-left border-primary" style="border-left-width: 4px !important;">
+                                <h5>
+                                    <i class="fas fa-database mr-2"></i>
+                                    <a href="/genealogy/${g.name}">${g.name}</a>
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>${stats.total_persons || 0}</strong> personnes
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>${stats.men_count || 0}</strong> hommes
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>${stats.women_count || 0}</strong> femmes
+                                    </div>
+                                    <div class="col-md-3">
+                                        <a href="/genealogy/${g.name}/config/database" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-cog"></i> Configurer
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('#genealogies-list').html(html);
+                    });
+                });
+            }).fail(function() {
+                $('#genealogies-list').html(
+                    '<div class="alert alert-danger">' +
+                    '<i class="fas fa-exclamation-circle mr-2"></i>' +
+                    'Erreur lors du chargement des généalogies' +
+                    '</div>'
+                );
+            });
+        });
+    </script>
+</body>
+</html>

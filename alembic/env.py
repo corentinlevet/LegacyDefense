@@ -24,6 +24,10 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
+# Import all models to ensure they are registered with SQLAlchemy
+from geneweb.infrastructure import config_models  # noqa: F401
+from geneweb.infrastructure import models  # noqa: F401
+
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
