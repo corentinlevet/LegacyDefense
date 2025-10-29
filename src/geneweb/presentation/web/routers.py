@@ -38,3 +38,13 @@ async def read_admin_page(request: Request):
     """
     context = {"request": request}
     return templates.TemplateResponse("gwsetup.html", context)
+
+
+@router.get("/genealogies/create", response_class=HTMLResponse)
+async def create_genealogy_form(request: Request):
+    return templates.TemplateResponse("create_genealogy.html", {"request": request})
+
+
+@router.get("/genealogies", response_class=HTMLResponse)
+async def list_genealogies_page(request: Request):
+    return templates.TemplateResponse("list_genealogies.html", {"request": request})
