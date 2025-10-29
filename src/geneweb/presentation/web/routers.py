@@ -1,8 +1,11 @@
 import pathlib
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+
+from ...application.services import ApplicationService
+from ...presentation.dependencies import get_app_service
 
 # Chemin vers le dossier contenant les templates
 # On part du principe que ce fichier est dans src/geneweb/presentation/web/
@@ -51,9 +54,27 @@ async def list_genealogies_page(request: Request):
 
 
 @router.get("/genealogy/{name}", response_class=HTMLResponse)
-async def view_genealogy(name: str, request: Request):
-    return HTMLResponse(
-        f"<h1>Viewing Genealogy: {name}</h1><p>Details for {name} would go here.</p>"
+async def view_genealogy(
+    name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    """
+    Sert la page d'accueil pour une généalogie spécifique,
+    en récupérant les données via la couche de service.
+    """
+    details = await app_service.get_genealogy_details(name)
+    print(details)
+    if not details:
+        raise HTTPException(status_code=404, detail="Genealogy not found")
+
+    return templates.TemplateResponse(
+        "genealogy_dashboard.html",
+        {
+            "request": request,
+            "genealogy_name": name,
+            "nb_persons": details.person_count,
+        },
     )
 
 
