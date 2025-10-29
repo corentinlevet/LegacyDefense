@@ -3,11 +3,11 @@ import sys
 
 from sqlalchemy.orm import Session
 
-from src.geneweb.infrastructure.database import SessionLocal
-from src.geneweb.infrastructure.models import Family, Person
-
 # Ajoute le répertoire parent au path pour que les imports fonctionnent
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from src.geneweb.infrastructure.database import SessionLocal
+from src.geneweb.infrastructure.models import Family, Person
 
 
 def fix_string(s: str | None) -> str | None:
