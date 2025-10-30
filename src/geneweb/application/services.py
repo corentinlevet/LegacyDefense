@@ -9,7 +9,7 @@ from fastapi import logger
 from gedcom.element.family import FamilyElement
 from gedcom.element.individual import IndividualElement
 from gedcom.parser import Parser as GedcomParser
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..infrastructure.database import SessionLocal
 from ..infrastructure.models import Event, Family, Genealogy, Person
@@ -1338,5 +1338,145 @@ class ApplicationService:
             result.sort(key=lambda x: x["place"])
 
             return result
+        finally:
+            db.close()
+
+    async def add_family(self, genealogy_name: str, form_data):
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return
+
+        from ..infrastructure.database import SessionLocal
+
+        def format_date(mm, dd, yyyy):
+            if yyyy and mm and dd:
+                return f"{dd}/{mm}/{yyyy}"
+            if yyyy and mm:
+                return f"{mm}/{yyyy}"
+            if yyyy:
+                return yyyy
+            return None
+
+        db = SessionLocal()
+        try:
+            father_birth_date = format_date(
+                form_data.get("pa1b_mm"),
+                form_data.get("pa1b_dd"),
+                form_data.get("pa1b_yyyy"),
+            )
+            father_death_date = format_date(
+                form_data.get("pa1d_mm"),
+                form_data.get("pa1d_dd"),
+                form_data.get("pa1d_yyyy"),
+            )
+            mother_birth_date = format_date(
+                form_data.get("pa2b_mm"),
+                form_data.get("pa2b_dd"),
+                form_data.get("pa2b_yyyy"),
+            )
+            mother_death_date = format_date(
+                form_data.get("pa2d_mm"),
+                form_data.get("pa2d_dd"),
+                form_data.get("pa2d_yyyy"),
+            )
+
+            father = Person(
+                genealogy_id=genealogy.id,
+                first_name=form_data["pa1_fn"],
+                surname=form_data["pa1_sn"],
+                sex="M",
+                birth_date=father_birth_date,
+                birth_place=form_data.get("pa1b_pl"),
+                death_date=father_death_date,
+                death_place=form_data.get("pa1d_pl"),
+                occupation=form_data.get("pa1_occupation"),
+            )
+            mother = Person(
+                genealogy_id=genealogy.id,
+                first_name=form_data["pa2_fn"],
+                surname=form_data["pa2_sn"],
+                sex="F",
+                birth_date=mother_birth_date,
+                birth_place=form_data.get("pa2b_pl"),
+                death_date=mother_death_date,
+                death_place=form_data.get("pa2d_pl"),
+                occupation=form_data.get("pa2_occupation"),
+            )
+
+            db.add(father)
+            db.add(mother)
+            db.flush()
+
+            family = Family(
+                genealogy_id=genealogy.id,
+                father_id=father.id,
+                mother_id=mother.id,
+            )
+            db.add(family)
+            db.flush()
+
+            # Add event
+            event_date = format_date(
+                form_data.get("e_date1_mm"),
+                form_data.get("e_date1_dd"),
+                form_data.get("e_date1_yyyy"),
+            )
+            if event_date:
+                event = Event(
+                    genealogy_id=genealogy.id,
+                    family_id=family.id,
+                    event_type=form_data.get("e_type1"),
+                    date=event_date,
+                    place=form_data.get("e_place1"),
+                    note=form_data.get("e_note1"),
+                    source=form_data.get("e_src1"),
+                )
+                db.add(event)
+
+            # Add child
+            child_birth_date = format_date(
+                form_data.get("ch1b_mm"),
+                form_data.get("ch1b_dd"),
+                form_data.get("ch1b_yyyy"),
+            )
+            child_death_date = format_date(
+                form_data.get("ch1d_mm"),
+                form_data.get("ch1d_dd"),
+                form_data.get("ch1d_yyyy"),
+            )
+            if form_data.get("ch1_fn") and form_data.get("ch1_sn"):
+                child = Person(
+                    genealogy_id=genealogy.id,
+                    first_name=form_data["ch1_fn"],
+                    surname=form_data["ch1_sn"],
+                    sex=form_data.get("ch1_sex"),
+                    birth_date=child_birth_date,
+                    birth_place=form_data.get("ch1b_pl"),
+                    death_date=child_death_date,
+                    death_place=form_data.get("ch1d_pl"),
+                    occupation=form_data.get("ch1_occupation"),
+                )
+                db.add(child)
+                family.children.append(child)
+
+            db.commit()
+
+            return family.id
+
+        finally:
+            db.close()
+
+    async def get_family(self, family_id: int):
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            family = (
+                db.query(Family)
+                .options(joinedload(Family.father), joinedload(Family.mother))
+                .filter(Family.id == family_id)
+                .first()
+            )
+            return family
         finally:
             db.close()
