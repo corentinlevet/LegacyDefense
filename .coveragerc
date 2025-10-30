@@ -1,0 +1,57 @@
+# Configuration Coverage.py
+# Documentation: https://coverage.readthedocs.io/
+
+[run]
+# Spécifier les dossiers sources à analyser
+source = src,code
+
+# Fichiers à omettre du coverage
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */venv/*
+    */.venv/*
+    */migrations/*
+    */alembic/*
+    */versions/*
+    */static/*
+    */templates/*
+    setup.py
+    conftest.py
+
+[report]
+# Lignes à exclure du coverage
+exclude_lines =
+    # Pragma standard pour ignorer des lignes
+    pragma: no cover
+    
+    # Ne pas se plaindre du code de debug
+    def __repr__
+    if self\.debug
+    
+    # Ne pas se plaindre des assertions défensives
+    raise AssertionError
+    raise NotImplementedError
+    
+    # Ne pas se plaindre du code non exécutable
+    if 0:
+    if __name__ == .__main__.:
+    
+    # Ne pas se plaindre des méthodes abstraites
+    @(abc\.)?abstractmethod
+    
+    # Ne pas se plaindre des blocs de type checking
+    if TYPE_CHECKING:
+    
+    # Ne pas se plaindre des pass statements
+    pass
+
+precision = 2
+show_missing = True
+
+[html]
+directory = htmlcov
+
+[xml]
+output = coverage.xml
