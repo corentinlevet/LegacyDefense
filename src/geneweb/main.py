@@ -3,8 +3,7 @@ import pathlib
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from .presentation.api.api import router as api_router
-from .presentation.api.config_api import router as config_api_router
+from .presentation.api.routers import api_router
 from .presentation.web.routers import router as web_router
 
 # Créer l'application FastAPI principale
@@ -23,5 +22,3 @@ app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 app.include_router(web_router)
 app.include_router(api_router)
-
-app.include_router(config_api_router)

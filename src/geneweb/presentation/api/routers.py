@@ -1,7 +1,14 @@
+"""
+Main API router for the application.
+
+This router aggregates all API sub-routers.
+"""
+
 from fastapi import APIRouter
 
-from .api import router as api_router
+from . import genealogy_api, server_api
 
-router = APIRouter()
+api_router = APIRouter(prefix="/api")
 
-router.include_router(api_router)
+api_router.include_router(genealogy_api.router, prefix="/genealogies")
+api_router.include_router(server_api.router, prefix="/server")
