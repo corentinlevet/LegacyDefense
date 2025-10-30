@@ -1531,3 +1531,26 @@ class ApplicationService:
             return person
         finally:
             db.close()
+
+    async def search_persons(
+        self, genealogy_name: str, first_name: str = None, surname: str = None
+    ):
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return []
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            query = db.query(Person).filter(Person.genealogy_id == genealogy.id)
+
+            if first_name:
+                query = query.filter(Person.first_name.ilike(f"%{first_name}%"))
+            if surname:
+                query = query.filter(Person.surname.ilike(f"%{surname}%"))
+
+            persons = query.all()
+            return persons
+        finally:
+            db.close()
