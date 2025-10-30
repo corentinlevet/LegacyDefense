@@ -4,7 +4,7 @@
 # - container: small runtime image which copies installed packages and source
 ################################################################################
 
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 WORKDIR /src
 
@@ -27,7 +27,7 @@ COPY src/ ./src
 ################################################################################
 # Final runtime image
 ################################################################################
-FROM python:3.13-slim AS container
+FROM python:3.14-slim AS container
 
 WORKDIR /app
 
