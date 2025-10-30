@@ -6,3 +6,4 @@ sqlalchemy
 pydantic
 alembic
 python-multipart
+pytest-asyncio
