@@ -664,9 +664,6 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        # Utilise SessionLocal pour créer une session
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             # Récupère TOUTES les personnes avec date de naissance
@@ -707,8 +704,6 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             all_persons = (
@@ -745,8 +740,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return None
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
@@ -791,8 +784,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return None
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
@@ -848,8 +839,6 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             # Récupère toutes les personnes avec date de naissance
@@ -901,8 +890,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return None
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
@@ -956,8 +943,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return None
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
@@ -1014,8 +999,6 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             if target_date is None:
@@ -1070,8 +1053,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return None
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
@@ -1142,8 +1123,6 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             # Récupère toutes les personnes avec une date de naissance
@@ -1194,8 +1173,6 @@ class ApplicationService:
         if not genealogy:
             return None
 
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             # Récupère toutes les personnes avec une date de décès
@@ -1245,8 +1222,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return None
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
@@ -1308,8 +1283,6 @@ class ApplicationService:
         if not genealogy:
             return []
 
-        from ..infrastructure.database import SessionLocal
-
         db = SessionLocal()
         try:
             persons = db.query(Person).filter(Person.genealogy_id == genealogy.id).all()
@@ -1345,8 +1318,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return
-
-        from ..infrastructure.database import SessionLocal
 
         def format_date(mm, dd, yyyy):
             if yyyy and mm and dd:
@@ -1469,9 +1440,7 @@ class ApplicationService:
             db.close()
 
     async def get_family(self, family_id: int):
-        from ..infrastructure.database import SessionLocal
-
-        db = SessionLocal()
+        db: Session = SessionLocal()
         try:
             print(f"Getting family with ID: {family_id}")
             family = (
@@ -1494,9 +1463,7 @@ class ApplicationService:
             db.close()
 
     async def get_person_details(self, person_id: int):
-        from ..infrastructure.database import SessionLocal
-
-        db = SessionLocal()
+        db: Session = SessionLocal()
         try:
             person = (
                 db.query(Person)
@@ -1538,8 +1505,6 @@ class ApplicationService:
         genealogy = self.genealogy_repo.get_by_name(genealogy_name)
         if not genealogy:
             return []
-
-        from ..infrastructure.database import SessionLocal
 
         db = SessionLocal()
         try:
