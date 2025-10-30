@@ -1,4 +1,5 @@
 import pathlib
+from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request, logger
 from fastapi.responses import HTMLResponse
@@ -289,5 +290,189 @@ async def errors_stats_page(request: Request):
         "errors_stats.html",
         {
             "request": request,
+        },
+    )
+
+
+def gettext(text: str) -> str:
+    # Ceci est un mock. Remplacez par votre vraie fonction de traduction.
+    translations = {
+        "Anniversaries": "Anniversaires",
+        "Home": "Accueil",
+        "Birthdays": "Anniversaires de naissance",
+        "Anniversaries of dead people": "Anniversaires de décès",
+        "Wedding anniversaries": "Anniversaires de mariage",
+    }
+    return translations.get(text, text)
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/anniversaries",
+    response_class=HTMLResponse,
+    name="anniversaries_menu",
+)
+async def anniversaries_menu(genealogy_name: str, request: Request):
+    """
+    Affiche le menu principal des anniversaires.
+    """
+    # Ajout de la fonction de traduction au contexte du template
+    return templates.TemplateResponse(
+        "anniversaries_menu.html",
+        {"request": request, "genealogy_name": genealogy_name, "_": gettext},
+    )
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/anniversaries/birth",
+    response_class=HTMLResponse,
+    name="birth_anniversaries",
+)
+async def birth_anniversaries(
+    genealogy_name: str,
+    request: Request,
+    month: int = None,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    day_after = today + timedelta(days=2)
+
+    today_anniversaries = await app_service.get_birth_anniversaries(
+        genealogy_name, target_date=today
+    )
+    tomorrow_anniversaries = await app_service.get_birth_anniversaries(
+        genealogy_name, target_date=tomorrow
+    )
+    day_after_anniversaries = await app_service.get_birth_anniversaries(
+        genealogy_name, target_date=day_after
+    )
+
+    month_anniversaries = None
+    month_name = None
+    if month:
+        month_anniversaries = await app_service.get_birth_anniversaries_for_month(
+            genealogy_name, month
+        )
+        month_name = datetime(1900, month, 1).strftime("%B")
+
+    return templates.TemplateResponse(
+        "birth_anniversaries.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "today_date": today.strftime("%A %d %B %Y"),
+            "tomorrow_date": tomorrow.strftime("%A %d %B %Y"),
+            "day_after_date": day_after.strftime("%A %d %B %Y"),
+            "today_birthdays": today_anniversaries,
+            "tomorrow_birthdays": tomorrow_anniversaries,
+            "day_after_birthdays": day_after_anniversaries,
+            "month_birthdays": month_anniversaries,
+            "selected_month": month,
+            "month_name": month_name,
+            "_": gettext,
+        },
+    )
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/anniversaries/death",
+    response_class=HTMLResponse,
+    name="death_anniversaries",
+)
+async def death_anniversaries(
+    genealogy_name: str,
+    request: Request,
+    month: int = None,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    day_after = today + timedelta(days=2)
+
+    today_anniversaries = await app_service.get_death_anniversaries(
+        genealogy_name, target_date=today
+    )
+    tomorrow_anniversaries = await app_service.get_death_anniversaries(
+        genealogy_name, target_date=tomorrow
+    )
+    day_after_anniversaries = await app_service.get_death_anniversaries(
+        genealogy_name, target_date=day_after
+    )
+
+    month_anniversaries = None
+    month_name = None
+    if month:
+        month_anniversaries = await app_service.get_death_anniversaries_for_month(
+            genealogy_name, month
+        )
+        month_name = datetime(1900, month, 1).strftime("%B")
+
+    return templates.TemplateResponse(
+        "death_anniversaries.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "today_date": today.strftime("%A %d %B %Y"),
+            "tomorrow_date": tomorrow.strftime("%A %d %B %Y"),
+            "day_after_date": day_after.strftime("%A %d %B %Y"),
+            "today_anniversaries": today_anniversaries,
+            "tomorrow_anniversaries": tomorrow_anniversaries,
+            "day_after_anniversaries": day_after_anniversaries,
+            "month_anniversaries": month_anniversaries,
+            "selected_month": month,
+            "month_name": month_name,
+            "_": gettext,
+        },
+    )
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/anniversaries/marriage",
+    response_class=HTMLResponse,
+    name="marriage_anniversaries",
+)
+async def marriage_anniversaries(
+    genealogy_name: str,
+    request: Request,
+    month: int = None,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    day_after = today + timedelta(days=2)
+
+    today_anniversaries = await app_service.get_marriage_anniversaries(
+        genealogy_name, target_date=today
+    )
+    tomorrow_anniversaries = await app_service.get_marriage_anniversaries(
+        genealogy_name, target_date=tomorrow
+    )
+    day_after_anniversaries = await app_service.get_marriage_anniversaries(
+        genealogy_name, target_date=day_after
+    )
+
+    month_anniversaries = None
+    month_name = None
+    if month:
+        month_anniversaries = await app_service.get_marriage_anniversaries_for_month(
+            genealogy_name, month
+        )
+        month_name = datetime(1900, month, 1).strftime("%B")
+
+    return templates.TemplateResponse(
+        "marriage_anniversaries.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "today_date": today.strftime("%A %d %B %Y"),
+            "tomorrow_date": tomorrow.strftime("%A %d %B %Y"),
+            "day_after_date": day_after.strftime("%A %d %B %Y"),
+            "today_anniversaries": today_anniversaries,
+            "tomorrow_anniversaries": tomorrow_anniversaries,
+            "day_after_anniversaries": day_after_anniversaries,
+            "month_anniversaries": month_anniversaries,
+            "selected_month": month,
+            "month_name": month_name,
+            "_": gettext,
         },
     )

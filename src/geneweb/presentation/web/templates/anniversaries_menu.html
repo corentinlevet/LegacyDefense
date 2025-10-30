@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="/static/images/favicon_gwd.png">
+  <title>{{ _('Anniversaries') }}</title>
+  
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    li.folder { list-style-type: disc; list-style-image: url('/static/images/folder.png'); }
+    li.file { list-style-type: circle; list-style-image: url('/static/images/file.png'); }
+    li.parent { list-style-type: disc; list-style-image: url('/static/images/left.png'); }
+    li.male { list-style-type: square; list-style-image: url('/static/images/male.png'); }
+    li.female { list-style-type: circle; list-style-image: url('/static/images/female.png'); }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>{{ _('Anniversaries') }}</h1>
+      <div class="btn-group">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary" title="{{ _('Back') }}">
+          <span class="fas fa-arrow-left"></span>
+        </a>
+        <a href="/" class="btn btn-outline-secondary ml-1" title="{{ _('Home') }}">
+          <span class="fas fa-home"></span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Menu des anniversaires -->
+    <div class="list-group">
+      <a href="{{ url_for('birth_anniversaries', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action">
+        <i class="fas fa-birthday-cake fa-fw mr-2"></i>{{ _('Birthdays') }}
+      </a>
+      <a href="{{ url_for('death_anniversaries', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action">
+        <i class="fas fa-cross fa-fw mr-2"></i>{{ _('Anniversaries of dead people') }}
+      </a>
+      <a href="{{ url_for('marriage_anniversaries', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action">
+        <i class="fas fa-ring fa-fw mr-2"></i>{{ _('Wedding anniversaries') }}
+      </a>
+    </div>
+
+    <!-- Footer / Copyright -->
+    <div class="d-flex justify-content-end mx-2 my-4" id="copyr">
+      <div class="d-flex flex-column">
+        <div class="ml-auto mb-2">
+          <small class="text-muted">GeneWeb Python</small>
+        </div>
+        <div class="btn-group">
+          <span class="text-muted">
+            &copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer noopener">INRIA</a> 1998-2025
+          </span>
+          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb" class="ml-2" 
+             target="_blank" rel="noreferrer noopener" title="Documentation GeneWeb">
+            <i class="fab fa-wikipedia-w"></i>
+          </a>
+          <a href="https://github.com/geneweb/geneweb" class="ml-1"
+             target="_blank" rel="noreferrer noopener" title="GeneWeb on Github">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

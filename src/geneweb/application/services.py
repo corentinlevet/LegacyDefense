@@ -949,3 +949,356 @@ class ApplicationService:
             return sorted_persons[:limit]
         finally:
             db.close()
+
+    async def get_birth_anniversaries(
+        self, genealogy_name: str, target_date: date = None, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            if target_date is None:
+                target_date = date.today()
+
+            # Récupère toutes les personnes avec une date de naissance
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id,
+                    Person.birth_date.isnot(None),
+                )
+                .all()
+            )
+
+            anniversaries = []
+            for person in all_persons:
+                birth_date_tuple = parse_date_for_sorting(person.birth_date)
+                if birth_date_tuple[0] != 9999:  # Date valide
+                    birth_date = date(
+                        birth_date_tuple[0], birth_date_tuple[1], birth_date_tuple[2]
+                    )
+                    # Vérifie si l'anniversaire est à la date cible
+                    if (
+                        birth_date.month == target_date.month
+                        and birth_date.day == target_date.day
+                    ):
+                        age = target_date.year - birth_date.year
+                        anniversaries.append(
+                            {
+                                "id": person.id,
+                                "first_name": person.first_name,
+                                "surname": person.surname,
+                                "birth_date": format_date_natural(person.birth_date),
+                                "age": age,
+                            }
+                        )
+
+            # Trie par nom de famille, puis par prénom
+            sorted_anniversaries = sorted(
+                anniversaries, key=lambda x: (x["surname"], x["first_name"])
+            )
+
+            return sorted_anniversaries[:limit]
+
+        finally:
+            db.close()
+
+    async def get_death_anniversaries(
+        self, genealogy_name: str, target_date: date = None, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            if target_date is None:
+                target_date = date.today()
+
+            # Récupère toutes les personnes avec une date de décès
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id,
+                    Person.death_date.isnot(None),
+                )
+                .all()
+            )
+
+            anniversaries = []
+            for person in all_persons:
+                death_date_tuple = parse_date_for_sorting(person.death_date)
+                if death_date_tuple[0] != 9999:  # Date valide
+                    death_date = date(
+                        death_date_tuple[0], death_date_tuple[1], death_date_tuple[2]
+                    )
+                    # Vérifie si l'anniversaire est à la date cible
+                    if (
+                        death_date.month == target_date.month
+                        and death_date.day == target_date.day
+                    ):
+                        years_since_death = target_date.year - death_date.year
+                        anniversaries.append(
+                            {
+                                "id": person.id,
+                                "first_name": person.first_name,
+                                "surname": person.surname,
+                                "death_date": format_date_natural(person.death_date),
+                                "years_since_death": years_since_death,
+                            }
+                        )
+
+            # Trie par nom de famille, puis par prénom
+            sorted_anniversaries = sorted(
+                anniversaries, key=lambda x: (x["surname"], x["first_name"])
+            )
+
+            return sorted_anniversaries[:limit]
+
+        finally:
+            db.close()
+
+    async def get_marriage_anniversaries(
+        self, genealogy_name: str, target_date: date = None, limit: int = 20
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            if target_date is None:
+                target_date = date.today()
+
+            # Récupère toutes les familles avec une date de mariage
+            all_families = (
+                db.query(Family)
+                .filter(
+                    Family.genealogy_id == genealogy.id,
+                    Family.marriage_date.isnot(None),
+                )
+                .all()
+            )
+
+            anniversaries = []
+            for family in all_families:
+                marriage_date_tuple = parse_date_for_sorting(family.marriage_date)
+                if marriage_date_tuple[0] != 9999:  # Date valide
+                    marriage_date = date(
+                        marriage_date_tuple[0],
+                        marriage_date_tuple[1],
+                        marriage_date_tuple[2],
+                    )
+                    # Vérifie si l'anniversaire est à la date cible
+                    if (
+                        marriage_date.month == target_date.month
+                        and marriage_date.day == target_date.day
+                    ):
+                        years_of_marriage = target_date.year - marriage_date.year
+                        anniversaries.append(
+                            {
+                                "id": family.id,
+                                "father_first_name": (
+                                    family.father.first_name if family.father else ""
+                                ),
+                                "father_surname": (
+                                    family.father.surname if family.father else ""
+                                ),
+                                "mother_first_name": (
+                                    family.mother.first_name if family.mother else ""
+                                ),
+                                "mother_surname": (
+                                    family.mother.surname if family.mother else ""
+                                ),
+                                "marriage_date": format_date_natural(
+                                    family.marriage_date
+                                ),
+                                "years_of_marriage": years_of_marriage,
+                            }
+                        )
+
+            # Trie par nom de famille du mari
+            sorted_anniversaries = sorted(
+                anniversaries, key=lambda x: x["father_surname"]
+            )
+
+            return sorted_anniversaries[:limit]
+
+        finally:
+            db.close()
+
+    async def get_birth_anniversaries_for_month(
+        self, genealogy_name: str, month: int, limit: int = 0
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            # Récupère toutes les personnes avec une date de naissance
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id,
+                    Person.birth_date.isnot(None),
+                )
+                .all()
+            )
+
+            anniversaries = []
+            for person in all_persons:
+                birth_date_tuple = parse_date_for_sorting(person.birth_date)
+                if birth_date_tuple[0] != 9999 and birth_date_tuple[1] == month:
+                    birth_date = date(
+                        birth_date_tuple[0], birth_date_tuple[1], birth_date_tuple[2]
+                    )
+                    age = date.today().year - birth_date.year
+                    anniversaries.append(
+                        {
+                            "id": person.id,
+                            "first_name": person.first_name,
+                            "surname": person.surname,
+                            "birth_date": format_date_natural(person.birth_date),
+                            "birth_day": birth_date.day,
+                            "age": age,
+                        }
+                    )
+
+            # Trie par jour, puis par nom de famille
+            sorted_anniversaries = sorted(
+                anniversaries, key=lambda x: (x["birth_day"], x["surname"])
+            )
+
+            if limit > 0:
+                return sorted_anniversaries[:limit]
+            return sorted_anniversaries
+
+        finally:
+            db.close()
+
+    async def get_death_anniversaries_for_month(
+        self, genealogy_name: str, month: int, limit: int = 0
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            # Récupère toutes les personnes avec une date de décès
+            all_persons = (
+                db.query(Person)
+                .filter(
+                    Person.genealogy_id == genealogy.id,
+                    Person.death_date.isnot(None),
+                )
+                .all()
+            )
+
+            anniversaries = []
+            for person in all_persons:
+                death_date_tuple = parse_date_for_sorting(person.death_date)
+                if death_date_tuple[0] != 9999 and death_date_tuple[1] == month:
+                    death_date = date(
+                        death_date_tuple[0], death_date_tuple[1], death_date_tuple[2]
+                    )
+                    years_since_death = date.today().year - death_date.year
+                    anniversaries.append(
+                        {
+                            "id": person.id,
+                            "first_name": person.first_name,
+                            "surname": person.surname,
+                            "death_date": format_date_natural(person.death_date),
+                            "death_day": death_date.day,
+                            "years_since_death": years_since_death,
+                        }
+                    )
+
+            # Trie par jour, puis par nom de famille
+            sorted_anniversaries = sorted(
+                anniversaries, key=lambda x: (x["death_day"], x["surname"])
+            )
+
+            if limit > 0:
+                return sorted_anniversaries[:limit]
+            return sorted_anniversaries
+
+        finally:
+            db.close()
+
+    async def get_marriage_anniversaries_for_month(
+        self, genealogy_name: str, month: int, limit: int = 0
+    ) -> list[dict] | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            # Récupère toutes les familles avec une date de mariage
+            all_families = (
+                db.query(Family)
+                .filter(
+                    Family.genealogy_id == genealogy.id,
+                    Family.marriage_date.isnot(None),
+                )
+                .all()
+            )
+
+            anniversaries = []
+            for family in all_families:
+                marriage_date_tuple = parse_date_for_sorting(family.marriage_date)
+                if marriage_date_tuple[0] != 9999 and marriage_date_tuple[1] == month:
+                    marriage_date = date(
+                        marriage_date_tuple[0],
+                        marriage_date_tuple[1],
+                        marriage_date_tuple[2],
+                    )
+                    years_of_marriage = date.today().year - marriage_date.year
+                    anniversaries.append(
+                        {
+                            "id": family.id,
+                            "father_first_name": (
+                                family.father.first_name if family.father else ""
+                            ),
+                            "father_surname": (
+                                family.father.surname if family.father else ""
+                            ),
+                            "mother_first_name": (
+                                family.mother.first_name if family.mother else ""
+                            ),
+                            "mother_surname": (
+                                family.mother.surname if family.mother else ""
+                            ),
+                            "marriage_date": format_date_natural(family.marriage_date),
+                            "marriage_day": marriage_date.day,
+                            "years_of_marriage": years_of_marriage,
+                        }
+                    )
+
+            # Trie par jour, puis par nom de famille du mari
+            sorted_anniversaries = sorted(
+                anniversaries, key=lambda x: (x["marriage_day"], x["father_surname"])
+            )
+
+            if limit > 0:
+                return sorted_anniversaries[:limit]
+            return sorted_anniversaries
+
+        finally:
+            db.close()
