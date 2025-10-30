@@ -16,13 +16,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install into a prefix (/install)
-COPY code/requirements.txt code/requirements-dev.txt ./
-RUN mkdir -p /install \
-    && python -m pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir --target=/install -r requirements.txt
+COPY requirements.txt ./
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Copy source so that any build-time steps that require it can use it
-COPY code/ ./code
+COPY src/ ./src
 
 
 ################################################################################
@@ -38,14 +37,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy installed Python packages from builder into /usr/local
-COPY --from=builder /install /usr/local
+# Copy installed Python packages from builder
+COPY --from=builder /install/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /install/bin /usr/local/bin
 
 # Copy application code
-COPY --from=builder /src/code ./code
+COPY --from=builder /src/src ./src
 
 # Ensure pip-installed scripts are on PATH
 ENV PATH=/usr/local/bin:$PATH
+ENV PYTHONPATH=/app
 
-# Default to an interactive shell - override with your entrypoint when needed
-CMD ["bash"]
+# Expose the application port
+EXPOSE 8000
+
+# Run the application
+CMD ["uvicorn", "src.geneweb.main:app", "--host", "0.0.0.0", "--port", "8000"]

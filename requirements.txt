@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 jinja2
 python-gedcom
+sqlalchemy
+pydantic
+alembic
+python-multipart

@@ -12,7 +12,7 @@ on:
       - "**/*.md"
 
 env:
-  IMAGE_NAME: "legacy"
+  IMAGE_NAME: "geneweb"
   PUSH_IMAGE: ${{ github.ref == 'refs/heads/main' }}
 
 jobs:
@@ -27,7 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          submodules: "true"
           fetch-depth: 1
 
       - name: Generate Docker image metadata
@@ -39,9 +38,10 @@ jobs:
           tags: |
             type=edge,branch=main
             type=sha,prefix=,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.title=Legacy
-            org.opencontainers.image.description=Legacy project image
+            org.opencontainers.image.title=GeneWeb
+            org.opencontainers.image.description=Modern Python-based GeneWeb genealogy software
             maintainer=${{ github.repository_owner }}
 
       - name: Set up Docker Buildx
@@ -75,7 +75,6 @@ jobs:
           build-args: |
             BUILDKIT_INLINE_CACHE=1
             BUILDKIT_PROGRESS=plain
-            FAST_BUILD=${{ github.ref != 'refs/heads/main' && '1' || '0' }}
 
   build-arm64:
     runs-on: ubuntu-latest
@@ -88,7 +87,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          submodules: "true"
           fetch-depth: 1
 
       - name: Generate Docker image metadata
@@ -100,9 +98,10 @@ jobs:
           tags: |
             type=edge,branch=main
             type=sha,prefix=,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
           labels: |
-            org.opencontainers.image.title=Legacy
-            org.opencontainers.image.description=Legacy project image
+            org.opencontainers.image.title=GeneWeb
+            org.opencontainers.image.description=Modern Python-based GeneWeb genealogy software
             maintainer=${{ github.repository_owner }}
 
       - name: Set up QEMU
@@ -138,4 +137,3 @@ jobs:
           build-args: |
             BUILDKIT_INLINE_CACHE=1
             BUILDKIT_PROGRESS=plain
-            FAST_BUILD=${{ github.ref != 'refs/heads/main' && '1' || '0' }}
