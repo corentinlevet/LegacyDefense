@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import GeneWeb file</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .message.success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .message.error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Import a GeneWeb file</h4>
+                        <a href="/gwd" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to genealogies
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Select a GeneWeb (.gw) file to import into a new or existing genealogy.</p>
+                        
+                        <form method="POST" action="/genealogies/import-geneweb" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="base_name">Genealogy name</label>
+                                <input type="text" class="form-control" id="base_name" name="base_name" 
+                                       placeholder="Enter genealogy name" required>
+                                <small class="form-text text-muted">
+                                    Enter the name of the genealogy to create or update.
+                                </small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="file">Select GeneWeb file (.gw)</label>
+                                <input type="file" class="form-control-file" id="file" name="file" 
+                                       accept=".gw" required>
+                                <small class="form-text text-muted">
+                                    Only .gw files are accepted.
+                                </small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload mr-1"></i> Import
+                            </button>
+                        </form>
+                        
+                        <div id="responseMessage" class="message mt-3" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i>About GeneWeb format</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>GeneWeb (.gw) is a text-based genealogy format with the following structure:</p>
+                        <ul>
+                            <li>Families start with "fam" followed by parents and children</li>
+                            <li>Persons are defined with their names, dates, and events</li>
+                            <li>Dates can be in various formats (DD/MM/YYYY, approximate dates, etc.)</li>
+                            <li>The file will be converted to GEDCOM format before import</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="/static/images/favicon_gwd.png">
+  <title>{{ _('Anniversaries of dead people') }}</title>
+  
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    li.folder { list-style-type: disc; list-style-image: url('/static/images/folder.png'); }
+    li.file { list-style-type: circle; list-style-image: url('/static/images/file.png'); }
+    li.parent { list-style-type: disc; list-style-image: url('/static/images/left.png'); }
+    li.male { list-style-type: square; list-style-image: url('/static/images/male.png'); }
+    li.female { list-style-type: circle; list-style-image: url('/static/images/female.png'); }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>{{ _('Anniversaries of dead people') }}</h1>
+      <div class="btn-group">
+        <a href="{{ url_for('anniversaries_menu', genealogy_name=genealogy_name) }}" class="btn btn-outline-secondary" title="{{ _('Back') }}">
+          <span class="fas fa-arrow-left"></span>
+        </a>
+        <a href="/" class="btn btn-outline-secondary ml-1" title="{{ _('Home') }}">
+          <span class="fas fa-home"></span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Anniversaires de décès du jour -->
+    <div class="mb-4">
+      <h5>{{ _('Today') }} ({{ today_date }})</h5>
+      {% if today_anniversaries %}
+        <ul class="list-group">
+          {% for person in today_anniversaries %}
+          <li class="list-group-item {% if person.sex == 'M' %}male{% else %}female{% endif %}">
+            {{ person.first_name }} {{ person.surname }}
+            <span class="text-muted">
+              († {{ person.death_date }}) - {{ person.years_since_death }} {{ _('years') }}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">{{ _('No death anniversary today.') }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Anniversaires de décès de demain -->
+    <div class="mb-4">
+      <h5>{{ _('Tomorrow') }} ({{ tomorrow_date }})</h5>
+      {% if tomorrow_anniversaries %}
+        <ul class="list-group">
+          {% for person in tomorrow_anniversaries %}
+          <li class="list-group-item {% if person.sex == 'M' %}male{% else %}female{% endif %}">
+            {{ person.first_name }} {{ person.surname }}
+            <span class="text-muted">
+              († {{ person.death_date }}) - {{ person.years_since_death }} {{ _('years') }}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">{{ _('No death anniversary tomorrow.') }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Anniversaires de décès d'après-demain -->
+    <div class="mb-4">
+      <h5>{{ _('The day after tomorrow') }} ({{ day_after_date }})</h5>
+      {% if day_after_anniversaries %}
+        <ul class="list-group">
+          {% for person in day_after_anniversaries %}
+          <li class="list-group-item {% if person.sex == 'M' %}male{% else %}female{% endif %}">
+            {{ person.first_name }} {{ person.surname }}
+            <span class="text-muted">
+              († {{ person.death_date }}) - {{ person.years_since_death }} {{ _('years') }}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">{{ _('No death anniversary the day after tomorrow.') }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Sélection de mois -->
+    <div class="card mb-4">
+      <div class="card-body text-center">
+        <p class="mb-3">{{ _('Select a month to see all the anniversaries.') }}</p>
+        <form class="form-inline justify-content-center" method="get" action="{{ url_for('death_anniversaries', genealogy_name=genealogy_name) }}">
+          <select class="form-control form-control-lg mr-2" name="month">
+            <option value="1" {% if selected_month == 1 %}selected{% endif %}>{{ _('January') }}</option>
+            <option value="2" {% if selected_month == 2 %}selected{% endif %}>{{ _('February') }}</option>
+            <option value="3" {% if selected_month == 3 %}selected{% endif %}>{{ _('March') }}</option>
+            <option value="4" {% if selected_month == 4 %}selected{% endif %}>{{ _('April') }}</option>
+            <option value="5" {% if selected_month == 5 %}selected{% endif %}>{{ _('May') }}</option>
+            <option value="6" {% if selected_month == 6 %}selected{% endif %}>{{ _('June') }}</option>
+            <option value="7" {% if selected_month == 7 %}selected{% endif %}>{{ _('July') }}</option>
+            <option value="8" {% if selected_month == 8 %}selected{% endif %}>{{ _('August') }}</option>
+            <option value="9" {% if selected_month == 9 %}selected{% endif %}>{{ _('September') }}</option>
+            <option value="10" {% if selected_month == 10 %}selected{% endif %}>{{ _('October') }}</option>
+            <option value="11" {% if selected_month == 11 %}selected{% endif %}>{{ _('November') }}</option>
+            <option value="12" {% if selected_month == 12 %}selected{% endif %}>{{ _('December') }}</option>
+          </select>
+          <button type="submit" class="btn btn-secondary btn-lg">{{ _('Submit') }}</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Anniversaires du mois sélectionné -->
+    {% if month_anniversaries %}
+    <div class="mb-4">
+      <h4>{{ _('Death anniversaries in') }} {{ month_name }}</h4>
+      <ul class="list-group">
+        {% for person in month_anniversaries %}
+        <li class="list-group-item {% if person.sex == 'M' %}male{% else %}female{% endif %}">
+          <strong>{{ person.death_day }}</strong> - 
+          {{ person.first_name }} {{ person.surname }}
+          <span class="text-muted">
+            († {{ person.death_date }}) - {{ person.years_since_death }} {{ _('years') }}
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Footer / Copyright -->
+    <div class="d-flex justify-content-end mx-2 my-4" id="copyr">
+      <div class="d-flex flex-column">
+        <div class="ml-auto mb-2">
+          <small class="text-muted">GeneWeb Python</small>
+        </div>
+        <div class="btn-group">
+          <span class="text-muted">
+            &copy; <a href="https://www.inria.fr" target="_blank" rel="noreferrer noopener">INRIA</a> 1998-2025
+          </span>
+          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb" class="ml-2" 
+             target="_blank" rel="noreferrer noopener" title="Documentation GeneWeb">
+            <i class="fab fa-wikipedia-w"></i>
+          </a>
+          <a href="https://github.com/geneweb/geneweb" class="ml-1"
+             target="_blank" rel="noreferrer noopener" title="GeneWeb on Github">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

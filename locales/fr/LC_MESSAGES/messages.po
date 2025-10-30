@@ -1,0 +1,178 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GeneWeb Modernization\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+
+msgid "Anniversaries"
+msgstr "Anniversaires"
+
+msgid "Home"
+msgstr "Accueil"
+
+msgid "Birthdays"
+msgstr "Anniversaires de naissance"
+
+msgid "Anniversaries of dead people"
+msgstr "Anniversaires de décès"
+
+msgid "Wedding anniversaries"
+msgstr "Anniversaires de mariage"
+
+msgid "Today"
+msgstr "Aujourd'hui"
+
+msgid "Tomorrow"
+msgstr "Demain"
+
+msgid "The day after tomorrow"
+msgstr "Après-demain"
+
+msgid "No birthday today."
+msgstr "Pas d'anniversaire aujourd'hui."
+
+msgid "No birthday tomorrow."
+msgstr "Pas d'anniversaire demain."
+
+msgid "No birthday the day after tomorrow."
+msgstr "Pas d'anniversaire après-demain."
+
+msgid "Select a month to see all the anniversaries."
+msgstr "Sélectionnez un mois pour voir tous les anniversaires."
+
+msgid "January"
+msgstr "Janvier"
+
+msgid "February"
+msgstr "Février"
+
+msgid "March"
+msgstr "Mars"
+
+msgid "April"
+msgstr "Avril"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juin"
+
+msgid "July"
+msgstr "Juillet"
+
+msgid "August"
+msgstr "Août"
+
+msgid "September"
+msgstr "Septembre"
+
+msgid "October"
+msgstr "Octobre"
+
+msgid "November"
+msgstr "Novembre"
+
+msgid "December"
+msgstr "Décembre"
+
+msgid "Submit"
+msgstr "Valider"
+
+msgid "Birthdays in"
+msgstr "Anniversaires en"
+
+msgid "years"
+msgstr "ans"
+
+msgid "living"
+msgstr "vivant(e)"
+
+msgid "No death anniversary today."
+msgstr "Pas d'anniversaire de décès aujourd'hui."
+
+msgid "No death anniversary tomorrow."
+msgstr "Pas d'anniversaire de décès demain."
+
+msgid "No death anniversary the day after tomorrow."
+msgstr "Pas d'anniversaire de décès après-demain."
+
+msgid "Death anniversaries in"
+msgstr "Anniversaires de décès en"
+
+msgid "No wedding anniversary today."
+msgstr "Pas d'anniversaire de mariage aujourd'hui."
+
+msgid "No wedding anniversary tomorrow."
+msgstr "Pas d'anniversaire de mariage demain."
+
+msgid "No wedding anniversary the day after tomorrow."
+msgstr "Pas d'anniversaire de mariage après-demain."
+
+msgid "Wedding anniversaries in"
+msgstr "Anniversaires de mariage en"
+
+msgid "Places / Surnames"
+msgstr "Lieux / Noms"
+
+msgid "Back"
+msgstr "Retour"
+
+msgid "Search Results"
+msgstr "Résultats de recherche"
+
+msgid "Search Results for"
+msgstr "Résultats de recherche pour"
+
+msgid "son of"
+msgstr "fils de"
+
+msgid "daughter of"
+msgstr "fille de"
+
+msgid "Family Created"
+msgstr "Famille créée"
+
+msgid "The family has been created successfully!"
+msgstr "La famille a été créée avec succès !"
+
+msgid "Parents"
+msgstr "Parents"
+
+msgid "Back to genealogy"
+msgstr "Retour à la généalogie"
+
+msgid "Basic Info"
+msgstr "Informations de base"
+
+msgid "Spouse and Children"
+msgstr "Conjoint et Enfants"
+
+msgid "Genealogy Tree (3 Generations)"
+msgstr "Arbre généalogique (3 générations)"
+
+msgid "Siblings"
+msgstr "Frères et Sœurs"
+
+msgid "Born"
+msgstr "Né(e)"
+
+msgid "in"
+msgstr "à"
+
+msgid "Died"
+msgstr "Décédé(e)"
+
+msgid "Occupation"
+msgstr "Profession"
+
+msgid "on"
+msgstr "le"
+
+msgid "with"
+msgstr "avec"
+
+msgid "No siblings found."
+msgstr "Aucun frère ou sœur trouvé."

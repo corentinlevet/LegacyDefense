@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ _('Family Created') }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>{{ _('Family Created') }}</h1>
+    <div class="alert alert-success" role="alert">
+      {{ _('The family has been created successfully!') }}
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ _('Parents') }}</h5>
+        <p class="card-text">
+          {% if family.father %}
+            <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.father.id) }}">{{ family.father.first_name }} {{ family.father.surname }}</a>
+          {% endif %}
+          {% if family.father and family.mother %}
+            &
+          {% endif %}
+          {% if family.mother %}
+            <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.mother.id) }}">{{ family.mother.first_name }} {{ family.mother.surname }}</a>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <a href="{{ url_for('view_genealogy', name=genealogy_name) }}" class="btn btn-primary mt-3">{{ _('Back to genealogy') }}</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

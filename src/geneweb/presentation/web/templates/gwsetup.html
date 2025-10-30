@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeneWeb - Administration</title>
+  <link rel="shortcut icon" href="/static/favicon_gwsetup.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    }
+    .list-group-item {
+      border: none;
+      padding: .75rem 1.25rem;
+      transition: background-color 0.2s;
+    }
+    .list-group-item:hover:not(.disabled) {
+      background-color: #e9ecef;
+    }
+    .list-group-item.disabled {
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+    .not-implemented {
+      color: #dc3545;
+      font-weight: bold;
+      font-size: 0.8em;
+    }
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      font-weight: 600;
+    }
+    .header-section {
+      background-color: rgba(0,0,0,.03);
+      color: rgb(0, 0, 0);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    }
+    .header-section h2 {
+      margin: 0;
+      font-weight: 300;
+    }
+    .header-section .btn {
+      background-color: rgba(255,255,255,0.2);
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      color: rgb(0, 0, 0);
+    }
+    .header-section .btn:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-color: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid px-4 py-4">
+    
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2>
+          <i class="fas fa-tools mr-3"></i>
+          Gestion de bord et création
+        </h2>
+        <a href="/" class="btn">
+          <i class="fas fa-home mr-2"></i> Accueil
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="row">
+      
+      <!-- Column 1: Consulter -->
+      <div class="col-lg-6 col-xl-3 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-search mr-2"></i>Consulter
+          </div>
+          <ul class="list-group list-group-flush">
+            <a href="/genealogies" class="list-group-item list-group-item-action">
+              <i class="fas fa-database mr-2"></i>
+              Généalogies existantes
+            </a>
+            <a href="/admin/errors-stats" class="list-group-item list-group-item-action">
+              <i class="fas fa-chart-line mr-2 text-info"></i>
+              Historique des erreurs et statistiques
+            </a>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Column 2: Gérer et Créer -->
+      <div class="col-lg-6 col-xl-3 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-edit mr-2"></i>Gérer et Créer
+          </div>
+          <ul class="list-group list-group-flush">
+            <a href="/genealogies/import" class="list-group-item list-group-item-action">
+              <i class="fas fa-upload mr-2 text-primary"></i>
+              Importer depuis un fichier GEDCOM
+            </a>
+            <a href="/genealogies/create" class="list-group-item list-group-item-action">
+              <i class="fas fa-plus-circle mr-2 text-success"></i>
+              Créer une généalogie vide
+            </a>
+            <a href="/genealogies/import-geneweb" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-import mr-2"></i>
+              Importer depuis un fichier GeneWeb
+            </a>
+            <a href="/genealogies/export" class="list-group-item list-group-item-action ">
+              <i class="fas fa-download mr-2"></i>
+              Sauvegarder en GEDCOM
+            </a>
+            <a href="#" id="export-geneweb-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-file-code mr-2"></i>
+              Sauvegarder en source GeneWeb
+            </a>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Column 3: Options avancées -->
+      <div class="col-lg-6 col-xl-3 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-cogs mr-2"></i>Options avancées
+          </div>
+          <ul class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-broom mr-2"></i>
+              Nettoyage
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" id="rename-genealogy-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-i-cursor mr-2 text-primary"></i>
+              Renommage
+            </a>
+            <a href="#" id="delete-genealogy-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-trash-alt mr-2 text-danger"></i>
+              Suppression
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-code-branch mr-2"></i>
+              Fusion de généalogies
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-save mr-2"></i>
+              Sauvegarde et restauration
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-dna mr-2"></i>
+              Initialisation des consanguinités
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-link mr-2"></i>
+              Mise à jour des liens
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-project-diagram mr-2"></i>
+              Calculer les composantes connexes
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-not-equal mr-2"></i>
+              Différence entre deux bases
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action disabled">
+              <i class="fas fa-wrench mr-2"></i>
+              Corriger une base
+              <span class="not-implemented float-right">Non implémenté</span>
+            </a>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Column 4: Configurer -->
+      <div class="col-lg-6 col-xl-3 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <i class="fas fa-sliders-h mr-2"></i>Configurer
+          </div>
+          <ul class="list-group list-group-flush">
+            <a href="#" id="database-config-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-database mr-2 text-warning"></i>
+              Paramètres d'une base de données
+            </a>
+            <a href="/config/server" class="list-group-item list-group-item-action">
+              <i class="fas fa-server mr-2 text-warning"></i>
+              Paramètres du service gwd
+            </a>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-5 mb-3">
+      <p class="text-muted">
+        <i class="fas fa-book mr-2"></i>
+        Consultez la <a href="http://geneweb.tuxfamily.org/wiki/gwsetup/fr" target="_blank">documentation complète</a> de GeneWeb
+      </p>
+      <div class="d-flex justify-content-center align-items-center mb-3">
+        <a href="https://github.com/geneweb/geneweb/" target="_blank">
+          <img src="/static/tree.png" style="border: 0; height: 24px;" alt="GeneWeb Logo">
+        </a> 
+        <em class="ml-2 text-muted">Version 1.0.0 Copyright &copy; 2025</em>
+      </div>
+      
+      <!-- Language switcher -->
+      <div class="text-muted">
+        <small>
+          <i class="fas fa-language mr-2"></i>
+          <span>Afficher en :</span>
+          <a href="?lang=co" class="mx-1">Corsu</a> •
+          <a href="?lang=de" class="mx-1">Deutsch</a> •
+          <a href="?lang=en" class="mx-1">English</a> •
+          <a href="?lang=es" class="mx-1">Español</a> •
+          <a href="?lang=fr" class="mx-1">Français</a> •
+          <a href="?lang=it" class="mx-1">Italiano</a> •
+          <a href="?lang=lv" class="mx-1">Latviesu</a> •
+          <a href="?lang=sv" class="mx-1">Svenska</a>
+        </small>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+  
+  <script>
+    $(document).ready(function() {
+      // Gestionnaire pour le lien "Paramètres d'une base de données"
+      $('#database-config-link').on('click', function(e) {
+        e.preventDefault();
+        
+        // Charger la liste des généalogies
+        $.get('/api/genealogies')
+          .done(function(genealogies) {
+            if (genealogies.length === 0) {
+              alert('Aucune généalogie disponible. Créez d\'abord une généalogie.');
+              return;
+            }
+            
+            // Créer une modale pour sélectionner la généalogie
+            let modalHtml = `
+              <div class="modal fade" id="selectGenealogyModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">
+                        <i class="fas fa-database mr-2"></i>
+                        Sélectionner une généalogie
+                      </h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p class="text-muted">
+                        Choisissez la généalogie à configurer :
+                      </p>
+                      <div class="list-group">
+                        ${genealogies.map(g => `
+                          <a href="/genealogy/${g.name}/config/database" 
+                             class="list-group-item list-group-item-action">
+                            <i class="fas fa-database mr-2 text-primary"></i>
+                            ${g.name}
+                          </a>
+                        `).join('')}
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            // Supprimer l'ancienne modale si elle existe
+            $('#selectGenealogyModal').remove();
+            
+            // Ajouter et afficher la modale
+            $('body').append(modalHtml);
+            $('#selectGenealogyModal').modal('show');
+            
+            // Supprimer la modale du DOM après fermeture
+            $('#selectGenealogyModal').on('hidden.bs.modal', function() {
+              $(this).remove();
+            });
+          })
+          .fail(function() {
+            alert('Erreur lors du chargement des généalogies');
+          });
+      });
+
+      // Gestionnaire pour le lien "Renommage"
+      $('#rename-genealogy-link').on('click', function(e) {
+        e.preventDefault();
+        handleGenealogySelection('/genealogy/{genealogy_name}/manage', 'Renommer la généalogie');
+      });
+
+      // Gestionnaire pour le lien "Suppression"
+      $('#delete-genealogy-link').on('click', function(e) {
+        e.preventDefault();
+        handleGenealogySelection('/genealogy/{genealogy_name}/manage', 'Supprimer la généalogie');
+      });
+
+      // Gestionnaire pour le lien "Sauvegarder en source GeneWeb"
+      $('#export-geneweb-link').on('click', function(e) {
+        e.preventDefault();
+        handleGenealogySelection('/genealogies/{genealogy_name}/export-geneweb', 'Sauvegarder en source GeneWeb');
+      });
+
+      function handleGenealogySelection(baseUrl, modalTitle) {
+        $.get('/api/genealogies')
+          .done(function(genealogies) {
+            if (genealogies.length === 0) {
+              alert('Aucune généalogie disponible. Créez d\'abord une généalogie.');
+              return;
+            }
+
+            let modalHtml = `
+              <div class="modal fade" id="selectGenealogyActionModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">
+                        <i class="fas fa-database mr-2"></i>
+                        ${modalTitle}
+                      </h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p class="text-muted">
+                        Choisissez la généalogie à ${modalTitle.toLowerCase().includes('renommer') ? 'renommer' : 'supprimer'} :
+                      </p>
+                      <div class="list-group">
+                        ${genealogies.map(g => `
+                          <a href="${baseUrl.replace('{genealogy_name}', g.name)}"
+                             class="list-group-item list-group-item-action">
+                            <i class="fas fa-database mr-2 text-primary"></i>
+                            ${g.name}
+                          </a>
+                        `).join('')}
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            $('#selectGenealogyActionModal').remove();
+            $('body').append(modalHtml);
+            $('#selectGenealogyActionModal').modal('show');
+
+            $('#selectGenealogyActionModal').on('hidden.bs.modal', function() {
+              $(this).remove();
+            });
+          })
+          .fail(function() {
+            alert('Erreur lors du chargement des généalogies');
+          });
+      }
+    });
+  </script>
+</body>
+</html>

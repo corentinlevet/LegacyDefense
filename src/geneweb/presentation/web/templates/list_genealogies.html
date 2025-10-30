@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeneWeb - Généalogies Disponibles</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Généalogies Disponibles</h4>
+            <a href="/" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-home mr-1"></i> Accueil
+            </a>
+          </div>
+          <div class="card-body">
+            <p class="text-muted">Voici la liste des généalogies enregistrées.</p>
+            <ul class="list-group" id="genealogyList">
+              <!-- Les généalogies seront chargées ici par JavaScript -->
+            </ul>
+            <hr>
+            <a href="/genealogies/create" class="btn btn-success mt-3">
+                <i class="fas fa-plus-circle mr-2"></i> Créer une nouvelle généalogie
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchGenealogies();
+    });
+
+    async function fetchGenealogies() {
+        const genealogyList = document.getElementById('genealogyList');
+        genealogyList.innerHTML = '<li class="list-group-item text-center">Chargement des généalogies...</li>';
+
+        try {
+            const response = await fetch('/api/genealogies');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const genealogies = await response.json();
+
+            genealogyList.innerHTML = ''; // Clear loading message
+
+            if (genealogies.length === 0) {
+                genealogyList.innerHTML = '<li class="list-group-item text-center text-muted">Aucune généalogie trouvée.</li>';
+            } else {
+                genealogies.forEach(genealogy => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    // You might want to link to a detail page for each genealogy later
+                    listItem.innerHTML = `<a href="/genealogy/${genealogy.name}">${genealogy.name}</a>`;
+                    genealogyList.appendChild(listItem);
+                });
+            }
+
+        } catch (error) {
+            console.error('Erreur lors du chargement des généalogies:', error);
+            genealogyList.innerHTML = '<li class="list-group-item text-center text-danger">Erreur lors du chargement. Veuillez réessayer.</li>';
+        }
+    }
+  </script>
+</body>
+</html>

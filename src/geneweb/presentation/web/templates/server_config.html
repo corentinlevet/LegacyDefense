@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Serveur</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-server text-info"></i>
+                Configuration du serveur
+            </h1>
+            <a href="/gwsetup" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <strong>Attention :</strong> Les modifications nécessitent un redémarrage du serveur
+        </div>
+
+        <form id="server-config-form">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-globe mr-2"></i>Paramètres globaux
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="default_lang">
+                            <i class="fas fa-language mr-2"></i>Langue par défaut
+                        </label>
+                        <select class="form-control" id="default_lang">
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                            <option value="it">Italiano</option>
+                            <option value="nl">Nederlands</option>
+                            <option value="pt">Português</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="only">
+                            <i class="fas fa-shield-alt mr-2"></i>Restriction d'accès IP
+                        </label>
+                        <input type="text" class="form-control" id="only" 
+                               placeholder="127.0.0.1,192.168.1.0/24">
+                        <small class="form-text text-muted">
+                            Liste d'adresses IP ou plages autorisées, séparées par des virgules
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="log">
+                            <i class="fas fa-file-alt mr-2"></i>Fichier de log
+                        </label>
+                        <input type="text" class="form-control" id="log" 
+                               placeholder="/var/log/geneweb/gwd.log">
+                        <small class="form-text text-muted">
+                            Chemin complet vers le fichier de log
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-info btn-lg btn-block">
+                <i class="fas fa-save mr-2"></i>Sauvegarder la configuration
+            </button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const apiUrl = '/api/server/config';
+
+            // Charger la configuration actuelle
+            $.get(apiUrl).done(function(data) {
+                $('#default_lang').val(data.default_lang || 'fr');
+                $('#only').val(data.only || '');
+                $('#log').val(data.log || '');
+            });
+
+            // Soumettre la configuration
+            $('#server-config-form').on('submit', function(e) {
+                e.preventDefault();
+
+                const configData = {
+                    default_lang: $('#default_lang').val(),
+                    only: $('#only').val(),
+                    log: $('#log').val()
+                };
+
+                $.ajax({
+                    url: apiUrl,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(configData),
+                    success: function() {
+                        alert('✅ Configuration serveur sauvegardée ! Redémarrez le serveur pour appliquer les changements.');
+                    },
+                    error: function() {
+                        alert('❌ Erreur lors de la sauvegarde');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

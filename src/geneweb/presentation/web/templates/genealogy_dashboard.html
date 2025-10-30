@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Généalogie - {{ genealogy_name }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 id="genealogyTitle">Généalogie</h1>
+            <a href="/gwd" class="btn btn-outline-secondary">
+                <i class="fas fa-list mr-1"></i> Toutes les généalogies
+            </a>
+        </div>
+
+        <div class="jumbotron text-center">
+            <h1 class="display-4" id="genealogyNameHeader"></h1>
+            <p class="lead">{{ nb_persons }} individus</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search mr-2"></i>Rechercher</h5>
+            </div>
+            <div class="card-body">
+                <form id="main-search" method="get" action="{{ url_for('search_persons', genealogy_name=genealogy_name) }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="firstname">Prénom(s)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <a role="button" href="#" class="btn btn-outline-secondary" title="Prénoms par ordre alphabétique"><i class="fa fa-arrow-down-a-z fa-fw"></i></a>
+                                    <a role="button" href="#" class="btn btn-outline-secondary" title="Prénoms par fréquence"><i class="fa fa-arrow-down-wide-short fa-fw"></i></a>
+                                </div>
+                                <input type="search" id="firstname" class="form-control" name="p" placeholder="Prénom(s)">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="surname">Nom</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <a role="button" href="#" class="btn btn-outline-secondary" title="Noms par ordre alphabétique"><i class="fa fa-arrow-down-a-z fa-fw"></i></a>
+                                    <a role="button" href="#" class="btn btn-outline-secondary" title="Noms par fréquence"><i class="fa fa-arrow-down-wide-short fa-fw"></i></a>
+                                </div>
+                                <input type="search" id="surname" class="form-control" name="n" placeholder="Nom, nom public, alias">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-search fa-fw"></i> Rechercher</button>
+                </form>
+                <hr>
+                <form id="title-search" class="mt-3" method="get" action="#">
+                    <input type="hidden" name="m" value="TT">
+                     <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="titles">Titre</label>
+                             <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <a class="btn btn-outline-secondary" role="button" href="#" title="Tous les titres"><i class="fa fa-list-ul fa-fw"></i></a>
+                                </div>
+                                <input type="search" class="form-control" name="t" id="titles" placeholder="Titre">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="estates">Fief</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <a class="btn btn-outline-secondary" role="button" href="#" title="Tous les fiefs"><i class="fa fa-list-ul fa-fw"></i></a>
+                                </div>
+                                <input type="search" class="form-control" name="p" id="estates" placeholder="Fief">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-info"><i class="fa fa-search fa-fw"></i> Rechercher par titre/fief</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tools Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tools mr-2"></i>Outils</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action"><i class="far fa-chart-bar fa-fw mr-2"></i>Statistiques</a>
+                    <a href="/genealogy/{{ genealogy_name }}/anniversaries" class="list-group-item list-group-item-action"><i class="fa fa-cake-candles fa-fw mr-2"></i>Anniversaires</a>
+                    <a href="{{ url_for('places_surnames', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action"><i class="fas fa-globe fa-fw mr-2"></i>Lieux / Noms</a>
+                    <a href="#" class="list-group-item list-group-item-action"><i class="fa fa-magnifying-glass-plus fa-fw mr-2"></i>Requête avancée</a>
+                    <a href="#" class="list-group-item list-group-item-action"><i class="far fa-calendar-days fa-fw mr-2"></i>Calendriers</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wizard Tools Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-hat-wizard mr-2"></i>Outils Magicien</h5>
+            </div>
+            <div class="card-body">
+                 <p class="text-muted">Actions réservées aux magiciens.</p>
+                <div class="list-group">
+                    <a href="{{ url_for('add_family', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action text-success"><i class="fas fa-user-plus mr-2"></i>Ajouter une famille</a>
+                    <a href="#" class="list-group-item list-group-item-action text-success"><i class="far fa-file-lines fa-fw mr-2"></i>Ajouter des notes</a>
+                </div>
+                <h6 class="mt-4">Livres</h6>
+                <div class="list-group">
+                    <a href="#" id="book-first-names-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Prénoms</a>
+                    <a href="#" id="book-last-names-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Noms</a>
+                    <a href="#" id="book-places-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Lieux</a>
+                    <a href="#" id="book-occupations-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Occupations</a>
+                    <a href="#" id="book-sources-link" class="list-group-item list-group-item-action text-info"><i class="fas fa-book fa-fw mr-2"></i>Sources</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-5 mb-3">
+            <p class="text-muted">
+                GeneWeb v.1.0.0 &copy; 2025
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Extract genealogy name from URL, e.g., /genealogy/{name}
+            const pathParts = window.location.pathname.split('/');
+            const genealogyName = pathParts[pathParts.length - 1];
+
+            if (genealogyName) {
+                // Update page titles
+                document.title = `Généalogie - ${genealogyName}`;
+                document.getElementById('genealogyTitle').textContent = `Généalogie`;
+                document.getElementById('genealogyNameHeader').textContent = genealogyName;
+
+                // Update form actions to be relative to the current genealogy
+
+                const titleSearchForm = document.getElementById('title-search');
+                titleSearchForm.action = `/genealogy/${genealogyName}`;
+
+                // Update tool links
+                const toolLinks = document.querySelectorAll('.list-group-item');
+                toolLinks.forEach(link => {
+                    if (link.getAttribute('href') === '#') {
+                        // Example: update statistics link
+                        if (link.textContent.includes('Statistiques')) {
+                            link.href = `/genealogy/${genealogyName}/stats`; // Adjust this URL as needed
+                        }
+                        // Add other tool links here
+                    }
+                });
+
+                const bookFirstNamesLink = document.getElementById('book-first-names-link');
+                if (bookFirstNamesLink) {
+                    bookFirstNamesLink.href = `/genealogy/${genealogyName}/book/first_names`;
+                }
+
+                const bookLastNamesLink = document.getElementById('book-last-names-link');
+                if (bookLastNamesLink) {
+                    bookLastNamesLink.href = `/genealogy/${genealogyName}/book/last_names`;
+                }
+
+                const bookPlacesLink = document.getElementById('book-places-link');
+                if (bookPlacesLink) {
+                    bookPlacesLink.href = `/genealogy/${genealogyName}/book/places`;
+                }
+
+                const bookOccupationsLink = document.getElementById('book-occupations-link');
+                if (bookOccupationsLink) {
+                    bookOccupationsLink.href = `/genealogy/${genealogyName}/book/occupations`;
+                }
+
+                const bookSourcesLink = document.getElementById('book-sources-link');
+                if (bookSourcesLink) {
+                    bookSourcesLink.href = `/genealogy/${genealogyName}/book/sources`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

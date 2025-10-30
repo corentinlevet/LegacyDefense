@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add family</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
+      color: #2c3e50;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+      padding-top: 80px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Navigation */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      padding: 15px 20px;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: #5a6c7d;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a:hover {
+      background: rgba(90, 141, 238, 0.1);
+      color: #5a8dee;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 30px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e8edf2;
+    }
+
+    .card-header {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 20px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e8edf2;
+      font-weight: 500;
+    }
+
+    .section-label {
+      color: #5a6c7d;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .form-row.with-controls {
+      grid-template-columns: 150px 1fr 80px 120px;
+    }
+
+    .form-row.date-row {
+      grid-template-columns: 150px 60px 60px 100px 1fr;
+    }
+
+    label {
+      color: #2c3e50;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      background: #f8f9fa;
+      border: 1px solid #dce4ec;
+      border-radius: 6px;
+      color: #2c3e50;
+      padding: 10px 12px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    input[type="text"]::placeholder,
+    textarea::placeholder {
+      color: #a0aec0;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #5a8dee;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.15);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a6c7d' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 35px;
+    }
+
+    input[type="number"] {
+      text-align: center;
+      padding: 10px 5px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      padding-left: 150px;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #5a8dee;
+    }
+
+    .checkbox-wrapper label,
+    .radio-group label {
+      cursor: pointer;
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+      margin: 30px 0;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px auto;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5);
+    }
+
+    .submit-btn.inline {
+      margin: 0;
+      margin-left: auto;
+    }
+
+    .inline-submit {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #5a8dee;
+      border: 2px solid #5a8dee;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #5a8dee;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(90, 141, 238, 0.3);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e8edf2;
+    }
+
+    .toolbar a {
+      color: #5a6c7d;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .toolbar a:hover {
+      color: #5a8dee;
+      background: white;
+    }
+
+    .accent-chars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 14px;
+      border: 1px solid #e8edf2;
+    }
+
+    .accent-chars a {
+      color: #5a6c7d;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      background: white;
+      border: 1px solid #e8edf2;
+    }
+
+    .accent-chars a:hover {
+      background: #5a8dee;
+      color: white;
+      border-color: #5a8dee;
+      transform: translateY(-1px);
+    }
+
+    .event-section,
+    .child-section {
+      border-top: 1px solid #e8edf2;
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+
+    .subsection-title {
+      color: #2c3e50;
+      font-size: 16px;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+      .form-row,
+      .form-row.with-controls,
+      .form-row.date-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .checkbox-wrapper {
+        padding-left: 0;
+      }
+
+      .nav-links a span:not(.fa, .fas, .far, .fab) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="top-nav">
+    <div class="nav-links">
+      <a href="#parents"><i class="fa fa-male"></i><i class="fa fa-female"></i> <span>Parents</span></a>
+      <a href="#events"><i class="fa fa-graduation-cap"></i> <span>Events</span></a>
+      <a href="#children"><i class="fa fa-child"></i> <span>Children</span></a>
+      <a href="#sources"><i class="fa fa-star"></i> <span>Sources</span></a>
+      <a href="#comments"><i class="fa fa-file-alt"></i> <span>Comment</span></a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Add family</h1>
+    
+    <form method="post" action="{{ url_for('add_family_post', genealogy_name=genealogy_name) }}">
+      <input type="hidden" name="lang" value="en" />
+      <input type="hidden" name="m" value="ADD_FAM_OK" />
+
+      <!-- PARENTS SECTION -->
+      <div class="card" id="parents">
+        <h3 class="card-header">Parents</h3>
+        
+        <div class="section-label">First name HIM</div>
+
+        <div class="form-row with-controls">
+          <label for="pa1_fn">First name</label>
+          <input type="text" id="pa1_fn" name="pa1_fn" placeholder="First name" autofocus>
+          <input type="number" id="pa1_occ" name="pa1_occ" value="0" min="0" title="Number (occurence)">
+          <select id="pa1_p" name="pa1_p">
+            <option value="create" selected>Create</option>
+            <option value="link">Link</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="pa1_sn">Surname</label>
+          <input type="text" id="pa1_sn" name="pa1_sn" placeholder="Surname">
+        </div>
+
+        <div id="pa1_div">
+          <div class="form-row date-row">
+            <label>Birth</label>
+            <input type="text" name="pa1b_mm" placeholder="MM" maxlength="2">
+            <input type="text" name="pa1b_dd" placeholder="DD" maxlength="2">
+            <input type="text" name="pa1b_yyyy" placeholder="YYYY" maxlength="8">
+            <input type="text" name="pa1b_pl" placeholder="Place">
+          </div>
+
+          <div class="form-row date-row">
+            <label>Death</label>
+            <input type="text" name="pa1d_mm" placeholder="MM" maxlength="2">
+            <input type="text" name="pa1d_dd" placeholder="DD" maxlength="2">
+            <input type="text" name="pa1d_yyyy" placeholder="YYYY" maxlength="8">
+            <input type="text" name="pa1d_pl" placeholder="Place">
+          </div>
+
+          <div class="form-row">
+            <label for="pa1_occupation">Occupation</label>
+            <input type="text" id="pa1_occupation" name="pa1_occupation" placeholder="Occupation">
+          </div>
+        </div>
+
+        <div class="checkbox-wrapper">
+          <input type="checkbox" id="nsck" name="nsck" value="on">
+          <label for="nsck">Same sex couple</label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-label">First name HER</div>
+
+        <div class="form-row with-controls">
+          <label for="pa2_fn">First name</label>
+          <input type="text" id="pa2_fn" name="pa2_fn" placeholder="First name">
+          <input type="number" id="pa2_occ" name="pa2_occ" value="0" min="0" title="Number (occurence)">
+          <select id="pa2_p" name="pa2_p">
+            <option value="create" selected>Create</option>
+            <option value="link">Link</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="pa2_sn">Surname</label>
+          <input type="text" id="pa2_sn" name="pa2_sn" placeholder="Surname">
+        </div>
+
+        <div id="pa2_div">
+          <div class="form-row date-row">
+            <label>Birth</label>
+            <input type="text" name="pa2b_mm" placeholder="MM" maxlength="2">
+            <input type="text" name="pa2b_dd" placeholder="DD" maxlength="2">
+            <input type="text" name="pa2b_yyyy" placeholder="YYYY" maxlength="8">
+            <input type="text" name="pa2b_pl" placeholder="Place">
+          </div>
+
+          <div class="form-row date-row">
+            <label>Death</label>
+            <input type="text" name="pa2d_mm" placeholder="MM" maxlength="2">
+            <input type="text" name="pa2d_dd" placeholder="DD" maxlength="2">
+            <input type="text" name="pa2d_yyyy" placeholder="YYYY" maxlength="8">
+            <input type="text" name="pa2d_pl" placeholder="Place">
+          </div>
+
+          <div class="form-row">
+            <label for="pa2_occupation">Occupation</label>
+            <input type="text" id="pa2_occupation" name="pa2_occupation" placeholder="Occupation">
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn inline" title="Submit">
+          <i class="fa fa-share fa-rotate-180"></i>
+        </button>
+      </div>
+
+      <!-- EVENTS SECTION -->
+      <div class="card" id="events">
+        <h3 class="card-header">Events</h3>
+
+        <div class="subsection-title">Event 1</div>
+
+        <div class="form-row">
+          <label for="fevent_select1">Event type</label>
+          <select id="fevent_select1" name="e_type1">
+            <option value="">Custom event</option>
+            <option disabled>──────────</option>
+            <option value="#marr" selected>Marriage</option>
+            <option value="#nmar">Partners</option>
+            <option value="#enga">Engagement</option>
+            <option value="#nmen">No mention</option>
+            <option value="#marb">Marriage bann</option>
+            <option value="#marc">Marriage contract</option>
+            <option value="#marl">Marriage License</option>
+            <option value="#pacs">Civil Marriage</option>
+            <option value="#div">Divorce</option>
+            <option value="#sep">Separation</option>
+            <option value="#anul">Annulment</option>
+            <option value="#resi">Residence</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="e_place1">Place</label>
+          <input type="text" id="e_place1" name="e_place1" placeholder="Place">
+        </div>
+
+        <div class="form-row date-row">
+          <label>Date</label>
+          <input type="text" name="e_date1_mm" placeholder="MM" maxlength="2">
+          <input type="text" name="e_date1_dd" placeholder="DD" maxlength="2">
+          <input type="text" name="e_date1_yyyy" placeholder="YYYY" maxlength="8">
+          <input type="text" name="e_date1_text" placeholder="…or text">
+        </div>
+
+        <div class="form-row">
+          <label for="e_date1_prec">Precision</label>
+          <select id="e_date1_prec" name="e_date1_prec">
+            <option value="sure">exact</option>
+            <option value="about">about</option>
+            <option value="maybe">possibly</option>
+            <option value="before">before</option>
+            <option value="after">after</option>
+            <option value="oryear">…or…</option>
+            <option value="yearint">…between…</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="e_note1">Notes</label>
+          <textarea id="e_note1" name="e_note1" rows="2" placeholder="Notes"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label for="e_src1">Source</label>
+          <input type="text" id="e_src1" name="e_src1" placeholder="Source">
+        </div>
+
+        <div class="event-section">
+          <div class="inline-submit">
+            <label>Add</label>
+            <select name="e1_ins_witn0_n" style="width: 80px;">
+              <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+            </select>
+            <span>witness/witnesses</span>
+            <button type="submit" class="btn-secondary">OK</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="inline-submit">
+          <label>Add</label>
+          <select name="ins_event1_n" style="width: 80px;">
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          </select>
+          <span>event/events</span>
+          <button type="submit" class="btn-secondary">OK</button>
+        </div>
+      </div>
+
+      <!-- CHILDREN SECTION -->
+      <div class="card" id="children">
+        <h3 class="card-header">Children</h3>
+
+        <div class="inline-submit">
+          <label>Add</label>
+          <select name="ins_ch0_n" style="width: 80px;">
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          </select>
+          <span>child/children</span>
+          <button type="submit" class="btn-secondary">OK</button>
+        </div>
+
+        <div class="child-section">
+          <div class="subsection-title">1st Child</div>
+
+          <div class="form-row with-controls">
+            <label for="ch1_fn">First name</label>
+            <input type="text" id="ch1_fn" name="ch1_fn" placeholder="First name">
+            <input type="number" id="ch1_occ" name="ch1_occ" value="0" min="0">
+            <select id="ch1_p" name="ch1_p">
+              <option value="create" selected>Create</option>
+              <option value="link">Link</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="ch1_sn">Surname</label>
+            <input type="text" id="ch1_sn" name="ch1_sn" placeholder="Surname">
+          </div>
+
+          <div class="form-row">
+            <label>Sex</label>
+            <div class="radio-group">
+              <label><input type="radio" name="ch1_sex" value="M"> M</label>
+              <label><input type="radio" name="ch1_sex" value="N" checked> ?</label>
+              <label><input type="radio" name="ch1_sex" value="F"> F</label>
+            </div>
+          </div>
+
+          <div id="ch1_div">
+            <div class="form-row date-row">
+              <label>Birth</label>
+              <input type="text" name="ch1b_mm" placeholder="MM" maxlength="2">
+              <input type="text" name="ch1b_dd" placeholder="DD" maxlength="2">
+              <input type="text" name="ch1b_yyyy" placeholder="YYYY" maxlength="8">
+              <input type="text" name="ch1b_pl" placeholder="Place">
+            </div>
+
+            <div class="form-row date-row">
+              <label>Death</label>
+              <input type="text" name="ch1d_mm" placeholder="MM" maxlength="2">
+              <input type="text" name="ch1d_dd" placeholder="DD" maxlength="2">
+              <input type="text" name="ch1d_yyyy" placeholder="YYYY" maxlength="8">
+              <input type="text" name="ch1d_pl" placeholder="Place">
+            </div>
+
+            <div class="form-row">
+              <label for="ch1_occupation">Occupation</label>
+              <input type="text" id="ch1_occupation" name="ch1_occupation" placeholder="Occupation">
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="inline-submit">
+          <label>Add</label>
+          <select name="ins_ch1_n" style="width: 80px;">
+            <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          </select>
+          <span>child/children</span>
+          <button type="submit" class="btn-secondary">OK</button>
+        </div>
+      </div>
+
+      <!-- SOURCES SECTION -->
+      <div class="card" id="sources">
+        <h3 class="card-header">Sources</h3>
+
+        <div class="form-row">
+          <label for="psrc">Individuals</label>
+          <textarea id="psrc" name="psrc" rows="2" placeholder="Sources individuals"></textarea>
+        </div>
+
+        <div class="form-row">
+          <label for="src">Family</label>
+          <input type="text" id="src" name="src" placeholder="Sources family">
+        </div>
+      </div>
+
+      <!-- COMMENT SECTION -->
+      <div class="card" id="comments">
+        <h3 class="card-header">Comment</h3>
+
+        <div class="toolbar">
+          <a href="javascript:;" title="Bold"><i class="fas fa-bold"></i></a>
+          <a href="javascript:;" title="Italic"><i class="fas fa-italic"></i></a>
+          <a href="javascript:;" title="Underline"><i class="fas fa-underline"></i></a>
+          <a href="javascript:;" title="Heading"><i class="fas fa-heading"></i></a>
+          <a href="javascript:;" title="Horizontal line"><i class="far fa-window-minimize"></i></a>
+          <a href="javascript:;" title="Superscript"><i class="fas fa-superscript"></i></a>
+          <a href="javascript:;" title="Link"><i class="fas fa-link"></i></a>
+          <a href="javascript:;" title="Center"><i class="fas fa-align-center"></i></a>
+          <a href="javascript:;" title="Indent"><i class="fas fa-indent"></i></a>
+        </div>
+
+        <textarea id="notes_comments" name="comment" rows="10" placeholder="Enter your comments here..."></textarea>
+
+        <div class="accent-chars">
+          <a href="#">–</a><a href="#">—</a><a href="#">«</a><a href="#">»</a><a href="#">'</a><a href="#">'</a><a href="#">„</a><a href="#">"</a><a href="#">"</a>
+          <a href="#">Á</a><a href="#">á</a><a href="#">À</a><a href="#">à</a><a href="#">Â</a><a href="#">â</a><a href="#">Ä</a><a href="#">ä</a><a href="#">Æ</a><a href="#">æ</a>
+          <a href="#">É</a><a href="#">é</a><a href="#">È</a><a href="#">è</a><a href="#">Ê</a><a href="#">ê</a><a href="#">Ë</a><a href="#">ë</a>
+          <a href="#">Í</a><a href="#">í</a><a href="#">Ì</a><a href="#">ì</a><a href="#">Î</a><a href="#">î</a><a href="#">Ï</a><a href="#">ï</a>
+          <a href="#">Ó</a><a href="#">ó</a><a href="#">Ò</a><a href="#">ò</a><a href="#">Ô</a><a href="#">ô</a><a href="#">Ö</a><a href="#">ö</a><a href="#">Œ</a><a href="#">œ</a>
+          <a href="#">Ú</a><a href="#">ú</a><a href="#">Ù</a><a href="#">ù</a><a href="#">Û</a><a href="#">û</a><a href="#">Ü</a><a href="#">ü</a>
+          <a href="#">Ç</a><a href="#">ç</a><a href="#">Ñ</a><a href="#">ñ</a><a href="#">ß</a>
+        </div>
+
+        <button type="submit" class="submit-btn" title="Submit">
+          <i class="fa fa-share fa-rotate-180"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Toggle visibility based on select
+    document.getElementById('pa1_p').addEventListener('change', function() {
+      document.getElementById('pa1_div').style.display = 
+        this.value === 'link' ? 'none' : 'block';
+    });
+
+    document.getElementById('pa2_p').addEventListener('change', function() {
+      document.getElementById('pa2_div').style.display = 
+        this.value === 'link' ? 'none' : 'block';
+    });
+
+    document.getElementById('ch1_p').addEventListener('change', function() {
+      document.getElementById('ch1_div').style.display = 
+        this.value === 'link' ? 'none' : 'block';
+    });
+
+    // Smooth scroll for navigation
+    document.querySelectorAll('.nav-links a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

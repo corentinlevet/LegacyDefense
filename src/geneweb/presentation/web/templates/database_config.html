@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Base - {{ genealogy_name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-database text-primary"></i>
+                Configuration - {{ genealogy_name }}
+            </h1>
+            <a href="/genealogy/{{ genealogy_name }}/config" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i>
+            Ces paramètres correspondent au fichier .gwf de GeneWeb OCaml
+        </div>
+
+        <form id="config-form">
+            <!-- Apparence -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-palette mr-2"></i>Apparence
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="body_prop">
+                            <i class="fas fa-code mr-2"></i>Style CSS du body
+                        </label>
+                        <input type="text" class="form-control" id="body_prop" 
+                               placeholder="background-color: #f0f0f0;">
+                        <small class="form-text text-muted">
+                            Propriétés CSS pour personnaliser l'apparence
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="default_lang">
+                            <i class="fas fa-language mr-2"></i>Langue par défaut
+                        </label>
+                        <select class="form-control" id="default_lang">
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                            <option value="it">Italiano</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trailer">
+                            <i class="fas fa-file-alt mr-2"></i>Texte en pied de page
+                        </label>
+                        <textarea class="form-control" id="trailer" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Limites -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line mr-2"></i>Limites des arbres
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="max_anc_level">
+                                    Limite ascendance
+                                </label>
+                                <input type="number" class="form-control" 
+                                       id="max_anc_level" value="12" min="1" max="50">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="max_desc_level">
+                                    Limite descendance
+                                </label>
+                                <input type="number" class="form-control" 
+                                       id="max_desc_level" value="12" min="1" max="50">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="max_anc_tree">
+                                    Limite arbre ascendants
+                                </label>
+                                <input type="number" class="form-control" 
+                                       id="max_anc_tree" value="7" min="1" max="20">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="max_desc_tree">
+                                    Limite arbre descendants
+                                </label>
+                                <input type="number" class="form-control" 
+                                       id="max_desc_tree" value="4" min="1" max="20">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fonctionnalités -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs mr-2"></i>Fonctionnalités
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" 
+                               id="history" checked>
+                        <label class="form-check-label" for="history">
+                            Activer l'historique des modifications
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" 
+                               id="hide_advanced_request">
+                        <label class="form-check-label" for="hide_advanced_request">
+                            Masquer la recherche avancée
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="images_path">
+                            <i class="fas fa-images mr-2"></i>Chemin des images
+                        </label>
+                        <input type="text" class="form-control" id="images_path">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sécurité -->
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lock mr-2"></i>Sécurité
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="friend_passwd">
+                            Mot de passe ami
+                        </label>
+                        <input type="password" class="form-control" 
+                               id="friend_passwd">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wizard_passwd">
+                            Mot de passe sorcier
+                        </label>
+                        <input type="password" class="form-control" 
+                               id="wizard_passwd">
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" 
+                               id="wizard_just_friend">
+                        <label class="form-check-label" for="wizard_just_friend">
+                            Sorcier = ami
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" 
+                               id="hide_private_names">
+                        <label class="form-check-label" for="hide_private_names">
+                            Masquer les noms privés
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" 
+                               id="can_send_image" checked>
+                        <label class="form-check-label" for="can_send_image">
+                            Autoriser l'envoi d'images
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
+                <i class="fas fa-save mr-2"></i>Sauvegarder la configuration
+            </button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const genealogyName = "{{ genealogy_name }}";
+            const apiUrl = `/api/genealogies/${genealogyName}/config`;
+
+            // Charger la configuration actuelle
+            $.get(apiUrl).done(function(data) {
+                $('#body_prop').val(data.body_prop || '');
+                $('#default_lang').val(data.default_lang || 'fr');
+                $('#trailer').val(data.trailer || '');
+                $('#max_anc_level').val(data.max_anc_level || 12);
+                $('#max_desc_level').val(data.max_desc_level || 12);
+                $('#max_anc_tree').val(data.max_anc_tree || 7);
+                $('#max_desc_tree').val(data.max_desc_tree || 4);
+                $('#history').prop('checked', data.history !== false);
+                $('#hide_advanced_request').prop('checked', data.hide_advanced_request || false);
+                $('#images_path').val(data.images_path || '');
+                $('#friend_passwd').val(data.friend_passwd || '');
+                $('#wizard_passwd').val(data.wizard_passwd || '');
+                $('#wizard_just_friend').prop('checked', data.wizard_just_friend || false);
+                $('#hide_private_names').prop('checked', data.hide_private_names || false);
+                $('#can_send_image').prop('checked', data.can_send_image !== false);
+            });
+
+            // Soumettre la configuration
+            $('#config-form').on('submit', function(e) {
+                e.preventDefault();
+
+                const configData = {
+                    body_prop: $('#body_prop').val(),
+                    default_lang: $('#default_lang').val(),
+                    trailer: $('#trailer').val(),
+                    max_anc_level: parseInt($('#max_anc_level').val()),
+                    max_desc_level: parseInt($('#max_desc_level').val()),
+                    max_anc_tree: parseInt($('#max_anc_tree').val()),
+                    max_desc_tree: parseInt($('#max_desc_tree').val()),
+                    history: $('#history').is(':checked'),
+                    hide_advanced_request: $('#hide_advanced_request').is(':checked'),
+                    images_path: $('#images_path').val(),
+                    friend_passwd: $('#friend_passwd').val(),
+                    wizard_passwd: $('#wizard_passwd').val(),
+                    wizard_just_friend: $('#wizard_just_friend').is(':checked'),
+                    hide_private_names: $('#hide_private_names').is(':checked'),
+                    can_send_image: $('#can_send_image').is(':checked')
+                };
+
+                $.ajax({
+                    url: apiUrl,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(configData),
+                    success: function() {
+                        alert('✅ Configuration sauvegardée avec succès !');
+                    },
+                    error: function() {
+                        alert('❌ Erreur lors de la sauvegarde');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
