@@ -2,7 +2,7 @@ import pathlib
 from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request, logger
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from ...application.services import ApplicationService
@@ -311,6 +311,58 @@ async def places_surnames(
             "request": request,
             "genealogy_name": genealogy_name,
             "places_hierarchy": places_hierarchy,
+            "_": gettext,
+        },
+    )
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/add_family",
+    response_class=HTMLResponse,
+    name="add_family",
+)
+async def add_family_form(genealogy_name: str, request: Request):
+    return templates.TemplateResponse(
+        "add_family.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "_": gettext,
+        },
+    )
+
+
+@router.post("/genealogy/{genealogy_name}/add_family", name="add_family_post")
+async def add_family_post(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    form_data = await request.form()
+    family_id = await app_service.add_family(genealogy_name, form_data)
+    return RedirectResponse(
+        url=f"/genealogy/{genealogy_name}/family/{family_id}", status_code=303
+    )
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/family/{family_id}",
+    response_class=HTMLResponse,
+    name="family_created",
+)
+async def family_created(
+    genealogy_name: str,
+    family_id: int,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    family = await app_service.get_family(family_id)
+    return templates.TemplateResponse(
+        "family_created.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "family": family,
             "_": gettext,
         },
     )

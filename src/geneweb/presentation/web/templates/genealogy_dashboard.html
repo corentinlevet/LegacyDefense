@@ -106,7 +106,7 @@
             <div class="card-body">
                  <p class="text-muted">Actions réservées aux magiciens.</p>
                 <div class="list-group">
-                    <a href="#" class="list-group-item list-group-item-action text-success"><i class="fas fa-user-plus mr-2"></i>Ajouter une famille</a>
+                    <a href="{{ url_for('add_family', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action text-success"><i class="fas fa-user-plus mr-2"></i>Ajouter une famille</a>
                     <a href="#" class="list-group-item list-group-item-action text-success"><i class="far fa-file-lines fa-fw mr-2"></i>Ajouter des notes</a>
                 </div>
                 <h6 class="mt-4">Livres</h6>
