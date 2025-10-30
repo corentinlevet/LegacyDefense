@@ -1407,6 +1407,8 @@ class ApplicationService:
             db.add(mother)
             db.flush()
 
+            print(f"Father ID: {father.id}, Mother ID: {mother.id}")
+
             family = Family(
                 genealogy_id=genealogy.id,
                 father_id=father.id,
@@ -1471,12 +1473,44 @@ class ApplicationService:
 
         db = SessionLocal()
         try:
+            print(f"Getting family with ID: {family_id}")
             family = (
                 db.query(Family)
-                .options(joinedload(Family.father), joinedload(Family.mother))
+                .options(
+                    joinedload(Family.father),
+                    joinedload(Family.mother),
+                )
                 .filter(Family.id == family_id)
                 .first()
             )
+            if family:
+                print(
+                    f"Family retrieved: {family.id}, Father: {family.father}, Mother: {family.mother}"
+                )
+            else:
+                print(f"Family with ID {family_id} not found.")
             return family
+        finally:
+            db.close()
+
+    async def get_person_details(self, person_id: int):
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            person = (
+                db.query(Person)
+                .options(
+                    joinedload(Person.child_of_families).joinedload(Family.father),
+                    joinedload(Person.child_of_families).joinedload(Family.mother),
+                    joinedload(Person.families_as_father).joinedload(Family.mother),
+                    joinedload(Person.families_as_father).joinedload(Family.children),
+                    joinedload(Person.families_as_mother).joinedload(Family.father),
+                    joinedload(Person.families_as_mother).joinedload(Family.children),
+                )
+                .filter(Person.id == person_id)
+                .first()
+            )
+            return person
         finally:
             db.close()

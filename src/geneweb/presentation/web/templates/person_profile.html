@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ person.first_name }} {{ person.surname }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>{{ person.first_name }} {{ person.surname }}</h1>
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ _('Information') }}</h5>
+        <p><strong>{{ _('First name') }}:</strong> {{ person.first_name }}</p>
+        <p><strong>{{ _('Surname') }}:</strong> {{ person.surname }}</p>
+        <p><strong>{{ _('Sex') }}:</strong> {{ person.sex }}</p>
+        <p><strong>{{ _('Birth date') }}:</strong> {{ person.birth_date }}</p>
+        <p><strong>{{ _('Birth place') }}:</strong> {{ person.birth_place }}</p>
+        <p><strong>{{ _('Death date') }}:</strong> {{ person.death_date }}</p>
+        <p><strong>{{ _('Death place') }}:</strong> {{ person.death_place }}</p>
+        <p><strong>{{ _('Occupation') }}:</strong> {{ person.occupation }}</p>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">{{ _('Parents') }}</h5>
+        {% if person.child_of_families %}
+          {% for family in person.child_of_families %}
+            <p>
+              <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.father.id) }}">{{ family.father.first_name }} {{ family.father.surname }}</a>
+              &
+              <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.mother.id) }}">{{ family.mother.first_name }} {{ family.mother.surname }}</a>
+            </p>
+          {% endfor %}
+        {% else %}
+          <p>{{ _('No parents found.') }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">{{ _('Family') }}</h5>
+        {% for family in person.families_as_father %}
+          <p><strong>{{ _('Spouse') }}:</strong> <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.mother.id) }}">{{ family.mother.first_name }} {{ family.mother.surname }}</a></p>
+          <p><strong>{{ _('Children') }}:</strong></p>
+          <ul>
+            {% for child in family.children %}
+              <li><a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=child.id) }}">{{ child.first_name }} {{ child.surname }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+        {% for family in person.families_as_mother %}
+          <p><strong>{{ _('Spouse') }}:</strong> <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.father.id) }}">{{ family.father.first_name }} {{ family.father.surname }}</a></p>
+          <p><strong>{{ _('Children') }}:</strong></p>
+          <ul>
+            {% for child in family.children %}
+              <li><a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=child.id) }}">{{ child.first_name }} {{ child.surname }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </div>
+    </div>
+
+    <a href="{{ url_for('view_genealogy', name=genealogy_name) }}" class="btn btn-primary mt-3">{{ _('Back to genealogy') }}</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

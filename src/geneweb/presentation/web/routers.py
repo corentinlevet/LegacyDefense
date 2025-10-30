@@ -368,6 +368,29 @@ async def family_created(
     )
 
 
+@router.get(
+    "/genealogy/{genealogy_name}/person/{person_id}",
+    response_class=HTMLResponse,
+    name="person_profile",
+)
+async def person_profile(
+    genealogy_name: str,
+    person_id: int,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    person = await app_service.get_person_details(person_id)
+    return templates.TemplateResponse(
+        "person_profile.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "person": person,
+            "_": gettext,
+        },
+    )
+
+
 def gettext(text: str) -> str:
     # Ceci est un mock. Remplacez par votre vraie fonction de traduction.
     translations = {

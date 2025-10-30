@@ -68,6 +68,12 @@ class Person(Base):
 
     genealogy = relationship("Genealogy", back_populates="persons")
     events = relationship("Event", back_populates="person")
+    families_as_father = relationship(
+        "Family", foreign_keys="[Family.father_id]", back_populates="father"
+    )
+    families_as_mother = relationship(
+        "Family", foreign_keys="[Family.mother_id]", back_populates="mother"
+    )
 
 
 class Family(Base):
@@ -86,8 +92,12 @@ class Family(Base):
     marriage_src = Column(String(200))
 
     genealogy = relationship("Genealogy", back_populates="families")
-    father = relationship("Person", foreign_keys=[father_id])
-    mother = relationship("Person", foreign_keys=[mother_id])
+    father = relationship(
+        "Person", foreign_keys=[father_id], back_populates="families_as_father"
+    )
+    mother = relationship(
+        "Person", foreign_keys=[mother_id], back_populates="families_as_mother"
+    )
     children = relationship(
         "Person", secondary=family_children, backref="child_of_families"
     )

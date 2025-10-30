@@ -18,9 +18,15 @@
       <div class="card-body">
         <h5 class="card-title">{{ _('Parents') }}</h5>
         <p class="card-text">
-          <a href="#">{{ family.father.first_name }} {{ family.father.surname }}</a>
-          &
-          <a href="#">{{ family.mother.first_name }} {{ family.mother.surname }}</a>
+          {% if family.father %}
+            <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.father.id) }}">{{ family.father.first_name }} {{ family.father.surname }}</a>
+          {% endif %}
+          {% if family.father and family.mother %}
+            &
+          {% endif %}
+          {% if family.mother %}
+            <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.mother.id) }}">{{ family.mother.first_name }} {{ family.mother.surname }}</a>
+          {% endif %}
         </p>
       </div>
     </div>
