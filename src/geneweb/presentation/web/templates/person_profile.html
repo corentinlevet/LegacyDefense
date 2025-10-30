@@ -12,8 +12,8 @@
     }
 
     body {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      color: #e0e0e0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
+      color: #2c3e50;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       min-height: 100vh;
       padding: 20px;
@@ -31,9 +31,10 @@
       top: 0;
       left: 0;
       right: 0;
-      background: rgba(30, 30, 40, 0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       z-index: 1000;
       padding: 15px 20px;
     }
@@ -55,9 +56,9 @@
     }
 
     .nav-btn {
-      background: rgba(90, 141, 238, 0.15);
+      background: white;
       color: #5a8dee;
-      border: 1px solid rgba(90, 141, 238, 0.3);
+      border: 1px solid #e0e0e0;
       padding: 6px 12px;
       border-radius: 6px;
       text-decoration: none;
@@ -70,20 +71,22 @@
     }
 
     .nav-btn:hover {
-      background: rgba(90, 141, 238, 0.25);
+      background: #f8f9fa;
       border-color: #5a8dee;
       transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(90, 141, 238, 0.2);
     }
 
     .nav-btn.active {
-      background: rgba(90, 141, 238, 0.3);
+      background: #5a8dee;
+      color: white;
       border-color: #5a8dee;
     }
 
     .nav-btn.home {
-      background: rgba(40, 44, 52, 0.5);
-      color: #b0b0b0;
-      border-color: rgba(255, 255, 255, 0.1);
+      background: white;
+      color: #5a6c7d;
+      border-color: #e0e0e0;
     }
 
     .nav-btn.home:hover {
@@ -94,7 +97,7 @@
     h1 {
       font-size: 36px;
       font-weight: 300;
-      color: #ffffff;
+      color: #2c3e50;
       margin-bottom: 10px;
     }
 
@@ -105,12 +108,12 @@
     }
 
     h1 a:hover {
-      color: #7aa3f7;
+      color: #4a7bd8;
     }
 
     h1 .death-date {
       font-size: 24px;
-      color: #999;
+      color: #95a5a6;
       font-weight: 300;
     }
 
@@ -130,23 +133,27 @@
 
     /* Cards */
     .card {
-      background: rgba(40, 44, 52, 0.7);
-      border-radius: 8px;
+      background: white;
+      border-radius: 12px;
       padding: 25px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e8edf2;
     }
 
     h2 {
-      color: #ffffff;
+      color: #2c3e50;
       font-size: 20px;
       margin-bottom: 20px;
       padding-bottom: 15px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: 400;
+      border-bottom: 2px solid #e8edf2;
+      font-weight: 500;
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    h2 i {
+      color: #5a8dee;
     }
 
     h2 a {
@@ -161,7 +168,7 @@
 
     .info-list li {
       padding: 8px 0;
-      color: #d0d0d0;
+      color: #34495e;
       font-size: 15px;
     }
 
@@ -186,10 +193,11 @@
       color: #5a8dee;
       text-decoration: none;
       transition: all 0.3s ease;
+      font-weight: 500;
     }
 
     a.person-link:hover {
-      color: #7aa3f7;
+      color: #4a7bd8;
       text-decoration: underline;
     }
 
@@ -198,7 +206,7 @@
     }
 
     a.person-link.female:hover {
-      color: #f05da0;
+      color: #d6368d;
     }
 
     .date-link {
@@ -212,17 +220,18 @@
     }
 
     .person-dates {
-      color: #999;
+      color: #7f8c8d;
       font-style: italic;
       font-size: 14px;
     }
 
     /* Genealogy Tree */
     .tree-container {
-      background: rgba(0, 0, 0, 0.3);
+      background: #f8f9fa;
       padding: 20px;
       border-radius: 8px;
       overflow-x: auto;
+      border: 1px solid #e8edf2;
     }
 
     .tree-table {
@@ -241,19 +250,22 @@
     .tree-person {
       display: inline-block;
       padding: 8px 12px;
-      background: rgba(90, 141, 238, 0.15);
-      border: 1px solid rgba(90, 141, 238, 0.3);
-      border-radius: 6px;
+      background: white;
+      border: 2px solid #5a8dee;
+      border-radius: 8px;
       transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
     .tree-person:hover {
-      background: rgba(90, 141, 238, 0.25);
-      border-color: #5a8dee;
+      background: #f0f5ff;
+      border-color: #4a7bd8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(90, 141, 238, 0.3);
     }
 
     .tree-person a {
-      color: #d0d0d0;
+      color: #2c3e50;
       text-decoration: none;
       display: block;
     }
@@ -263,22 +275,22 @@
     }
 
     .tree-line {
-      color: #666;
+      color: #bdc3c7;
       font-size: 16px;
     }
 
     .tree-connector {
-      border-top: 2px solid #444;
+      border-top: 2px solid #bdc3c7;
       margin: 0;
       padding: 0;
     }
 
     .tree-connector.half-right {
-      border-right: 2px solid #444;
+      border-right: 2px solid #bdc3c7;
     }
 
     .tree-connector.half-left {
-      border-left: 2px solid #444;
+      border-left: 2px solid #bdc3c7;
     }
 
     /* Siblings */
@@ -290,16 +302,22 @@
     .siblings-list li {
       padding: 10px 15px;
       margin: 8px 0;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 6px;
+      background: #f8f9fa;
+      border-radius: 8px;
       border-left: 3px solid #5a8dee;
       display: flex;
       align-items: center;
       gap: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .siblings-list li:hover {
+      background: #f0f5ff;
+      transform: translateX(3px);
     }
 
     .siblings-list li.current {
-      background: rgba(90, 141, 238, 0.15);
+      background: #e8f0ff;
       border-left-color: #5a8dee;
       font-weight: 600;
     }
@@ -313,7 +331,7 @@
       width: 20px;
       height: 20px;
       display: inline-block;
-      opacity: 0.6;
+      opacity: 0.7;
       transition: opacity 0.3s ease;
     }
 
@@ -327,28 +345,42 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(40, 44, 52, 0.98);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: white;
+      border: 1px solid #e0e0e0;
       border-radius: 12px;
       padding: 30px;
       z-index: 2000;
       min-width: 400px;
       display: none;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
 
     .search-modal.active {
       display: block;
     }
 
+    .search-modal h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
     .search-modal input {
       width: 100%;
-      background: #2a2d35;
-      border: 1px solid #3a3d45;
+      background: #f8f9fa;
+      border: 1px solid #dce4ec;
       border-radius: 6px;
-      color: #e0e0e0;
+      color: #2c3e50;
       padding: 12px;
       font-size: 16px;
       margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+
+    .search-modal input:focus {
+      outline: none;
+      border-color: #5a8dee;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.15);
     }
 
     .search-modal button {
@@ -359,6 +391,13 @@
       padding: 10px 20px;
       cursor: pointer;
       margin-top: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .search-modal button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(90, 141, 238, 0.3);
     }
 
     /* Responsive */
@@ -430,7 +469,7 @@
 
   <!-- Search Modal -->
   <div class="search-modal">
-    <h3 style="color: #fff; margin-bottom: 15px;">Search individual</h3>
+    <h3>Search individual</h3>
     <input type="search" placeholder="Surname, public name, alias" autofocus>
     <input type="search" placeholder="First name">
     <button><i class="fa fa-search"></i> Search</button>
@@ -455,10 +494,10 @@
           <h2><i class="fas fa-info-circle"></i> {{ _('Basic Info') }}</h2>
           <ul class="info-list">
             {% if person.birth_date %}
-              <li>{{ _('Born') }} {{ person.birth_date }} {% if person.birth_place %}{{ _('in') }} {{ person.birth_place }}{% endif %}</li>
+              <li>{{ _('Born') }} {{ format_date_natural(person.birth_date) }} {% if person.birth_place %}{{ _('in') }} {{ person.birth_place }}{% endif %}</li>
             {% endif %}
             {% if person.death_date %}
-              <li>{{ _('Died') }} {{ person.death_date }} {% if person.death_place %}{{ _('in') }} {{ person.death_place }}{% endif %}</li>
+              <li>{{ _('Died') }} {{ format_date_natural(person.death_date) }} {% if person.death_place %}{{ _('in') }} {{ person.death_place }}{% endif %}</li>
             {% endif %}
             {% if person.occupation %}
               <li>{{ _('Occupation') }}: {{ person.occupation }}</li>
@@ -475,8 +514,7 @@
 
           <ul style="padding-left: 0;">
             {% for family in person.families_as_father %}
-              <li class="family-item">
-                {{ _('Married') }} {% if family.marriage_date %}<a href="#" class="date-link">{{ _('on') }} {{ family.marriage_date }}</a>{% endif %} {{ _('to') }} 
+              Married {% if family.marriage_date %}<a href="#" class="date-link">{{ _('on') }} {{ format_date_natural(family.marriage_date) }}</a>{% endif %} to 
                 {% if family.mother %}
                   <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.mother.id) }}" class="person-link female">{{ family.mother.first_name }} {{ family.mother.surname }}</a>
                 {% endif %}
@@ -485,7 +523,7 @@
                     {% for child in family.children %}
                       <li>
                         <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=child.id) }}" class="person-link {% if child.sex == 'M' %}male{% else %}female{% endif %}">{{ child.first_name }} {{ child.surname }}</a>
-                        <span class="person-dates">{% if child.birth_date %}{{ child.birth_date }}{% endif %}{% if child.birth_date and child.death_date %}-{% endif %}{% if child.death_date %}{{ child.death_date }}{% endif %}</span>
+                        <span class="person-dates">{% if child.birth_date %}{{ format_date_natural(child.birth_date) }}{% endif %}{% if child.birth_date and child.death_date %}-{% endif %}{% if child.death_date %}{{ format_date_natural(child.death_date) }}{% endif %}</span>
                       </li>
                     {% endfor %}
                   </ul>
@@ -494,7 +532,7 @@
             {% endfor %}
             {% for family in person.families_as_mother %}
               <li class="family-item">
-                {{ _('Married') }} {% if family.marriage_date %}<a href="#" class="date-link">{{ _('on') }} {{ family.marriage_date }}</a>{% endif %} {{ _('to') }} 
+                Married {% if family.marriage_date %}<a href="#" class="date-link">{{ _('on') }} {{ format_date_natural(family.marriage_date) }}</a>{% endif %} to 
                 {% if family.father %}
                   <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=family.father.id) }}" class="person-link male">{{ family.father.first_name }} {{ family.father.surname }}</a>
                 {% endif %}
@@ -503,7 +541,7 @@
                     {% for child in family.children %}
                       <li>
                         <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=child.id) }}" class="person-link {% if child.sex == 'M' %}male{% else %}female{% endif %}">{{ child.first_name }} {{ child.surname }}</a>
-                        <span class="person-dates">{% if child.birth_date %}{{ child.birth_date }}{% endif %}{% if child.birth_date and child.death_date %}-{% endif %}{% if child.death_date %}{{ child.death_date }}{% endif %}</span>
+                        <span class="person-dates">{% if child.birth_date %}{{ format_date_natural(child.birth_date) }}{% endif %}{% if child.birth_date and child.death_date %}-{% endif %}{% if child.death_date %}{{ format_date_natural(child.death_date) }}{% endif %}</span>
                       </li>
                     {% endfor %}
                   </ul>
@@ -534,7 +572,7 @@
                       <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=person.child_of_families[0].father.child_of_families[0].father.id) }}" class="person-link">
                         <div>{{ person.child_of_families[0].father.child_of_families[0].father.first_name }}</div>
                         <div>{{ person.child_of_families[0].father.child_of_families[0].father.surname }}</div>
-                        <div class="person-dates">{% if person.child_of_families[0].father.child_of_families[0].father.birth_date %}{{ person.child_of_families[0].father.child_of_families[0].father.birth_date }}{% endif %}{% if person.child_of_families[0].father.child_of_families[0].father.birth_date and person.child_of_families[0].father.child_of_families[0].father.death_date %}-{% endif %}{% if person.child_of_families[0].father.child_of_families[0].father.death_date %}{{ person.child_of_families[0].father.child_of_families[0].father.death_date }}{% endif %}</div>
+                        <div class="person-dates">{% if person.child_of_families[0].father.child_of_families[0].father.birth_date %}{{ format_date_natural(person.child_of_families[0].father.child_of_families[0].father.birth_date) }}{% endif %}{% if person.child_of_families[0].father.child_of_families[0].father.birth_date and person.child_of_families[0].father.child_of_families[0].father.death_date %}-{% endif %}{% if person.child_of_families[0].father.child_of_families[0].father.death_date %}{{ format_date_natural(person.child_of_families[0].father.child_of_families[0].father.death_date) }}{% endif %}</div>
                       </a>
                     </div>
                   {% endif %}
@@ -548,7 +586,7 @@
                       <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=person.child_of_families[0].father.child_of_families[0].mother.id) }}" class="person-link">
                         <div>{{ person.child_of_families[0].father.child_of_families[0].mother.first_name }}</div>
                         <div>{{ person.child_of_families[0].father.child_of_families[0].mother.surname }}</div>
-                        <div class="person-dates">{% if person.child_of_families[0].father.child_of_families[0].mother.birth_date %}{{ person.child_of_families[0].father.child_of_families[0].mother.birth_date }}{% endif %}{% if person.child_of_families[0].father.child_of_families[0].mother.birth_date and person.child_of_families[0].father.child_of_families[0].mother.death_date %}-{% endif %}{% if person.child_of_families[0].father.child_of_families[0].mother.death_date %}{{ person.child_of_families[0].father.child_of_families[0].mother.death_date }}{% endif %}</div>
+                        <div class="person-dates">{% if person.child_of_families[0].father.child_of_families[0].mother.birth_date %}{{ format_date_natural(person.child_of_families[0].father.child_of_families[0].mother.birth_date) }}{% endif %}{% if person.child_of_families[0].father.child_of_families[0].mother.birth_date and person.child_of_families[0].father.child_of_families[0].mother.death_date %}-{% endif %}{% if person.child_of_families[0].father.child_of_families[0].mother.death_date %}{{ format_date_natural(person.child_of_families[0].father.child_of_families[0].mother.death_date) }}{% endif %}</div>
                       </a>
                     </div>
                   {% endif %}
@@ -558,9 +596,9 @@
               <tr>
                 <td colspan="3"></td>
                 <td colspan="3"><span class="tree-line">│</span></td>
-                <td colspan="7" style="font-style: italic; color: #999; font-size: 12px;">
+                <td colspan="7" style="font-style: italic; color: #95a5a6; font-size: 12px;">
                   {% if person.child_of_families and person.child_of_families[0].father and person.child_of_families[0].father.child_of_families and person.child_of_families[0].father.child_of_families[0].marriage_date %}
-                    <a href="#" style="color: #999;">{{ person.child_of_families[0].father.child_of_families[0].marriage_date }}</a>
+                    <a href="#" style="color: #95a5a6;">{{ format_date_natural(person.child_of_families[0].father.child_of_families[0].marriage_date) }}</a>
                   {% endif %}
                 </td>
                 <td colspan="3"><span class="tree-line">│</span></td>
@@ -586,7 +624,7 @@
                       <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=person.child_of_families[0].father.id) }}" class="person-link">
                         <div>{{ person.child_of_families[0].father.first_name }}</div>
                         <div>{{ person.child_of_families[0].father.surname }}</div>
-                        <div class="person-dates">{% if person.child_of_families[0].father.birth_date %}{{ person.child_of_families[0].father.birth_date }}{% endif %}{% if person.child_of_families[0].father.birth_date and person.child_of_families[0].father.death_date %}-{% endif %}{% if person.child_of_families[0].father.death_date %}{{ person.child_of_families[0].father.death_date }}{% endif %}</div>
+                        <div class="person-dates">{% if person.child_of_families[0].father.birth_date %}{{ format_date_natural(person.child_of_families[0].father.birth_date) }}{% endif %}{% if person.child_of_families[0].father.birth_date and person.child_of_families[0].father.death_date %}-{% endif %}{% if person.child_of_families[0].father.death_date %}{{ format_date_natural(person.child_of_families[0].father.death_date) }}{% endif %}</div>
                       </a>
                     </div>
                   {% endif %}
@@ -598,7 +636,7 @@
                       <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=person.child_of_families[0].mother.id) }}" class="person-link">
                         <div>{{ person.child_of_families[0].mother.first_name }}</div>
                         <div>{{ person.child_of_families[0].mother.surname }}</div>
-                        <div class="person-dates">{% if person.child_of_families[0].mother.birth_date %}{{ person.child_of_families[0].mother.birth_date }}{% endif %}{% if person.child_of_families[0].mother.birth_date and person.child_of_families[0].mother.death_date %}-{% endif %}{% if person.child_of_families[0].mother.death_date %}{{ person.child_of_families[0].mother.death_date }}{% endif %}</div>
+                        <div class="person-dates">{% if person.child_of_families[0].mother.birth_date %}{{ format_date_natural(person.child_of_families[0].mother.birth_date) }}{% endif %}{% if person.child_of_families[0].mother.birth_date and person.child_of_families[0].mother.death_date %}-{% endif %}{% if person.child_of_families[0].mother.death_date %}{{ format_date_natural(person.child_of_families[0].mother.death_date) }}{% endif %}</div>
                       </a>
                     </div>
                   {% endif %}
@@ -608,9 +646,9 @@
               <tr>
                 <td colspan="5"></td>
                 <td colspan="3"><span class="tree-line">│</span></td>
-                <td colspan="3" style="font-style: italic; color: #999; font-size: 12px;">
+                <td colspan="3" style="font-style: italic; color: #95a5a6; font-size: 12px;">
                   {% if person.child_of_families and person.child_of_families[0].marriage_date %}
-                    <a href="#" style="color: #999;">{{ person.child_of_families[0].marriage_date }}</a>
+                    <a href="#" style="color: #95a5a6;">{{ format_date_natural(person.child_of_families[0].marriage_date) }}</a>
                   {% endif %}
                 </td>
                 <td colspan="3"><span class="tree-line">│</span></td>
@@ -635,7 +673,7 @@
                     <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=person.id) }}" class="person-link">
                       <div>{{ person.first_name }}</div>
                       <div>{{ person.surname }}</div>
-                      <div class="person-dates">{% if person.birth_date %}{{ person.birth_date }}{% endif %}{% if person.birth_date and person.death_date %}-{% endif %}{% if person.death_date %}{{ person.death_date }}{% endif %}</div>
+                      <div class="person-dates">{% if person.birth_date %}{{ format_date_natural(person.birth_date) }}{% endif %}{% if person.birth_date and person.death_date %}-{% endif %}{% if person.death_date %}{{ format_date_natural(person.death_date) }}{% endif %}</div>
                     </a>
                   </div>
                 </td>
@@ -665,7 +703,7 @@
                     <li>
                       <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=sibling.id) }}" title="Update {{ sibling.first_name }} {{ sibling.surname }}"><i class="fa {% if sibling.sex == 'M' %}fa-mars{% else %}fa-venus{% endif %}"></i></a>
                       <a href="{{ url_for('person_profile', genealogy_name=genealogy_name, person_id=sibling.id) }}" class="person-link">{{ sibling.first_name }} {{ sibling.surname }}</a>
-                      <span class="person-dates">{% if sibling.birth_date %}{{ sibling.birth_date }}{% endif %}{% if sibling.birth_date and sibling.death_date %}-{% endif %}{% if sibling.death_date %}{{ sibling.death_date }}{% endif %}</span>
+                      <span class="person-dates">{% if sibling.birth_date %}{{ format_date_natural(sibling.birth_date) }}{% endif %}{% if sibling.birth_date and sibling.death_date %}-{% endif %}{% if sibling.death_date %}{{ format_date_natural(sibling.death_date) }}{% endif %}</span>
                     </li>
                   {% endif %}
                 {% endfor %}

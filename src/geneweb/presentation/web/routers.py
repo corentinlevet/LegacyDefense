@@ -368,6 +368,9 @@ async def family_created(
     )
 
 
+from ...presentation.web.formatters import format_date_natural
+
+
 @router.get(
     "/genealogy/{genealogy_name}/person/{person_id}",
     response_class=HTMLResponse,
@@ -386,6 +389,33 @@ async def person_profile(
             "request": request,
             "genealogy_name": genealogy_name,
             "person": person,
+            "_": gettext,
+            "format_date_natural": format_date_natural,
+        },
+    )
+
+
+@router.get(
+    "/genealogy/{genealogy_name}/search",
+    response_class=HTMLResponse,
+    name="search_persons",
+)
+async def search_persons(
+    genealogy_name: str,
+    request: Request,
+    p: str = None,
+    n: str = None,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    search_query = f"{p or ''} {n or ''}".strip()
+    search_results = await app_service.search_persons(genealogy_name, p, n)
+    return templates.TemplateResponse(
+        "search_results.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "search_query": search_query,
+            "search_results": search_results,
             "_": gettext,
         },
     )
