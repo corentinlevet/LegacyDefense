@@ -294,6 +294,28 @@ async def errors_stats_page(request: Request):
     )
 
 
+@router.get(
+    "/genealogy/{genealogy_name}/places-surnames",
+    response_class=HTMLResponse,
+    name="places_surnames",
+)
+async def places_surnames(
+    genealogy_name: str,
+    request: Request,
+    app_service: ApplicationService = Depends(get_app_service),
+):
+    places_hierarchy = await app_service.get_places_surnames(genealogy_name)
+    return templates.TemplateResponse(
+        "places_surnames.html",
+        {
+            "request": request,
+            "genealogy_name": genealogy_name,
+            "places_hierarchy": places_hierarchy,
+            "_": gettext,
+        },
+    )
+
+
 def gettext(text: str) -> str:
     # Ceci est un mock. Remplacez par votre vraie fonction de traduction.
     translations = {

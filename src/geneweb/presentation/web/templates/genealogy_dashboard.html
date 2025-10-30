@@ -91,7 +91,7 @@
                 <div class="list-group">
                     <a href="#" class="list-group-item list-group-item-action"><i class="far fa-chart-bar fa-fw mr-2"></i>Statistiques</a>
                     <a href="/genealogy/{{ genealogy_name }}/anniversaries" class="list-group-item list-group-item-action"><i class="fa fa-cake-candles fa-fw mr-2"></i>Anniversaires</a>
-                    <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-globe fa-fw mr-2"></i>Lieux / Noms</a>
+                    <a href="{{ url_for('places_surnames', genealogy_name=genealogy_name) }}" class="list-group-item list-group-item-action"><i class="fas fa-globe fa-fw mr-2"></i>Lieux / Noms</a>
                     <a href="#" class="list-group-item list-group-item-action"><i class="fa fa-magnifying-glass-plus fa-fw mr-2"></i>Requête avancée</a>
                     <a href="#" class="list-group-item list-group-item-action"><i class="far fa-calendar-days fa-fw mr-2"></i>Calendriers</a>
                 </div>

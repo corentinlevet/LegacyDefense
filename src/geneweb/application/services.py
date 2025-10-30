@@ -1302,3 +1302,41 @@ class ApplicationService:
 
         finally:
             db.close()
+
+    async def get_places_surnames(self, genealogy_name: str) -> list:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return []
+
+        from ..infrastructure.database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            persons = db.query(Person).filter(Person.genealogy_id == genealogy.id).all()
+            places_surnames = {}
+
+            for person in persons:
+                places = [person.birth_place, person.death_place]
+                for place_str in places:
+                    if not place_str:
+                        continue
+
+                    if place_str not in places_surnames:
+                        places_surnames[place_str] = {}
+
+                    if person.surname:
+                        places_surnames[place_str][person.surname] = (
+                            places_surnames[place_str].get(person.surname, 0) + 1
+                        )
+
+            # Convert to list of dicts
+            result = []
+            for place, surnames in places_surnames.items():
+                result.append({"place": place, "surnames": surnames})
+
+            # Sort by place name
+            result.sort(key=lambda x: x["place"])
+
+            return result
+        finally:
+            db.close()
