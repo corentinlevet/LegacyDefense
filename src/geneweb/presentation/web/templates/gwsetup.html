@@ -117,19 +117,17 @@
               <i class="fas fa-plus-circle mr-2 text-success"></i>
               Créer une généalogie vide
             </a>
-            <a href="#" class="list-group-item list-group-item-action disabled">
+            <a href="/genealogies/import-geneweb" class="list-group-item list-group-item-action">
               <i class="fas fa-file-import mr-2"></i>
               Importer depuis un fichier GeneWeb
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
             <a href="/genealogies/export" class="list-group-item list-group-item-action ">
               <i class="fas fa-download mr-2"></i>
               Sauvegarder en GEDCOM
             </a>
-            <a href="#" class="list-group-item list-group-item-action disabled">
+            <a href="#" id="export-geneweb-link" class="list-group-item list-group-item-action">
               <i class="fas fa-file-code mr-2"></i>
               Sauvegarder en source GeneWeb
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
           </ul>
         </div>
@@ -147,15 +145,13 @@
               Nettoyage
               <span class="not-implemented float-right">Non implémenté</span>
             </a>
-            <a href="#" class="list-group-item list-group-item-action disabled">
-              <i class="fas fa-i-cursor mr-2"></i>
+            <a href="#" id="rename-genealogy-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-i-cursor mr-2 text-primary"></i>
               Renommage
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
-            <a href="#" class="list-group-item list-group-item-action disabled">
-              <i class="fas fa-trash-alt mr-2"></i>
+            <a href="#" id="delete-genealogy-link" class="list-group-item list-group-item-action">
+              <i class="fas fa-trash-alt mr-2 text-danger"></i>
               Suppression
-              <span class="not-implemented float-right">Non implémenté</span>
             </a>
             <a href="#" class="list-group-item list-group-item-action disabled">
               <i class="fas fa-code-branch mr-2"></i>
@@ -321,6 +317,82 @@
             alert('Erreur lors du chargement des généalogies');
           });
       });
+
+      // Gestionnaire pour le lien "Renommage"
+      $('#rename-genealogy-link').on('click', function(e) {
+        e.preventDefault();
+        handleGenealogySelection('/genealogy/{genealogy_name}/manage', 'Renommer la généalogie');
+      });
+
+      // Gestionnaire pour le lien "Suppression"
+      $('#delete-genealogy-link').on('click', function(e) {
+        e.preventDefault();
+        handleGenealogySelection('/genealogy/{genealogy_name}/manage', 'Supprimer la généalogie');
+      });
+
+      // Gestionnaire pour le lien "Sauvegarder en source GeneWeb"
+      $('#export-geneweb-link').on('click', function(e) {
+        e.preventDefault();
+        handleGenealogySelection('/genealogies/{genealogy_name}/export-geneweb', 'Sauvegarder en source GeneWeb');
+      });
+
+      function handleGenealogySelection(baseUrl, modalTitle) {
+        $.get('/api/genealogies')
+          .done(function(genealogies) {
+            if (genealogies.length === 0) {
+              alert('Aucune généalogie disponible. Créez d\'abord une généalogie.');
+              return;
+            }
+
+            let modalHtml = `
+              <div class="modal fade" id="selectGenealogyActionModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">
+                        <i class="fas fa-database mr-2"></i>
+                        ${modalTitle}
+                      </h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p class="text-muted">
+                        Choisissez la généalogie à ${modalTitle.toLowerCase().includes('renommer') ? 'renommer' : 'supprimer'} :
+                      </p>
+                      <div class="list-group">
+                        ${genealogies.map(g => `
+                          <a href="${baseUrl.replace('{genealogy_name}', g.name)}"
+                             class="list-group-item list-group-item-action">
+                            <i class="fas fa-database mr-2 text-primary"></i>
+                            ${g.name}
+                          </a>
+                        `).join('')}
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            $('#selectGenealogyActionModal').remove();
+            $('body').append(modalHtml);
+            $('#selectGenealogyActionModal').modal('show');
+
+            $('#selectGenealogyActionModal').on('hidden.bs.modal', function() {
+              $(this).remove();
+            });
+          })
+          .fail(function() {
+            alert('Erreur lors du chargement des généalogies');
+          });
+      }
     });
   </script>
 </body>

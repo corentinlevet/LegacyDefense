@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import tempfile
@@ -5,8 +6,9 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Optional
 
-from fastapi import logger
 from gedcom.element.family import FamilyElement
+
+logger = logging.getLogger(__name__)
 from gedcom.element.individual import IndividualElement
 from gedcom.parser import Parser as GedcomParser
 from sqlalchemy.orm import Session, joinedload
@@ -171,13 +173,15 @@ class GenealogyService:
             raise ValueError(f"Genealogy '{genealogy_name}' not found.")
 
         # Créer un fichier temporaire pour le parser GEDCOM
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".ged", delete=False, encoding="utf-8"
-        ) as tmp_file:
-            tmp_file.write(gedcom_content)
-            tmp_file_path = tmp_file.name
-
+        tmp_file_path = None
         try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".ged", delete=False, encoding="utf-8"
+            ) as tmp_file:
+                tmp_file.write(gedcom_content)
+                tmp_file_path = tmp_file.name
+            # Le fichier est maintenant fermé, on peut le parser
+
             # Créer le parser et charger le contenu GEDCOM
             parser = GedcomParser()
             parser.parse_file(tmp_file_path)
@@ -420,8 +424,13 @@ class GenealogyService:
             print(f"GEDCOM content imported into genealogy '{genealogy.name}'.")
         finally:
             # Supprimer le fichier temporaire
-            if os.path.exists(tmp_file_path):
-                os.remove(tmp_file_path)
+            if tmp_file_path and os.path.exists(tmp_file_path):
+                try:
+                    os.unlink(tmp_file_path)
+                except Exception as e:
+                    print(
+                        f"Warning: Could not delete temporary file {tmp_file_path}: {e}"
+                    )
 
     def export_gedcom(self, genealogy_id: int, db: Session) -> str:
         """
@@ -1519,3 +1528,25 @@ class ApplicationService:
             return persons
         finally:
             db.close()
+
+    async def rename_genealogy(
+        self, genealogy_name: str, new_name: str
+    ) -> GenealogyDetails | None:
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return None
+
+        genealogy.name = new_name
+        self.genealogy_repo.update(genealogy)
+
+        person_count = self.genealogy_repo.count_persons(genealogy.id)
+
+        return GenealogyDetails(name=genealogy.name, person_count=person_count)
+
+    async def delete_genealogy(self, genealogy_name: str):
+        genealogy = self.genealogy_repo.get_by_name(genealogy_name)
+        if not genealogy:
+            return False
+
+        self.genealogy_repo.delete(genealogy)
+        return True
