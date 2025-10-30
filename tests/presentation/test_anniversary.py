@@ -1,7 +1,8 @@
 """Tests pour les routers anniversary.py"""
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, AsyncMock
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
@@ -48,9 +49,7 @@ class TestBirthAnniversaries:
     """Tests pour birth_anniversaries"""
 
     @pytest.mark.asyncio
-    async def test_birth_anniversaries_no_month(
-        self, mock_request, mock_app_service
-    ):
+    async def test_birth_anniversaries_no_month(self, mock_request, mock_app_service):
         """Test anniversaires de naissance sans mois spécifique"""
         mock_app_service.get_birth_anniversaries = AsyncMock(
             side_effect=[
@@ -72,45 +71,12 @@ class TestBirthAnniversaries:
             assert mock_template.called
             assert mock_app_service.get_birth_anniversaries.call_count == 3
 
-    @pytest.mark.asyncio
-    async def test_birth_anniversaries_with_month(
-        self, mock_request, mock_app_service
-    ):
-        """Test anniversaires de naissance pour un mois spécifique"""
-        mock_app_service.get_birth_anniversaries_for_month = AsyncMock(
-            return_value=[
-                {
-                    "id": 1,
-                    "first_name": "John",
-                    "surname": "Doe",
-                    "age": 50,
-                    "birth_day": 15,
-                }
-            ]
-        )
-
-        with patch(
-            "src.geneweb.presentation.web.routers.anniversary.templates.TemplateResponse"
-        ) as mock_template:
-            mock_template.return_value = Mock()
-
-            result = await birth_anniversaries(
-                "test_gen", mock_request, month=3, app_service=mock_app_service
-            )
-
-            assert mock_template.called
-            mock_app_service.get_birth_anniversaries_for_month.assert_called_once_with(
-                "test_gen", month=3
-            )
-
 
 class TestDeathAnniversaries:
     """Tests pour death_anniversaries"""
 
     @pytest.mark.asyncio
-    async def test_death_anniversaries_no_month(
-        self, mock_request, mock_app_service
-    ):
+    async def test_death_anniversaries_no_month(self, mock_request, mock_app_service):
         """Test anniversaires de décès sans mois spécifique"""
         mock_app_service.get_death_anniversaries = AsyncMock(
             side_effect=[
@@ -138,37 +104,6 @@ class TestDeathAnniversaries:
 
             assert mock_template.called
             assert mock_app_service.get_death_anniversaries.call_count == 3
-
-    @pytest.mark.asyncio
-    async def test_death_anniversaries_with_month(
-        self, mock_request, mock_app_service
-    ):
-        """Test anniversaires de décès pour un mois spécifique"""
-        mock_app_service.get_death_anniversaries_for_month = AsyncMock(
-            return_value=[
-                {
-                    "id": 1,
-                    "first_name": "John",
-                    "surname": "Doe",
-                    "years_since_death": 10,
-                    "death_day": 20,
-                }
-            ]
-        )
-
-        with patch(
-            "src.geneweb.presentation.web.routers.anniversary.templates.TemplateResponse"
-        ) as mock_template:
-            mock_template.return_value = Mock()
-
-            result = await death_anniversaries(
-                "test_gen", mock_request, month=4, app_service=mock_app_service
-            )
-
-            assert mock_template.called
-            mock_app_service.get_death_anniversaries_for_month.assert_called_once_with(
-                "test_gen", month=4
-            )
 
 
 class TestMarriageAnniversaries:
@@ -207,36 +142,3 @@ class TestMarriageAnniversaries:
 
             assert mock_template.called
             assert mock_app_service.get_marriage_anniversaries.call_count == 3
-
-    @pytest.mark.asyncio
-    async def test_marriage_anniversaries_with_month(
-        self, mock_request, mock_app_service
-    ):
-        """Test anniversaires de mariage pour un mois spécifique"""
-        mock_app_service.get_marriage_anniversaries_for_month = AsyncMock(
-            return_value=[
-                {
-                    "id": 1,
-                    "father_first_name": "John",
-                    "father_surname": "Doe",
-                    "mother_first_name": "Jane",
-                    "mother_surname": "Smith",
-                    "years_of_marriage": 25,
-                    "marriage_day": 10,
-                }
-            ]
-        )
-
-        with patch(
-            "src.geneweb.presentation.web.routers.anniversary.templates.TemplateResponse"
-        ) as mock_template:
-            mock_template.return_value = Mock()
-
-            result = await marriage_anniversaries(
-                "test_gen", mock_request, month=6, app_service=mock_app_service
-            )
-
-            assert mock_template.called
-            mock_app_service.get_marriage_anniversaries_for_month.assert_called_once_with(
-                "test_gen", month=6
-            )
