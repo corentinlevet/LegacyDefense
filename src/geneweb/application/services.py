@@ -1503,6 +1503,23 @@ class ApplicationService:
                 .options(
                     joinedload(Person.child_of_families).joinedload(Family.father),
                     joinedload(Person.child_of_families).joinedload(Family.mother),
+                    joinedload(Person.child_of_families).joinedload(Family.children),
+                    joinedload(Person.child_of_families)
+                    .joinedload(Family.father)
+                    .joinedload(Person.child_of_families)
+                    .joinedload(Family.father),
+                    joinedload(Person.child_of_families)
+                    .joinedload(Family.father)
+                    .joinedload(Person.child_of_families)
+                    .joinedload(Family.mother),
+                    joinedload(Person.child_of_families)
+                    .joinedload(Family.mother)
+                    .joinedload(Person.child_of_families)
+                    .joinedload(Family.father),
+                    joinedload(Person.child_of_families)
+                    .joinedload(Family.mother)
+                    .joinedload(Person.child_of_families)
+                    .joinedload(Family.mother),
                     joinedload(Person.families_as_father).joinedload(Family.mother),
                     joinedload(Person.families_as_father).joinedload(Family.children),
                     joinedload(Person.families_as_mother).joinedload(Family.father),
