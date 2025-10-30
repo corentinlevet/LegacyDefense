@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Genealogy: {{ genealogy_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">Manage Genealogy: {{ genealogy_name }}</h1>
+
+    <div class="box">
+        <h2 class="subtitle">Rename Genealogy</h2>
+        <form action="{{ url_for('rename_genealogy', genealogy_name=genealogy_name) }}" method="post">
+            <div class="field">
+                <label class="label" for="new_name">New Genealogy Name</label>
+                <div class="control">
+                    <input class="input" type="text" id="new_name" name="new_name" value="{{ genealogy_name }}" required>
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary" type="submit">Rename</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box mt-5">
+        <h2 class="subtitle">Delete Genealogy</h2>
+        <p><strong>Warning:</strong> Deleting a genealogy is irreversible and will remove all associated data (persons, families, etc.).</p>
+        <form action="{{ url_for('delete_genealogy', genealogy_name=genealogy_name) }}" method="post" onsubmit="return confirm('Are you sure you want to delete the genealogy \'{{ genealogy_name }}\'? This action cannot be undone.');">
+            <div class="field">
+                <div class="control">
+                    <button class="button is-danger" type="submit">Delete Genealogy</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="mt-5">
+        <a href="{{ url_for('view_genealogy', name=genealogy_name) }}" class="button is-link is-light">Back to Genealogy Dashboard</a>
+    </div>
+</div>
+{% endblock %}

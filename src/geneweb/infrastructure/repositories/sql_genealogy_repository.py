@@ -230,3 +230,11 @@ class SQLGenealogyRepository:
             .options(joinedload(models.Family.father), joinedload(models.Family.mother))
             .all()
         )
+
+    def update(self, genealogy: models.Genealogy) -> None:
+        self.db.add(genealogy)
+        self.db.commit()
+
+    def delete(self, genealogy: models.Genealogy) -> None:
+        self.db.delete(genealogy)
+        self.db.commit()

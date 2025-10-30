@@ -7,7 +7,7 @@ It is the heart of the software and
 has no dependencies on any other layer.
 """
 
-from .models import Event, Family, Person
-from .repositories import FamilyRepository, PersonRepository
+from ..infrastructure.models import Event, Family, Person
+from ..infrastructure.repositories import SQLPersonRepository
 
-__all__ = ["Event", "Family", "Person", "FamilyRepository", "PersonRepository"]
+__all__ = ["Event", "Family", "Person", "SQLPersonRepository"]

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Options for {{ genealogy_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="title">Advanced Options for {{ genealogy_name }}</h1>
+
+    <div class="box">
+        <p>This page will contain advanced configuration options for the genealogy "{{ genealogy_name }}".</p>
+        <p>Currently, no advanced options are available.</p>
+    </div>
+
+    <div class="mt-5">
+        <a href="{{ url_for('view_genealogy', name=genealogy_name) }}" class="button is-link is-light">Back to Genealogy Dashboard</a>
+    </div>
+</div>
+{% endblock %}
