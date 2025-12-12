@@ -32,7 +32,7 @@ jobs:
       - name: Cache pip (Unix)
         if: runner.os != 'Windows'
         id: cache-pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
@@ -42,7 +42,7 @@ jobs:
       - name: Cache pip (Windows)
         if: runner.os == 'Windows'
         id: cache-pip-windows
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: '%USERPROFILE%\\AppData\\Local\\pip'
           key: windows-pip-${{ hashFiles('requirements.txt') }}
