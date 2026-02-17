@@ -7,6 +7,49 @@
 
 ---
 
+## Sommaire
+1. [Objectifs de la Politique de Test](#1-objectifs-de-la-politique-de-test)
+   - 1.1 [Objectifs Généraux](#11-objectifs-g%C3%A9n%C3%A9raux)
+   - 1.2 [Objectifs Spécifiques](#12-objectifs-sp%C3%A9cifiques)
+2. [Stratégie de Test Adoptée](#2-strat%C3%A9gie-de-test-adopt%C3%A9e)
+   - 2.1 [Approche Test-Driven Development (TDD)](#21-approche-test-driven-development-tdd)
+   - 2.2 [Niveaux de Test Implémentés](#22-niveaux-de-test-impl%C3%A9ment%C3%A9s)
+     - [Tests Unitaires](#tests-unitaires)
+     - [Tests d'Intégration](#tests-dint%C3%A9gration)
+     - [Tests End-to-End (E2E)](#tests-end-to-end-e2e)
+     - [Tests de Performance](#tests-de-performance)
+3. [Standards et Métriques](#3-standards-et-m%C3%A9triques)
+   - 3.1 [Critères de Qualité](#31-crit%C3%A8res-de-qualit%C3%A9)
+   - 3.2 [Métriques de Succès](#32-m%C3%A9triques-de-succ%C3%A8s)
+   - 3.3 [Critères d'Acceptation](#33-crit%C3%A8res-dacceptation)
+4. [Processus et Procédures](#4-processus-et-proc%C3%A9dures)
+   - 4.1 [Workflow de Développement](#41-workflow-de-d%C3%A9veloppement)
+   - 4.2 [Pre-commit Hooks](#42-pre-commit-hooks)
+   - 4.3 [Pipeline CI/CD](#43-pipeline-cicd)
+5. [Environnements de Test](#5-environnements-de-test)
+   - 5.1 [Environnement Local Développeur](#51-environnement-local-d%C3%A9veloppeur)
+   - 5.2 [Environnement CI](#52-environnement-ci)
+   - 5.3 [Environnement E2E](#53-environnement-e2e)
+6. [Types de Tests Spécifiques](#6-types-de-tests-sp%C3%A9cifiques)
+   - 6.1 [Tests Algorithmes Généalogiques](#61-tests-algorithmes-g%C3%A9n%C3%A9alogiques)
+   - 6.2 [Tests Import/Export GEDCOM](#62-tests-importexport-gedcom)
+   - 6.3 [Tests Performance](#63-tests-performance)
+7. [Gestion des Échecs de Tests](#7-gestion-des-%C3%A9checs-de-tests)
+   - 7.1 [Classification des Échecs](#71-classification-des-%C3%A9checs)
+   - 7.2 [Processus de Résolution](#72-processus-de-r%C3%A9solution)
+8. [Maintenance et Évolution](#8-maintenance-et-%C3%A9volution)
+   - 8.1 [Révision Périodique](#81-r%C3%A9vision-p%C3%A9riodique)
+   - 8.2 [Évolution des Tests](#82-%C3%A9volution-des-tests)
+9. [Outils et Technologies](#9-outils-et-technologies)
+    - 9.1 [Stack de Test](#91-stack-de-test)
+    - 9.2 [Reporting et Monitoring](#92-reporting-et-monitoring)
+10. [Formation et Documentation](#10-formation-et-documentation)
+    - 10.1 [Guidelines Développeurs](#101-guidelines-d%C3%A9veloppeurs)
+    - 10.2 [Ressources](#102-ressources)
+11. [Conclusion](#11-conclusion)
+
+---
+
 ## 1. Objectifs de la Politique de Test
 
 ### 1.1 Objectifs Généraux

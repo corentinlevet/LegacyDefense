@@ -1,5 +1,39 @@
+## Table of Contents
+
+1. [Vue d'Ensemble de la Stratégie QA](#1-vue-densemble-de-la-stratégie-qa)
+   - 1.1 [Objectifs Qualité](#11-objectifs-qualité)
+   - 1.2 [Principes QA Adoptés](#12-principes-qa-adoptés)
+2. [Processus d'Assurance Qualité](#2-processus-dassurance-qualité)
+   - 2.1 [Workflow QA Intégré](#21-workflow-qa-intégré)
+   - 2.2 [Quality Gates Définis](#22-quality-gates-définis)
+3. [Métriques et KPIs Qualité](#3-métriques-et-kpis-qualité)
+   - 3.1 [Métriques Techniques](#31-métriques-techniques)
+   - 3.2 [Métriques Processus](#32-métriques-processus)
+   - 3.3 [Dashboard Qualité](#33-dashboard-qualité)
+4. [Outils et Processus QA](#4-outils-et-processus-qa)
+   - 4.1 [Stack d'Outils QA](#41-stack-doutils-qa)
+   - 4.2 [Pipeline CI/CD QA](#42-pipeline-cicd-qa)
+5. [Tests de Sécurité et Conformité](#5-tests-de-sécurité-et-conformité)
+   - 5.1 [Analyse de Sécurité](#51-analyse-de-sécurité)
+   - 5.2 [Tests de Performance](#52-tests-de-performance)
+6. [Processus de Review et Validation](#6-processus-de-review-et-validation)
+   - 6.1 [Code Review Guidelines](#61-code-review-guidelines)
+   - 6.2 [Validation Acceptance](#62-validation-acceptance)
+7. [Gestion des Risques Qualité](#7-gestion-des-risques-qualité)
+   - 7.1 [Matrice des Risques](#71-matrice-des-risques)
+   - 7.2 [Plan de Contingence](#72-plan-de-contingence)
+8. [Formation et Amélioration Continue](#8-formation-et-amélioration-continue)
+   - 8.1 [Formation Équipe QA](#81-formation-équipe-qa)
+   - 8.2 [Amélioration Continue](#82-amélioration-continue)
+9. [Documentation et Traçabilité](#9-documentation-et-traçabilité)
+   - 9.1 [Artifacts QA Produits](#91-artifacts-qa-produits)
+   - 9.2 [Audit et Compliance](#92-audit-et-compliance)
+10. [Résultats et Evidence](#10-résultats-et-evidence)
+    - 10.1 [Preuves de Qualité Atteintes](#101-preuves-de-qualité-atteintes)
+    - 10.2 [Certification Qualité](#102-certification-qualité)
+
 # Documentation Quality Assurance - GeneWeb Python
-## Stratégie et Processus d'Assurance Qualité
+## Stratégie et Processus d'Assurance Qualité - GeneWeb Python
 
 **Version :** 1.0  
 **Date :** September 2025  

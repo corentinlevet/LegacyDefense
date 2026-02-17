@@ -1,14 +1,56 @@
 # Testing Strategy & TDD Guide
 
-## Overview
+## Table of Contents
+
+1. [Overview](#1-overview)
+2. [Testing Philosophy](#2-testing-philosophy)
+   - 2.1 [Core Principles](#21-core-principles)
+   - 2.2 [Coverage Goals](#22-coverage-goals)
+3. [Test Pyramid](#3-test-pyramid)
+   - 3.1 [Unit Tests (60%)](#31-unit-tests-60)
+   - 3.2 [Integration Tests (30%)](#32-integration-tests-30)
+   - 3.3 [End-to-End Tests (10%)](#33-end-to-end-tests-10)
+4. [TDD Workflow](#4-tdd-workflow)
+   - 4.1 [Red-Green-Refactor Cycle](#41-red-green-refactor-cycle)
+5. [Test Organization](#5-test-organization)
+   - 5.1 [Directory Structure](#51-directory-structure)
+6. [Writing Effective Tests](#6-writing-effective-tests)
+   - 6.1 [Test Naming Convention](#61-test-naming-convention)
+   - 6.2 [Arrange-Act-Assert (AAA) Pattern](#62-arrange-act-assert-aaa-pattern)
+   - 6.3 [Test Fixtures](#63-test-fixtures)
+7. [Testing Strategies by Module](#7-testing-strategies-by-module)
+   - 7.1 [Testing Models (`models.py`)](#71-testing-models-modelspy)
+   - 7.2 [Testing Algorithms (`algorithms.py`)](#72-testing-algorithms-algorithmspy)
+   - 7.3 [Testing Database Layer (`database.py`)](#73-testing-database-layer-databasepy)
+   - 7.4 [Testing GEDCOM Parser (`gedcom.py`)](#74-testing-gedcom-parser-gedcompy)
+   - 7.5 [Testing API Endpoints (`api.py`)](#75-testing-api-endpoints-apipy)
+   - 7.6 [Testing Web Application (`webapp.py`)](#76-testing-web-application-webapppy)
+8. [Mocking and Test Doubles](#8-mocking-and-test-doubles)
+   - 8.1 [When to Mock](#81-when-to-mock)
+   - 8.2 [Mock Examples](#82-mock-examples)
+9. [Performance Testing](#9-performance-testing)
+   - 9.1 [Benchmark Critical Operations](#91-benchmark-critical-operations)
+10. [Regression Testing](#10-regression-testing)
+    - 10.1 [Ensure Compatibility with OCaml](#101-ensure-compatibility-with-ocaml)
+11. [Continuous Integration](#11-continuous-integration)
+    - 11.1 [GitHub Actions Workflow](#111-github-actions-workflow)
+12. [Test Commands](#12-test-commands)
+    - 12.1 [Running Tests](#121-running-tests)
+    - 12.2 [Coverage Reports](#122-coverage-reports)
+13. [Quality Metrics](#13-quality-metrics)
+    - 13.1 [Test Quality Indicators](#131-test-quality-indicators)
+    - 13.2 [Coverage Goals](#132-coverage-goals)
+14. [References](#14-references)
+
+## 1. Overview
 
 This document outlines the testing strategy for the GeneWeb Python modernization project, following **Test-Driven Development (TDD)** principles and aiming for **≥90% code coverage** on critical modules.
 
 ---
 
-## Testing Philosophy
+## 2. Testing Philosophy
 
-### Core Principles
+### 2.1 Core Principles
 
 1. **Test First, Code Second** - Write tests before implementation
 2. **Red-Green-Refactor** - Follow TDD cycle rigorously
@@ -16,7 +58,7 @@ This document outlines the testing strategy for the GeneWeb Python modernization
 4. **Isolated Tests** - Each test is independent
 5. **Readable Tests** - Tests serve as documentation
 
-### Coverage Goals
+### 2.2 Coverage Goals
 
 | Module | Current | Target | Priority |
 |--------|---------|--------|----------|
@@ -33,7 +75,7 @@ This document outlines the testing strategy for the GeneWeb Python modernization
 
 ---
 
-## Test Pyramid
+## 3. Test Pyramid
 
 ```
         /\
@@ -48,19 +90,19 @@ This document outlines the testing strategy for the GeneWeb Python modernization
 /________________\
 ```
 
-### Unit Tests (60%)
+### 3.1 Unit Tests (60%)
 - Test individual functions/methods
 - Mock external dependencies
 - Fast execution (<1s per test)
 - Cover edge cases and error handling
 
-### Integration Tests (30%)
+### 3.2 Integration Tests (30%)
 - Test module interactions
 - Use test database
 - Verify data flow between components
 - Test API endpoints with real DB
 
-### End-to-End Tests (10%)
+### 3.3 End-to-End Tests (10%)
 - Full user workflows
 - Browser automation (if applicable)
 - Complete system validation
@@ -68,9 +110,9 @@ This document outlines the testing strategy for the GeneWeb Python modernization
 
 ---
 
-## TDD Workflow
+## 4. TDD Workflow
 
-### Red-Green-Refactor Cycle
+### 4.1 Red-Green-Refactor Cycle
 
 ```python
 # Step 1: RED - Write failing test
@@ -128,9 +170,9 @@ class GenealogyAlgorithms:
 
 ---
 
-## Test Organization
+## 5. Test Organization
 
-### Directory Structure
+### 5.1 Directory Structure
 
 ```
 tests/
@@ -154,9 +196,9 @@ tests/
 
 ---
 
-## Writing Effective Tests
+## 6. Writing Effective Tests
 
-### Test Naming Convention
+### 6.1 Test Naming Convention
 
 ```python
 # Pattern: test_<what>_<when>_<expected>
@@ -174,7 +216,7 @@ def test_gedcom_import_with_utf8_encoding_preserves_special_characters():
     pass
 ```
 
-### Arrange-Act-Assert (AAA) Pattern
+### 6.2 Arrange-Act-Assert (AAA) Pattern
 
 ```python
 def test_find_ancestors_returns_all_generations():
@@ -196,7 +238,7 @@ def test_find_ancestors_returns_all_generations():
     assert grandparent_id in ancestors
 ```
 
-### Test Fixtures
+### 6.3 Test Fixtures
 
 ```python
 # conftest.py
@@ -235,9 +277,9 @@ def sample_family(test_db, sample_person):
 
 ---
 
-## Testing Strategies by Module
+## 7. Testing Strategies by Module
 
-### Testing Models (`models.py`)
+### 7.1 Testing Models (`models.py`)
 
 ```python
 class TestPersonModel:
@@ -267,7 +309,7 @@ class TestPersonModel:
         assert api_model.first_name == person.name.first_name
 ```
 
-### Testing Algorithms (`algorithms.py`)
+### 7.2 Testing Algorithms (`algorithms.py`)
 
 ```python
 class TestConsanguinityCalculation:
@@ -307,7 +349,7 @@ class TestConsanguinityCalculation:
         assert abs(result.consanguinity - expected_coefficient) < 1e-6
 ```
 
-### Testing Database Layer (`database.py`)
+### 7.3 Testing Database Layer (`database.py`)
 
 ```python
 class TestDatabaseOperations:
@@ -347,7 +389,7 @@ class TestDatabaseOperations:
         assert count == 0
 ```
 
-### Testing GEDCOM Parser (`gedcom.py`)
+### 7.4 Testing GEDCOM Parser (`gedcom.py`)
 
 ```python
 class TestGedcomParser:
@@ -401,7 +443,7 @@ class TestGedcomParser:
         # Test UTF-8 handling...
 ```
 
-### Testing API Endpoints (`api.py`)
+### 7.5 Testing API Endpoints (`api.py`)
 
 ```python
 from fastapi.testclient import TestClient
@@ -443,7 +485,7 @@ class TestPersonAPI:
         assert response.status_code == 401
 ```
 
-### Testing Web Application (`webapp.py`)
+### 7.6 Testing Web Application (`webapp.py`)
 
 ```python
 class TestWebAppRoutes:
@@ -470,9 +512,9 @@ class TestWebAppRoutes:
 
 ---
 
-## Mocking and Test Doubles
+## 8. Mocking and Test Doubles
 
-### When to Mock
+### 8.1 When to Mock
 
 ✅ **DO mock:**
 - External services (APIs, file systems)
@@ -486,7 +528,7 @@ class TestWebAppRoutes:
 - Your own code in integration tests
 - Database in integration tests (use test DB)
 
-### Mock Examples
+### 8.2 Mock Examples
 
 ```python
 from unittest.mock import Mock, patch, MagicMock
@@ -507,9 +549,9 @@ def test_external_api_call():
 
 ---
 
-## Performance Testing
+## 9. Performance Testing
 
-### Benchmark Critical Operations
+### 9.1 Benchmark Critical Operations
 
 ```python
 import pytest
@@ -537,9 +579,9 @@ def test_search_scales_linearly(num_persons):
 
 ---
 
-## Regression Testing
+## 10. Regression Testing
 
-### Ensure Compatibility with OCaml
+### 10.1 Ensure Compatibility with OCaml
 
 ```python
 class TestOCamlCompatibility:
@@ -566,9 +608,9 @@ class TestOCamlCompatibility:
 
 ---
 
-## Continuous Integration
+## 11. Continuous Integration
 
-### GitHub Actions Workflow
+### 11.1 GitHub Actions Workflow
 
 ```yaml
 # .github/workflows/tests.yml
@@ -619,9 +661,9 @@ jobs:
 
 ---
 
-## Test Commands
+## 12. Test Commands
 
-### Running Tests
+### 12.1 Running Tests
 
 ```bash
 # Run all tests
@@ -652,7 +694,7 @@ pytest --lf
 pytest -s
 ```
 
-### Coverage Reports
+### 12.2 Coverage Reports
 
 ```bash
 # Generate HTML coverage report
@@ -668,9 +710,9 @@ pytest --cov=core --cov-report=xml
 
 ---
 
-## Quality Metrics
+## 13. Quality Metrics
 
-### Test Quality Indicators
+### 13.1 Test Quality Indicators
 
 ✅ **Good Tests:**
 - Fast (<100ms per unit test)
@@ -686,7 +728,7 @@ pytest --cov=core --cov-report=xml
 - Testing implementation details
 - Too many mocks
 
-### Coverage Goals
+### 13.2 Coverage Goals
 
 - **Critical modules (algorithms, database, gedcom)**: ≥95%
 - **API/Web layer**: ≥85%
@@ -695,7 +737,7 @@ pytest --cov=core --cov-report=xml
 
 ---
 
-## References
+## 14. References
 
 - [Test-Driven Development - Kent Beck](https://www.amazon.com/Test-Driven-Development-Kent-Beck/dp/0321146530)
 - [Pytest Documentation](https://docs.pytest.org/)
