@@ -201,7 +201,7 @@ repos:
       - id: black
         name: Code formatting (Black)
         
-  - repo: https://github.com/pycqa/flake8  
+  - repo: https://github.com/pycqa/flake8
     rev: 6.1.0
     hooks:
       - id: flake8

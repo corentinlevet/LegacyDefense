@@ -64,7 +64,7 @@ Notre politique de tests s'articule autour de **4 niveaux** hiérarchisés selon
      / 30%      \      Interaction API ↔ Services ↔ DB
     /------------\
    /              \    Tests unitaires (60%)
-  /  328 tests     \   Fonctions, méthodes, classes isolées
+  /  383 tests     \   Fonctions, méthodes, classes isolées
  /  68.77% coverage \
 /____________________\
 ```
@@ -139,7 +139,7 @@ Tests validant : création de l'app FastAPI, configuration des routers, titre, f
 |-------|-------------|----------------|-------------------|
 | **Développement** | Chaque save/commit | Tests unitaires du module modifié | 100% pass |
 | **Pre-commit** | `git commit` | Linting (Black, flake8, isort) + tests unitaires | 0 erreur, 100% pass |
-| **Pull Request** | Ouverture de PR | Suite complète (328 tests) + couverture | 100% pass, ≥65% coverage |
+| **Pull Request** | Ouverture de PR | Suite complète (383 tests) + couverture | 100% pass, ≥65% coverage |
 | **Intégration** | Merge dans `dev` | Tests d'intégration complets | 100% pass |
 | **Pre-release** | Merge dans `main` | Suite complète + tests de performance | 100% pass, perf ≤ 2x OCaml |
 
@@ -187,7 +187,7 @@ La politique de tests est directement alignée sur les **risques métier** :
 | Perte de données généalogiques | Tests round-trip GEDCOM import/export |
 | Parsing incorrect des dates | 15+ formats testés dans `parse_date_for_sorting` |
 | Calcul statistique erroné | Tests exhaustifs des anniversaires, durées de vie, couples |
-| Régression lors d'un refactoring | 328 tests automatisés exécutés à chaque commit |
+| Régression lors d'un refactoring | 383 tests automatisés exécutés à chaque commit |
 | Corruption de la base de données | Mock de SessionLocal — isolation complète des tests |
 
 ---
@@ -374,8 +374,8 @@ tests/
 
 | Métrique | Objectif initial | Résultat obtenu | Évaluation |
 |----------|-----------------|-----------------|------------|
-| **Nombre de tests** | ≥100 | **328** | ✅ 3x l'objectif |
-| **Taux de réussite** | 100% | **100%** (328/328) | ✅ Atteint |
+| **Nombre de tests** | ≥100 | **383** | ✅ 3x l'objectif |
+| **Taux de réussite** | 100% | **100%** (383/383) | ✅ Atteint |
 | **Couverture globale** | ≥65% | **68.77%** | ✅ Au-dessus du seuil |
 | **Temps d'exécution** | <30s | **3.72s** | ✅ 8x plus rapide |
 | **Modules à 100%** | ≥5 | **18 modules** | ✅ Dépasse |
@@ -413,7 +413,7 @@ La politique de test définie dans `docs/testing/TEST_POLICY.md` est **directeme
 ### Architecture des tests
 
 ```
-tests/                                          # 328 tests au total
+tests/                                          # 383 tests au total
 │
 ├── conftest.py                                 # Fixtures partagées (DB, models, data)
 ├── test_main.py                                # 4 tests  — app FastAPI, routers, titre, static files
@@ -513,7 +513,7 @@ class TestSQLGenealogyRepository:
 
 **Exécution** : `pytest --cov=src --cov-report=term-missing`  
 **Date** : Février 2026  
-**Résultat** : **328 tests passés, 68.77% de couverture globale**
+**Résultat** : **383 tests passés, 68.77% de couverture globale**
 
 | Module | Statements | Miss | Coverage | Évaluation |
 |--------|-----------|------|----------|------------|
@@ -614,7 +614,7 @@ Notre stratégie d'assurance qualité repose sur **3 piliers** : Prévention, D�
 
 | Vérification | Outil | Seuil | Statut |
 |-------------|-------|-------|--------|
-| Tests unitaires | pytest | 100% pass rate | ✅ 328/328 |
+| Tests unitaires | pytest | 100% pass rate | ✅ 383/383 |
 | Couverture | pytest-cov | ≥65% (`--cov-fail-under`) | ✅ 68.77% |
 | Tests async | pytest-asyncio | Intégré | ✅ `asyncio_mode = auto` |
 
@@ -983,7 +983,7 @@ La stratégie QA mise en place est **directement alignée** sur les risques et c
 
 | Contrainte du projet | Réponse QA | Résultat |
 |---------------------|------------|---------|
-| **Migration d'un legacy OCaml** | TDD + tests de régression automatisés | 328 tests garantissent l'équivalence fonctionnelle |
+| **Migration d'un legacy OCaml** | TDD + tests de régression automatisés | 383 tests garantissent l'équivalence fonctionnelle |
 | **Données généalogiques sensibles (RGPD)** | Tests d'intégrité des données, pas de données réelles dans les tests | 0 données personnelles dans le repo |
 | **Format GEDCOM complexe** | 30+ tests de parsing couvrant tous les formats | Round-trip import/export validé |
 | **Équipe de 5 développeurs** | Conventions strictes (CONTRIBUTING.md), PR avec approval | Process standardisé |
@@ -996,7 +996,7 @@ La stratégie QA a permis de :
 
 1. **Détecter et corriger des bugs de parsing de dates** qui auraient causé des erreurs silencieuses dans les données généalogiques.
 2. **Standardiser le code** via Black/isort/flake8, rendant le code lisible par toute l'équipe.
-3. **Garantir la non-régression** : les 328 tests s'exécutent en 3.72s, permettant un feedback immédiat.
+3. **Garantir la non-régression** : les 383 tests s'exécutent en 3.72s, permettant un feedback immédiat.
 4. **Documenter le comportement attendu** : les tests servent de spécification vivante du système.
 5. **Sécuriser les données** : audit Bandit, protection SQL injection via ORM, protection XSS via Jinja2.
 
@@ -1018,7 +1018,7 @@ La stratégie QA a permis de :
 | Type de preuve | Artefact | Localisation | Description |
 |---------------|---------|-------------|-------------|
 | **Rapport de couverture** | HTML interactif | `htmlcov/index.html` | Couverture ligne par ligne, 68.77% global |
-| **Résultats de tests** | Terminal output | `pytest --cov=src` | 328 passed, 0 failed |
+| **Résultats de tests** | Terminal output | `pytest --cov=src` | 383 passed, 0 failed |
 | **Documentation QA** | Markdown | `docs/testing/QUALITY_ASSURANCE.md` | Stratégie complète (553 lignes) |
 | **Politique de test** | Markdown | `docs/testing/TEST_POLICY.md` | Politique officielle (353 lignes) |
 | **Stratégie TDD** | Markdown | `docs/testing/TDD_STRATEGY.md` | Guide TDD complet (746 lignes) |
@@ -1083,7 +1083,7 @@ La configuration de pytest enforce automatiquement les standards :
 ```
 $ pytest
 ...
-328 passed, 3 warnings in 3.72s
+383 passed, 3 warnings in 3.72s
 Required test coverage of 65% reached. Total coverage: 68.77%
 ```
 
@@ -1169,7 +1169,7 @@ La stratégie QA a conduit à des **corrections concrètes** dans le code et la 
 | Sept. 2025 | `docs:` | Création ACCESSIBILITY_GUIDELINES.md | Accessibilité intégrée |
 | Sept. 2025 | `docs:` | Création SECURITY_PRIVACY.md | Sécurité auditée |
 | Sept. 2025 | `feat:` | Architecture Clean Architecture (4 couches) | Testabilité améliorée |
-| Sept. 2025 | `test:` | Écriture de 328 tests | Couverture 68.77% |
+| Sept. 2025 | `test:` | Écriture de 383 tests | Couverture 68.77% |
 | Fév. 2026 | `fix:` | Configuration `--cov-fail-under=65` | Seuil enforced |
 | Fév. 2026 | `fix:` | Création `conftest.py` avec fixtures partagées | DRY tests |
 | Fév. 2026 | `fix:` | Ajout markers de test catégorisés | Tests sélectifs |
@@ -1229,7 +1229,7 @@ $ pytest tests/ -q
 ........................................................................  [ 65%]
 ........................................................................  [ 87%]
 ........................................                                  [100%]
-328 passed, 3 warnings in 3.72s
+383 passed, 3 warnings in 3.72s
 
 Coverage HTML written to dir htmlcov
 Required test coverage of 65% reached. Total coverage: 68.77%
@@ -1269,7 +1269,7 @@ docs/
 | **C25.2** | Justification des choix | ✅ Études comparatives | Ce document §C25.2 |
 | **C26.1** | Protocole adapté | ✅ Stack complète documentée | `pytest.ini`, `pyproject.toml` |
 | **C26.2** | Argumentation des choix | ✅ Tableaux comparatifs + résultats | Ce document §C26.2 |
-| **C27.1** | Protocole et code cohérents | ✅ 328 tests implémentés | `tests/` (18 fichiers) |
+| **C27.1** | Protocole et code cohérents | ✅ 383 tests implémentés | `tests/` (18 fichiers) |
 | **C27.2** | Couverture des tests | ✅ 68.77%, seuil enforced | `htmlcov/`, `pytest.ini` |
 | **C28.1** | Documentation QA strategy | ✅ QA strategy complète | `docs/testing/QUALITY_ASSURANCE.md` |
 | **C28.2** | Accessibilité | ✅ WCAG 2.1 AA | `docs/ACCESSIBILITY_GUIDELINES.md`, `docs/user/ACCESSIBILITY_FEATURES.md` |
