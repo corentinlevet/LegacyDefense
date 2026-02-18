@@ -2,3 +2,28 @@
 profile = "black"
 line_length = 88
 skip = [".venv", "__pycache__", ".mypy_cache", ".pytest_cache"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "alembic/*",
+]
+
+[tool.coverage.report]
+fail_under = 65
+show_missing = true
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+    "pass",
+    "except ImportError",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
