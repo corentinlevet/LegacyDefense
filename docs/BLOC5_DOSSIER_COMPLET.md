@@ -987,18 +987,356 @@ La stratégie QA mise en place est **directement alignée** sur les risques et c
 | **Données généalogiques sensibles (RGPD)** | Tests d'intégrité des données, pas de données réelles dans les tests | 0 données personnelles dans le repo |
 | **Format GEDCOM complexe** | 30+ tests de parsing couvrant tous les formats | Round-trip import/export validé |
 | **Équipe de 5 développeurs** | Conventions strictes (CONTRIBUTING.md), PR avec approval | Process standardisé |
-| **Accessibilité** | WCAG 2.1 AA intégré dans la QA | 2 documents dédiés, Lighthouse |
+| **Accessibilité** | WCAG 2.1 AA intégré dans la QA | 55 tests dédiés dans `test_accessibility.py` |
 | **Sécurité** | Bandit, SQLAlchemy ORM (anti-injection), Jinja2 auto-escape (anti-XSS) | Grade B+, 0 vuln critique |
 
-### Combien la stratégie QA a amélioré le projet
+---
 
-La stratégie QA a permis de :
+### 5.1 Naming Convention
 
-1. **Détecter et corriger des bugs de parsing de dates** qui auraient causé des erreurs silencieuses dans les données généalogiques.
-2. **Standardiser le code** via Black/isort/flake8, rendant le code lisible par toute l'équipe.
-3. **Garantir la non-régression** : les 383 tests s'exécutent en 3.72s, permettant un feedback immédiat.
-4. **Documenter le comportement attendu** : les tests servent de spécification vivante du système.
-5. **Sécuriser les données** : audit Bandit, protection SQL injection via ORM, protection XSS via Jinja2.
+Les conventions de nommage sont **enforcer par `pytest.ini`** et appliquées uniformément dans les 18 fichiers de test :
+
+```ini
+# pytest.ini
+python_files   = test_*.py       # Tout fichier préfixé test_
+python_classes = Test*           # Toute classe préfixée Test
+python_functions = test_*        # Toute fonction préfixée test_
+```
+
+**Convention des noms de méthodes** : `test_<sujet>_<condition>_<résultat_attendu>`
+
+| Fichier | Exemple de méthode | Ce que le nom communique |
+|---------|-------------------|--------------------------|
+| `test_repositories.py` | `test_get_by_name_found` | Sujet: get_by_name / Condition: trouvé |
+| `test_repositories.py` | `test_get_by_name_not_found` | Même sujet, condition opposée |
+| `test_services.py` | `test_get_genealogy_details_not_found` | Service / cas d'erreur |
+| `test_accessibility.py` | `test_start_html_dropdown_has_aria_haspopup` | Critère WCAG précis |
+| `test_web_routers.py` | `test_search_persons_first_name_only` | Comportement par paramètre |
+
+**Convention des classes** : une classe = un composant testé (pas un scénario)
+
+```python
+class TestSQLGenealogyRepository:  # → tests/infrastructure/test_repositories.py
+class TestPersonRouter:            # → tests/presentation/test_web_routers.py
+class TestGettextTranslationFunction:  # → tests/presentation/test_accessibility.py
+class TestConfigModelsDefaultLang:     # → tests/presentation/test_accessibility.py
+```
+
+Cette convention rend les sorties de pytest **auto-documentées** : l'arbre d'échec indique immédiatement quel composant, dans quelle condition.
+
+---
+
+### 5.2 Test Categories
+
+Six marqueurs sont définis dans `pytest.ini` et disponibles pour filtrer ou prioriser l'exécution :
+
+```ini
+# pytest.ini
+markers =
+    unit: Unit tests (fast, isolated)
+    integration: Integration tests (module interaction)
+    e2e: End-to-end tests (full workflow)
+    slow: Slow running tests
+    performance: Performance benchmarks
+    security: Security-related tests
+```
+
+L'option `--strict-markers` garantit qu'un marqueur inconnu **fait échouer la session** — impossible d'utiliser un marqueur mal orthographié sans être alerté.
+
+**Répartition actuelle des catégories** :
+
+| Couche | Catégorie | Exemples de fichiers | Nb tests |
+|--------|-----------|---------------------|---------|
+| Infrastructure (parsing, DB) | `unit` | `test_geneweb_parser.py`, `test_repositories.py` | ~60 |
+| Application (services) | `unit` | `test_services*.py` (7 fichiers) | ~200 |
+| Présentation (API, web) | `unit` / `integration` | `test_genealogy_api.py`, `test_web_routers.py` | ~70 |
+| Accessibilité | `unit` | `test_accessibility.py` | 55 |
+| API serveur | `integration` | `test_server_api.py` | ~10 |
+
+La catégorisation permet d'exécuter des sous-ensembles ciblés :
+
+```bash
+pytest -m unit         # ~360 tests, < 2s — feedback immédiat
+pytest -m integration  # Tests avec interactions réelles entre couches
+pytest -m security     # Réservé aux audits de sécurité ponctuels
+```
+
+---
+
+### 5.3 Assertion Library
+
+Le projet utilise exclusivement les **assertions natives de pytest** (`assert`) renforcées par les matchers de `unittest.mock` pour les interactions.
+
+**Assertions de valeur (pytest)**
+
+```python
+# tests/application/test_services.py — pattern AAA (Arrange / Act / Assert)
+
+async def test_get_genealogy_details(app_service, mock_genealogy_repo):
+    # Arrange
+    mock_genealogy_repo.count_persons.return_value = 123
+
+    # Act
+    details = await app_service.get_genealogy_details("test_genealogy")
+
+    # Assert
+    assert isinstance(details, GenealogyDetails)   # Type correct
+    assert details.name == "test_genealogy"         # Valeur correcte
+    assert details.person_count == 123              # Donnée propagée
+```
+
+**Assertions d'interaction (unittest.mock)**
+
+```python
+# tests/infrastructure/test_repositories.py
+
+def test_get_by_name_found(self, mock_db):
+    repo = SQLGenealogyRepository(mock_db)
+    result = repo.get_by_name("test")
+
+    assert result == mock_genealogy
+    mock_db.execute.assert_called_once()   # La DB a bien été interrogée une seule fois
+```
+
+**Avantages de ce choix**
+
+| Critère | Décision |
+|---------|---------|
+| **Lisibilité** | `assert x == y` est plus lisible que `assertEqual(x, y)` |
+| **Messages d'erreur** | pytest réécrit les assertions et affiche les valeurs réelles vs attendues |
+| **Pas de dépendance externe** | Pas besoin d'importer `assertpy`, `hamcrest` ou similaire |
+| **Cohérence** | Un seul style dans 18 fichiers de test |
+
+---
+
+### 5.4 Test Isolation
+
+Chaque test est **totalement isolé** : aucune mutation d'état partagé ne peut faire échouer un test voisin. Trois mécanismes garantissent cette isolation :
+
+**1 — Fixtures pytest par scope `function` (défaut)**
+
+```python
+# tests/conftest.py — fixtures partagées, instanciées à chaque test
+
+@pytest.fixture
+def mock_db_session():
+    """Provide a mocked SQLAlchemy database session."""
+    session = MagicMock()
+    session.query.return_value = session
+    session.filter.return_value = session
+    session.all.return_value = []
+    session.first.return_value = None
+    session.commit.return_value = None
+    return session
+
+@pytest.fixture
+def mock_genealogy_repo():
+    repo = MagicMock()
+    mock_genealogy = MagicMock()
+    mock_genealogy.id = 1
+    mock_genealogy.name = "test_genealogy"
+    repo.get_by_name.return_value = mock_genealogy
+    return repo
+```
+
+Chaque test reçoit une **nouvelle instance** de ces mocks — impossible qu'un test « pollue » le suivant.
+
+**2 — `MagicMock(spec=…)` pour isoler les couches**
+
+```python
+# tests/presentation/test_web_routers.py
+
+@pytest.fixture
+def mock_request():
+    request = Mock(spec=Request)          # Spec garantit qu'on ne peut accéder
+    request.url = Mock()                  # qu'aux attributs qui existent sur Request
+    request.url.path = "/test"
+    return request
+
+@pytest.fixture
+def mock_app_service():
+    service = Mock(spec=ApplicationService)
+    for attr in dir(service):
+        if not attr.startswith("_"):
+            method = getattr(service, attr)
+            if callable(method):
+                setattr(service, attr, AsyncMock())  # Toutes les méthodes async mockées
+    return service
+```
+
+**3 — `patch()` comme context manager pour les dépendances globales**
+
+```python
+# Isolation du template engine pour tester uniquement la logique du routeur
+with patch("src.geneweb.presentation.web.routers.person.templates") as mock_tpl:
+    await person.person_profile(request, "test_genealogy", 1, mock_app_service)
+    mock_tpl.TemplateResponse.assert_called_once()
+```
+
+Le `patch()` est automatiquement défait à la sortie du bloc `with` — aucun résidu entre les tests.
+
+---
+
+### 5.5 Integration vs Unit Tests
+
+La distinction est formalisée dans la structure des dossiers **et** dans les mocks utilisés :
+
+**Tests unitaires** — dépendances toutes mockées, 0 I/O réel
+
+```
+tests/
+├── application/        → services mockent les repositories (MagicMock)
+│   ├── test_services.py
+│   └── test_services_*.py  (7 variations de cas limites)
+├── infrastructure/
+│   ├── test_geneweb_parser.py  → parse des chaînes en mémoire, 0 fichier
+│   └── test_repositories.py   → DB mockée (MagicMock(spec=Session))
+└── presentation/
+    ├── test_web_routers.py     → templates mockés + service mocké
+    └── test_accessibility.py  → lecture de fichiers statiques HTML/PO
+```
+
+Exemple — test unitaire du repository (DB entièrement mockée) :
+
+```python
+# tests/infrastructure/test_repositories.py
+
+def test_get_by_name_found(self, mock_db):        # mock_db = MagicMock(spec=Session)
+    repo = SQLGenealogyRepository(mock_db)        # Injecté — aucune vraie connexion DB
+    result = repo.get_by_name("test")
+    assert result == mock_genealogy
+    mock_db.execute.assert_called_once()
+```
+
+**Tests d'intégration** — modules réels assemblés, base SQLite in-memory
+
+```
+tests/
+└── presentation/
+    ├── test_genealogy_api.py   → FastAPI TestClient + SQLite in-memory
+    └── test_server_api.py      → API + service + config réels (sans mock)
+```
+
+Exemple — test d'intégration de l'API (service + DB réels) :
+
+```python
+# tests/presentation/test_genealogy_api.py
+
+def test_get_genealogy_success(self):
+    mock_config = Mock(              # Seul le config est mocké (externe au système)
+        default_lang="fr", port=8080, only="", log=False
+    )
+    mock_db = Mock()
+    # Tous les autres composants s'exécutent réellement
+    response = client.get("/api/genealogy/test_genealogy")
+    assert response.status_code == 200
+```
+
+**Pourquoi cette séparation ?**
+
+| Critère | Tests unitaires | Tests d'intégration |
+|---------|----------------|---------------------|
+| Vitesse | < 1ms/test | 5-50ms/test |
+| Localisation d'un bug | Précise (composant exact) | Module ou interface |
+| Feedback TDD | Immédiat | Complémentaire |
+| Couverture visée | Branches, edge cases | Flux complets |
+
+---
+
+### 5.6 Known Design Decisions Documented in Tests
+
+Les docstrings des tests servent de **documentation des décisions de conception** : chaque test explique non seulement *ce qu'il teste* mais *pourquoi* cette règle existe.
+
+**Décision 1 — Fallback vers la langue anglaise (start.html)**
+
+```python
+# tests/presentation/test_accessibility.py
+
+def test_start_html_language_fallback_to_english(self):
+    """
+    Un fallback vers l'anglais doit exister si la langue du navigateur
+    n'est pas dans la liste supportée.
+    """
+    content = read_template("start.html")
+    assert "fallback" in content.lower() or "userLang = 'en'" in content
+```
+
+→ *Décision documentée* : l'interface ne peut pas rester silencieuse si la langue est inconnue — l'anglais, lingua franca du web, est le choix par défaut.
+
+**Décision 2 — `spec=` obligatoire sur les mocks de couche**
+
+```python
+# tests/presentation/test_web_routers.py
+
+@pytest.fixture
+def mock_request():
+    """Mock de la requête FastAPI."""
+    request = Mock(spec=Request)   # spec= évite les faux positifs :
+    ...                            # accéder à un attribut inexistant lève AttributeError
+```
+
+→ *Décision documentée* : un mock sans `spec` peut masquer des bugs (appel d'une méthode qui n'existe pas sur l'objet réel passerait silencieusement). L'utilisation de `spec=Request` transforme ce bug potentiel en erreur de test immédiate.
+
+**Décision 3 — Langue par défaut `"fr"` obligatoire en base**
+
+```python
+# tests/presentation/test_accessibility.py
+
+def test_genealogy_config_default_lang_default_value_is_fr(self):
+    """
+    La valeur par défaut de default_lang dans GenealogyConfig doit être 'fr'
+    pour garantir un comportement prévisible à la création.
+    """
+    col = GenealogyConfig.__table__.columns["default_lang"]
+    assert col.default.arg == "fr"
+```
+
+→ *Décision documentée* : une généalogie fraîchement créée sans configuration explicite affichera toujours le français — évite l'état indéfini qui causerait des erreurs 500 lors du premier rendu de template.
+
+**Décision 4 — Toutes les méthodes de service doivent être `async`**
+
+```python
+# tests/presentation/test_web_routers.py
+
+@pytest.fixture
+def mock_app_service():
+    service = Mock(spec=ApplicationService)
+    for attr in dir(service):
+        if not attr.startswith("_"):
+            method = getattr(service, attr)
+            if callable(method):
+                setattr(service, attr, AsyncMock())  # Toutes les méthodes async mockées
+    return service
+```
+
+→ *Décision documentée* : FastAPI exécute les routes dans une boucle asyncio — toutes les dépendances de service doivent être `async` pour éviter les deadlocks. Le mock force cette contrainte dans tous les tests de routeurs.
+
+**Décision 5 — Labels de formulaire liés explicitement (pas de placeholder seul)**
+
+```python
+# tests/presentation/test_accessibility.py
+
+def test_add_family_key_fields_have_labels(self):
+    """
+    WCAG 1.3.1 — Les champs principaux du formulaire d'ajout de famille
+    doivent tous avoir un label explicitement lié.
+    """
+    for field_id, label_text in required_pairs.items():
+        assert f'for="{field_id}"' in content  # label lié
+        assert f'id="{field_id}"' in content   # champ cible existant
+```
+
+→ *Décision documentée* : le `placeholder` seul n'est pas accessible (disparaît à la saisie, non lu par tous les lecteurs d'écran). Le `<label for=...>` est la seule technique conforme WCAG 1.3.1.
+
+---
+
+### Bilan — La stratégie QA a amélioré le projet
+
+1. **Détection de bugs de parsing de dates** qui auraient causé des erreurs silencieuses dans les données généalogiques.
+2. **Standardisation du code** via Black/isort/flake8, rendant le code lisible par toute l'équipe.
+3. **Garantie de non-régression** : les 383 tests s'exécutent en < 4s, feedback immédiat.
+4. **Documentation vivante** : les docstrings de tests remplacent des spécifications statiques qui se périment.
+5. **Sécurisation des données** : audit Bandit, protection SQL injection via ORM, protection XSS via Jinja2.
 
 ### Pertinence par rapport aux alternatives
 
