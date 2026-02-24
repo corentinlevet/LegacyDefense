@@ -27,7 +27,7 @@ directory = "htmlcov"
 targets = ["src"]
 exclude_dirs = ["tests", ".venv", "__pycache__"]
 skips = [
-    "B101",  # assert statements are fine in tests
-    "B105",  # false positive: empty-string config fields ("passwd" key names) and genealogy token "od"
-    "B110",  # intentional try/except/pass for date-parsing fallbacks
+    "B101", # assert statements are fine in tests
+    "B105", # false positive: empty-string config fields ("passwd" key names) and genealogy token "od"
+    "B110", # intentional try/except/pass for date-parsing fallbacks
 ]
