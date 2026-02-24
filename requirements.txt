@@ -7,3 +7,5 @@ pydantic
 alembic
 python-multipart
 pytest-asyncio
+gunicorn>=21.2.0
+psycopg2-binary>=2.9.0
