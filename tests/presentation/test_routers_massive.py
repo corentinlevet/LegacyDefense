@@ -2,13 +2,14 @@
 Tests massifs pour les routers web restants.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
-from fastapi import Request, HTTPException
+
+import pytest
+from fastapi import HTTPException, Request
 from fastapi.templating import Jinja2Templates
 
-from src.geneweb.presentation.web.routers import book, family, genealogy, base, places
 from src.geneweb.application.services import ApplicationService
+from src.geneweb.presentation.web.routers import base, book, family, genealogy, places
 
 
 @pytest.fixture

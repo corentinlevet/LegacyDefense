@@ -1,7 +1,8 @@
 """Tests pour main.py"""
 
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from fastapi import FastAPI
 
 
@@ -16,6 +17,7 @@ class TestMainApp:
 
             # Import du module pour trigger la création
             import importlib
+
             import src.geneweb.main
 
             importlib.reload(src.geneweb.main)

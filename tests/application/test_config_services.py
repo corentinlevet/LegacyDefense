@@ -2,14 +2,15 @@
 Tests pour les services de configuration.
 """
 
-import pytest
 from unittest.mock import MagicMock, Mock
+
+import pytest
 from sqlalchemy.orm import Session
 
 from src.geneweb.application.config_services import (
     get_genealogy_config,
-    update_genealogy_config,
     get_server_config,
+    update_genealogy_config,
     update_server_config,
 )
 from src.geneweb.infrastructure.config_models import GenealogyConfig, ServerConfig

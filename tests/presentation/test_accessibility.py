@@ -14,8 +14,9 @@ Critères couverts :
 """
 
 import re
-import pytest
 from pathlib import Path
+
+import pytest
 
 # ---------------------------------------------------------------------------
 # Chemins vers les ressources testées
@@ -33,7 +34,8 @@ ALL_TEMPLATES = list(TEMPLATES_DIR.glob("*.html"))
 
 # Templates standalone (ne font pas extends — donc déclarent leur propre <html>)
 STANDALONE_TEMPLATES = [
-    tpl for tpl in ALL_TEMPLATES
+    tpl
+    for tpl in ALL_TEMPLATES
     if "{%" not in tpl.read_text(encoding="utf-8").split("\n")[0]
     and "{% extends" not in tpl.read_text(encoding="utf-8")[:200]
 ]
@@ -42,6 +44,7 @@ STANDALONE_TEMPLATES = [
 # ===========================================================================
 # Helpers
 # ===========================================================================
+
 
 def read_template(name: str) -> str:
     """Retourne le contenu brut d'un template HTML."""
@@ -55,12 +58,15 @@ def _extract_label_for_values(html: str) -> set:
 
 def _extract_input_ids(html: str) -> set:
     """Retourne tous les id d'éléments <input>, <select> et <textarea>."""
-    return set(re.findall(r'<(?:input|select|textarea)[^>]+id=["\']([^"\']+)["\']', html))
+    return set(
+        re.findall(r'<(?:input|select|textarea)[^>]+id=["\']([^"\']+)["\']', html)
+    )
 
 
 # ===========================================================================
 # 1. Tests des templates HTML (WCAG 1.1.1, 1.3.1, 1.4.4, 3.1.1, 4.1.2)
 # ===========================================================================
+
 
 class TestHTMLTemplatesAccessibility:
     """Parse les vrais fichiers HTML du projet et vérifie les critères WCAG."""
@@ -75,12 +81,12 @@ class TestHTMLTemplatesAccessibility:
         Tous les templates enfants ({% extends 'base.html' %}) en héritent.
         """
         content = read_template("base.html")
-        assert 'name="viewport"' in content, (
-            "base.html : <meta name='viewport'> absent (WCAG 1.4.4)"
-        )
-        assert "width=device-width" in content, (
-            "base.html : le viewport doit inclure width=device-width"
-        )
+        assert (
+            'name="viewport"' in content
+        ), "base.html : <meta name='viewport'> absent (WCAG 1.4.4)"
+        assert (
+            "width=device-width" in content
+        ), "base.html : le viewport doit inclure width=device-width"
 
     def test_standalone_templates_have_viewport_meta(self):
         """
@@ -92,9 +98,9 @@ class TestHTMLTemplatesAccessibility:
             content = tpl.read_text(encoding="utf-8")
             if 'name="viewport"' not in content and "name='viewport'" not in content:
                 missing.append(tpl.name)
-        assert missing == [], (
-            f"Templates standalone sans <meta name='viewport'> (WCAG 1.4.4) : {missing}"
-        )
+        assert (
+            missing == []
+        ), f"Templates standalone sans <meta name='viewport'> (WCAG 1.4.4) : {missing}"
 
     # ------------------------------------------------------------------
     # WCAG 3.1.1 — Langue de la page
@@ -106,9 +112,9 @@ class TestHTMLTemplatesAccessibility:
         qui font {% extends 'base.html' %} bénéficient de cet attribut.
         """
         content = read_template("base.html")
-        assert re.search(r"<html\s[^>]*lang=", content), (
-            "base.html : attribut lang absent sur <html> (WCAG 3.1.1)"
-        )
+        assert re.search(
+            r"<html\s[^>]*lang=", content
+        ), "base.html : attribut lang absent sur <html> (WCAG 3.1.1)"
 
     def test_standalone_templates_declare_html_lang(self):
         """
@@ -120,9 +126,9 @@ class TestHTMLTemplatesAccessibility:
             content = tpl.read_text(encoding="utf-8")
             if not re.search(r"<html\s[^>]*lang=", content):
                 missing.append(tpl.name)
-        assert missing == [], (
-            f"Templates standalone sans lang sur <html> (WCAG 3.1.1) : {missing}"
-        )
+        assert (
+            missing == []
+        ), f"Templates standalone sans lang sur <html> (WCAG 3.1.1) : {missing}"
 
     def test_start_html_lang_is_dynamic(self):
         """
@@ -130,9 +136,9 @@ class TestHTMLTemplatesAccessibility:
         afin que la langue corresponde au choix de l'utilisateur.
         """
         content = read_template("start.html")
-        assert "<html lang=%l>" in content, (
-            "start.html doit avoir <html lang=%l> pour le rendu multi-langue dynamique"
-        )
+        assert (
+            "<html lang=%l>" in content
+        ), "start.html doit avoir <html lang=%l> pour le rendu multi-langue dynamique"
 
     def test_static_templates_lang_is_fr(self):
         """
@@ -142,9 +148,9 @@ class TestHTMLTemplatesAccessibility:
         static_templates = ["server_config.html", "statistics.html"]
         for name in static_templates:
             content = read_template(name)
-            assert 'lang="fr"' in content, (
-                f"{name} : la langue par défaut déclarée doit être 'fr'"
-            )
+            assert (
+                'lang="fr"' in content
+            ), f"{name} : la langue par défaut déclarée doit être 'fr'"
 
     def test_base_html_has_charset_utf8(self):
         """
@@ -153,9 +159,9 @@ class TestHTMLTemplatesAccessibility:
         Les templates enfants héritent de cette déclaration.
         """
         content = read_template("base.html")
-        assert 'charset="UTF-8"' in content or "charset='UTF-8'" in content, (
-            "base.html : <meta charset='UTF-8'> absent"
-        )
+        assert (
+            'charset="UTF-8"' in content or "charset='UTF-8'" in content
+        ), "base.html : <meta charset='UTF-8'> absent"
 
     def test_standalone_templates_have_charset_utf8(self):
         """
@@ -166,9 +172,7 @@ class TestHTMLTemplatesAccessibility:
             content = tpl.read_text(encoding="utf-8")
             if 'charset="UTF-8"' not in content and "charset='UTF-8'" not in content:
                 missing.append(tpl.name)
-        assert missing == [], (
-            f"Templates standalone sans charset UTF-8 : {missing}"
-        )
+        assert missing == [], f"Templates standalone sans charset UTF-8 : {missing}"
 
     # ------------------------------------------------------------------
     # WCAG 3.1.2 — 10 langues supportées dans start.html
@@ -182,9 +186,9 @@ class TestHTMLTemplatesAccessibility:
         content = read_template("start.html")
         required = ["de", "en", "es", "fr", "it", "lv", "nl", "no", "fi", "sv"]
         for lang_code in required:
-            assert f'"{lang_code}"' in content, (
-                f"start.html : code langue '{lang_code}' absent de supportedLangs"
-            )
+            assert (
+                f'"{lang_code}"' in content
+            ), f"start.html : code langue '{lang_code}' absent de supportedLangs"
 
     def test_start_html_navigator_language_autodetect(self):
         """
@@ -192,9 +196,9 @@ class TestHTMLTemplatesAccessibility:
         via navigator.language pour une expérience accessible dès l'arrivée.
         """
         content = read_template("start.html")
-        assert "navigator.language" in content, (
-            "start.html : auto-détection de langue via navigator.language absente"
-        )
+        assert (
+            "navigator.language" in content
+        ), "start.html : auto-détection de langue via navigator.language absente"
 
     def test_start_html_language_fallback_to_english(self):
         """
@@ -202,9 +206,9 @@ class TestHTMLTemplatesAccessibility:
         n'est pas dans la liste supportée.
         """
         content = read_template("start.html")
-        assert "fallback" in content.lower() or "userLang = 'en'" in content, (
-            "start.html : le fallback vers 'en' pour les langues non supportées est absent"
-        )
+        assert (
+            "fallback" in content.lower() or "userLang = 'en'" in content
+        ), "start.html : le fallback vers 'en' pour les langues non supportées est absent"
 
     # ------------------------------------------------------------------
     # WCAG 4.1.2 — Nom, rôle, valeur (ARIA sur le sélecteur de langue)
@@ -216,9 +220,9 @@ class TestHTMLTemplatesAccessibility:
         aria-haspopup pour que les lecteurs d'écran annoncent le menu.
         """
         content = read_template("start.html")
-        assert 'aria-haspopup="true"' in content, (
-            "start.html : aria-haspopup='true' absent sur le bouton sélecteur de langue"
-        )
+        assert (
+            'aria-haspopup="true"' in content
+        ), "start.html : aria-haspopup='true' absent sur le bouton sélecteur de langue"
 
     def test_start_html_dropdown_has_aria_expanded(self):
         """
@@ -226,9 +230,9 @@ class TestHTMLTemplatesAccessibility:
         si le menu déroulant est ouvert ou fermé.
         """
         content = read_template("start.html")
-        assert 'aria-expanded="false"' in content, (
-            "start.html : aria-expanded absent sur le bouton sélecteur de langue"
-        )
+        assert (
+            'aria-expanded="false"' in content
+        ), "start.html : aria-expanded absent sur le bouton sélecteur de langue"
 
     def test_start_html_dropdown_menu_has_aria_labelledby(self):
         """
@@ -236,9 +240,9 @@ class TestHTMLTemplatesAccessibility:
         via aria-labelledby pour une navigation clavier cohérente.
         """
         content = read_template("start.html")
-        assert 'aria-labelledby="lang-dropdown"' in content, (
-            "start.html : aria-labelledby absent sur le menu déroulant de langue"
-        )
+        assert (
+            'aria-labelledby="lang-dropdown"' in content
+        ), "start.html : aria-labelledby absent sur le menu déroulant de langue"
 
     def test_start_html_lang_dropdown_items_all_present(self):
         """
@@ -250,9 +254,9 @@ class TestHTMLTemplatesAccessibility:
         expected = {"de", "en", "es", "fr", "it", "lv", "nl", "no", "fi", "sv"}
         found = set(lang_items)
         missing = expected - found
-        assert not missing, (
-            f"start.html : langues manquantes dans le sélecteur : {missing}"
-        )
+        assert (
+            not missing
+        ), f"start.html : langues manquantes dans le sélecteur : {missing}"
 
     # ------------------------------------------------------------------
     # WCAG 1.1.1 — Texte alternatif sur les images
@@ -266,9 +270,7 @@ class TestHTMLTemplatesAccessibility:
         content = read_template("start.html")
         img_tags = re.findall(r"<img[^>]+>", content)
         for img in img_tags:
-            assert "alt=" in img, (
-                f"start.html : <img> sans attribut alt trouvé : {img}"
-            )
+            assert "alt=" in img, f"start.html : <img> sans attribut alt trouvé : {img}"
 
     def test_start_html_tree_img_alt_value(self):
         """
@@ -276,9 +278,9 @@ class TestHTMLTemplatesAccessibility:
         et non vide.
         """
         content = read_template("start.html")
-        assert 'alt="Tree"' in content, (
-            "start.html : l'image principale doit avoir alt=\"Tree\""
-        )
+        assert (
+            'alt="Tree"' in content
+        ), 'start.html : l\'image principale doit avoir alt="Tree"'
 
     def test_all_templates_img_have_alt_attribute(self):
         """
@@ -292,8 +294,8 @@ class TestHTMLTemplatesAccessibility:
             for img in img_tags:
                 if "alt=" not in img:
                     failures.append(f"{tpl.name}: {img[:80]}")
-        assert failures == [], (
-            f"Images sans attribut alt (WCAG 1.1.1) :\n" + "\n".join(failures)
+        assert failures == [], "Images sans attribut alt (WCAG 1.1.1) :\n" + "\n".join(
+            failures
         )
 
     # ------------------------------------------------------------------
@@ -309,9 +311,9 @@ class TestHTMLTemplatesAccessibility:
         label_targets = _extract_label_for_values(content)
         input_ids = _extract_input_ids(content)
         orphan_labels = label_targets - input_ids
-        assert not orphan_labels, (
-            f"add_family.html : labels sans champ associé (WCAG 1.3.1) : {orphan_labels}"
-        )
+        assert (
+            not orphan_labels
+        ), f"add_family.html : labels sans champ associé (WCAG 1.3.1) : {orphan_labels}"
 
     def test_add_family_key_fields_have_labels(self):
         """
@@ -328,12 +330,12 @@ class TestHTMLTemplatesAccessibility:
             "nsck": "Same sex couple",
         }
         for field_id, label_text in required_pairs.items():
-            assert f'for="{field_id}"' in content, (
-                f"add_family.html : label for='{field_id}' ('{label_text}') absent"
-            )
-            assert f'id="{field_id}"' in content, (
-                f"add_family.html : input id='{field_id}' absent"
-            )
+            assert (
+                f'for="{field_id}"' in content
+            ), f"add_family.html : label for='{field_id}' ('{label_text}') absent"
+            assert (
+                f'id="{field_id}"' in content
+            ), f"add_family.html : input id='{field_id}' absent"
 
     def test_server_config_all_labels_have_matching_inputs(self):
         """
@@ -344,9 +346,9 @@ class TestHTMLTemplatesAccessibility:
         label_targets = _extract_label_for_values(content)
         input_ids = _extract_input_ids(content)
         orphan_labels = label_targets - input_ids
-        assert not orphan_labels, (
-            f"server_config.html : labels sans champ associé (WCAG 1.3.1) : {orphan_labels}"
-        )
+        assert (
+            not orphan_labels
+        ), f"server_config.html : labels sans champ associé (WCAG 1.3.1) : {orphan_labels}"
 
     def test_server_config_lang_selector_has_label(self):
         """
@@ -354,21 +356,21 @@ class TestHTMLTemplatesAccessibility:
         doit avoir un label lié (essentiel pour les lecteurs d'écran).
         """
         content = read_template("server_config.html")
-        assert 'for="default_lang"' in content, (
-            "server_config.html : label for='default_lang' absent"
-        )
-        assert 'id="default_lang"' in content, (
-            "server_config.html : select id='default_lang' absent"
-        )
+        assert (
+            'for="default_lang"' in content
+        ), "server_config.html : label for='default_lang' absent"
+        assert (
+            'id="default_lang"' in content
+        ), "server_config.html : select id='default_lang' absent"
 
     def test_server_config_ip_field_has_label(self):
         """
         WCAG 1.3.1 — Le champ de restriction IP doit avoir un label lié.
         """
         content = read_template("server_config.html")
-        assert 'for="only"' in content and 'id="only"' in content, (
-            "server_config.html : label/input pour le champ 'only' (IP) absent"
-        )
+        assert (
+            'for="only"' in content and 'id="only"' in content
+        ), "server_config.html : label/input pour le champ 'only' (IP) absent"
 
     def test_server_config_7_lang_options(self):
         """
@@ -386,6 +388,7 @@ class TestHTMLTemplatesAccessibility:
 # 2. Tests de la fonction gettext() (WCAG 3.1.2)
 # ===========================================================================
 
+
 class TestGettextTranslationFunction:
     """
     Vérifie que la fonction gettext() du routeur person.py traduit
@@ -396,6 +399,7 @@ class TestGettextTranslationFunction:
     def import_gettext(self):
         """Importe la fonction à tester une seule fois."""
         from src.geneweb.presentation.web.routers.person import gettext
+
         self.gettext = gettext
 
     def test_basic_info_translates_to_french(self):
@@ -405,7 +409,10 @@ class TestGettextTranslationFunction:
         assert self.gettext("Spouse and Children") == "Conjoint et Enfants"
 
     def test_genealogy_tree_label_translates(self):
-        assert self.gettext("Genealogy Tree (3 Generations)") == "Arbre généalogique (3 générations)"
+        assert (
+            self.gettext("Genealogy Tree (3 Generations)")
+            == "Arbre généalogique (3 générations)"
+        )
 
     def test_siblings_label_translates(self):
         assert self.gettext("Siblings") == "Frères et Sœurs"
@@ -442,9 +449,16 @@ class TestGettextTranslationFunction:
     def test_all_translations_return_non_empty_string(self):
         """Aucune traduction ne doit retourner une chaîne vide."""
         known_keys = [
-            "Basic Info", "Spouse and Children",
-            "Genealogy Tree (3 Generations)", "Siblings",
-            "Born", "in", "Died", "Occupation", "on", "with",
+            "Basic Info",
+            "Spouse and Children",
+            "Genealogy Tree (3 Generations)",
+            "Siblings",
+            "Born",
+            "in",
+            "Died",
+            "Occupation",
+            "on",
+            "with",
             "No siblings found.",
         ]
         for key in known_keys:
@@ -472,6 +486,7 @@ class TestGettextTranslationFunction:
 # ===========================================================================
 # 3. Tests des fichiers de localisation .po (WCAG 3.1.2)
 # ===========================================================================
+
 
 class TestLocalesPoFiles:
     """
@@ -529,15 +544,15 @@ class TestLocalesPoFiles:
     def test_fr_locale_header_declares_language_fr(self):
         """Le header du fichier .po français doit déclarer Language: fr."""
         content = self.FR_PO.read_text(encoding="utf-8")
-        assert "Language: fr" in content, (
-            "locales/fr/messages.po : en-tête Language: fr absent"
-        )
+        assert (
+            "Language: fr" in content
+        ), "locales/fr/messages.po : en-tête Language: fr absent"
 
     def test_en_locale_header_declares_language_en(self):
         content = self.EN_PO.read_text(encoding="utf-8")
-        assert "Language: en" in content, (
-            "locales/en/messages.po : en-tête Language: en absent"
-        )
+        assert (
+            "Language: en" in content
+        ), "locales/en/messages.po : en-tête Language: en absent"
 
     def test_fr_locale_has_all_required_msgids(self):
         """
@@ -546,16 +561,12 @@ class TestLocalesPoFiles:
         """
         entries = self._parse_po(self.FR_PO)
         missing = [mid for mid in self.REQUIRED_MSGIDS if mid not in entries]
-        assert not missing, (
-            f"locales/fr/messages.po : msgid manquants : {missing}"
-        )
+        assert not missing, f"locales/fr/messages.po : msgid manquants : {missing}"
 
     def test_en_locale_has_all_required_msgids(self):
         entries = self._parse_po(self.EN_PO)
         missing = [mid for mid in self.REQUIRED_MSGIDS if mid not in entries]
-        assert not missing, (
-            f"locales/en/messages.po : msgid manquants : {missing}"
-        )
+        assert not missing, f"locales/en/messages.po : msgid manquants : {missing}"
 
     def test_fr_locale_no_empty_msgstr_for_required_keys(self):
         """
@@ -564,9 +575,7 @@ class TestLocalesPoFiles:
         """
         entries = self._parse_po(self.FR_PO)
         empty = [k for k in self.REQUIRED_MSGIDS if entries.get(k, None) == ""]
-        assert not empty, (
-            f"locales/fr/messages.po : msgstr vides pour : {empty}"
-        )
+        assert not empty, f"locales/fr/messages.po : msgstr vides pour : {empty}"
 
     def test_fr_locale_has_all_12_months(self):
         """
@@ -575,12 +584,32 @@ class TestLocalesPoFiles:
         """
         entries = self._parse_po(self.FR_PO)
         months_en = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December",
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
         ]
         months_fr = [
-            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-            "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
+            "Janvier",
+            "Février",
+            "Mars",
+            "Avril",
+            "Mai",
+            "Juin",
+            "Juillet",
+            "Août",
+            "Septembre",
+            "Octobre",
+            "Novembre",
+            "Décembre",
         ]
         for en, fr in zip(months_en, months_fr):
             assert entries.get(en) == fr, (
@@ -605,14 +634,15 @@ class TestLocalesPoFiles:
     def test_fr_locale_utf8_encoding(self):
         """Le fichier .po français doit être encodé en UTF-8 (charset déclaré)."""
         content = self.FR_PO.read_text(encoding="utf-8")
-        assert "charset=utf-8" in content, (
-            "locales/fr/messages.po : Content-Type charset=utf-8 absent"
-        )
+        assert (
+            "charset=utf-8" in content
+        ), "locales/fr/messages.po : Content-Type charset=utf-8 absent"
 
 
 # ===========================================================================
 # 4. Tests des modèles de configuration — langue persistante (WCAG 3.1.2)
 # ===========================================================================
+
 
 class TestConfigModelsDefaultLang:
     """
@@ -626,10 +656,11 @@ class TestConfigModelsDefaultLang:
         la langue par défaut d'une généalogie.
         """
         from src.geneweb.infrastructure.config_models import GenealogyConfig
+
         columns = {col.key for col in GenealogyConfig.__table__.columns}
-        assert "default_lang" in columns, (
-            "GenealogyConfig : colonne 'default_lang' absente (WCAG 3.1.2)"
-        )
+        assert (
+            "default_lang" in columns
+        ), "GenealogyConfig : colonne 'default_lang' absente (WCAG 3.1.2)"
 
     def test_server_config_has_default_lang_column(self):
         """
@@ -637,10 +668,11 @@ class TestConfigModelsDefaultLang:
         la langue globale du serveur.
         """
         from src.geneweb.infrastructure.config_models import ServerConfig
+
         columns = {col.key for col in ServerConfig.__table__.columns}
-        assert "default_lang" in columns, (
-            "ServerConfig : colonne 'default_lang' absente (WCAG 3.1.2)"
-        )
+        assert (
+            "default_lang" in columns
+        ), "ServerConfig : colonne 'default_lang' absente (WCAG 3.1.2)"
 
     def test_genealogy_config_default_lang_default_value_is_fr(self):
         """
@@ -648,40 +680,49 @@ class TestConfigModelsDefaultLang:
         pour garantir un comportement prévisible à la création.
         """
         from src.geneweb.infrastructure.config_models import GenealogyConfig
+
         col = GenealogyConfig.__table__.columns["default_lang"]
-        assert col.default is not None, (
-            "GenealogyConfig.default_lang : aucune valeur par défaut définie"
-        )
-        assert col.default.arg == "fr", (
-            f"GenealogyConfig.default_lang : défaut attendu 'fr', obtenu '{col.default.arg}'"
-        )
+        assert (
+            col.default is not None
+        ), "GenealogyConfig.default_lang : aucune valeur par défaut définie"
+        assert (
+            col.default.arg == "fr"
+        ), f"GenealogyConfig.default_lang : défaut attendu 'fr', obtenu '{col.default.arg}'"
 
     def test_server_config_default_lang_default_value_is_fr(self):
         """
         La valeur par défaut de default_lang dans ServerConfig doit être 'fr'.
         """
         from src.geneweb.infrastructure.config_models import ServerConfig
+
         col = ServerConfig.__table__.columns["default_lang"]
-        assert col.default is not None, (
-            "ServerConfig.default_lang : aucune valeur par défaut définie"
-        )
-        assert col.default.arg == "fr", (
-            f"ServerConfig.default_lang : défaut attendu 'fr', obtenu '{col.default.arg}'"
-        )
+        assert (
+            col.default is not None
+        ), "ServerConfig.default_lang : aucune valeur par défaut définie"
+        assert (
+            col.default.arg == "fr"
+        ), f"ServerConfig.default_lang : défaut attendu 'fr', obtenu '{col.default.arg}'"
 
     def test_genealogy_config_default_lang_is_string_type(self):
         """default_lang doit être un type String (pas Integer, pas Boolean)."""
         from sqlalchemy import String
+
         from src.geneweb.infrastructure.config_models import GenealogyConfig
+
         col = GenealogyConfig.__table__.columns["default_lang"]
-        assert isinstance(col.type, String), (
-            f"GenealogyConfig.default_lang : type attendu String, obtenu {type(col.type)}"
-        )
+        assert isinstance(
+            col.type, String
+        ), f"GenealogyConfig.default_lang : type attendu String, obtenu {type(col.type)}"
 
     def test_server_config_default_lang_is_string_type(self):
         from sqlalchemy import String
+
         from src.geneweb.infrastructure.config_models import ServerConfig
+
         col = ServerConfig.__table__.columns["default_lang"]
-        assert isinstance(col.type, String), (
-            f"ServerConfig.default_lang : type attendu String, obtenu {type(col.type)}"
-        )
+        assert isinstance(
+            col.type, String
+        ), f"ServerConfig.default_lang : type attendu String, obtenu {type(col.type)}"
+        assert isinstance(
+            col.type, String
+        ), f"ServerConfig.default_lang : type attendu String, obtenu {type(col.type)}"

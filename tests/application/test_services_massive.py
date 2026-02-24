@@ -2,18 +2,19 @@
 Tests massifs pour services.py pour atteindre 70%+ de coverage.
 """
 
+from datetime import date, datetime
+from unittest.mock import AsyncMock, MagicMock, Mock, call, patch
+
 import pytest
-from datetime import datetime, date
-from unittest.mock import AsyncMock, MagicMock, Mock, patch, call
 from sqlalchemy.orm import Session
 
 from src.geneweb.application.services import (
     ApplicationService,
     GenealogyService,
-    parse_date_for_sorting,
     is_possibly_alive,
+    parse_date_for_sorting,
 )
-from src.geneweb.infrastructure.models import Genealogy, Person, Family, Event
+from src.geneweb.infrastructure.models import Event, Family, Genealogy, Person
 from src.geneweb.infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )
@@ -180,7 +181,9 @@ class TestApplicationServiceStatistics:
 
     @pytest.mark.asyncio
     @patch("src.geneweb.application.services.SessionLocal")
-    async def test_get_last_births_success(self, mock_session_local, app_service, mock_repo):
+    async def test_get_last_births_success(
+        self, mock_session_local, app_service, mock_repo
+    ):
         """Test get_last_births avec succès."""
         mock_genealogy = Mock(spec=Genealogy)
         mock_genealogy.id = 1

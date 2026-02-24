@@ -2,19 +2,20 @@
 Tests complémentaires pour ApplicationService (services.py).
 """
 
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import pytest
 from sqlalchemy.orm import Session
 
 from src.geneweb.application.services import (
     ApplicationService,
     GenealogyService,
     _format_date_for_gedcom,
-    parse_date_for_sorting,
     is_possibly_alive,
+    parse_date_for_sorting,
 )
-from src.geneweb.infrastructure.models import Genealogy, Person, Family
+from src.geneweb.infrastructure.models import Family, Genealogy, Person
 from src.geneweb.infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )

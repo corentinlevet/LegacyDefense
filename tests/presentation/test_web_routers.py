@@ -2,13 +2,14 @@
 Tests pour les routers web.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import pytest
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
-from src.geneweb.presentation.web.routers import person, search, stats
 from src.geneweb.application.services import ApplicationService
+from src.geneweb.presentation.web.routers import person, search, stats
 
 
 @pytest.fixture
@@ -134,9 +135,7 @@ class TestSearchRouter:
             mock_template.TemplateResponse.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_search_persons_first_name_only(
-        self, mock_request, mock_app_service
-    ):
+    async def test_search_persons_first_name_only(self, mock_request, mock_app_service):
         """Test de recherche avec prénom seulement."""
         mock_results = [{"id": 1, "first_name": "John", "surname": "Doe"}]
         mock_app_service.search_persons.return_value = mock_results
@@ -159,9 +158,7 @@ class TestSearchRouter:
             )
 
     @pytest.mark.asyncio
-    async def test_search_persons_last_name_only(
-        self, mock_request, mock_app_service
-    ):
+    async def test_search_persons_last_name_only(self, mock_request, mock_app_service):
         """Test de recherche avec nom seulement."""
         mock_results = [{"id": 1, "first_name": "John", "surname": "Doe"}]
         mock_app_service.search_persons.return_value = mock_results
@@ -230,9 +227,7 @@ class TestStatsRouter:
             {"id": 4, "name": "Couple2"}
         ]
         mock_app_service.get_oldest_alive.return_value = [{"id": 5, "name": "Person3"}]
-        mock_app_service.get_longest_lived.return_value = [
-            {"id": 6, "name": "Person4"}
-        ]
+        mock_app_service.get_longest_lived.return_value = [{"id": 6, "name": "Person4"}]
 
         with patch(
             "src.geneweb.presentation.web.routers.stats.templates"
@@ -255,9 +250,7 @@ class TestStatsRouter:
                 "test_genealogy"
             )
             mock_app_service.get_oldest_alive.assert_called_once_with("test_genealogy")
-            mock_app_service.get_longest_lived.assert_called_once_with(
-                "test_genealogy"
-            )
+            mock_app_service.get_longest_lived.assert_called_once_with("test_genealogy")
 
             # Vérifier que le template a été appelé
             mock_template.TemplateResponse.assert_called_once()
@@ -333,7 +326,9 @@ class TestStatsRouter:
         ) as mock_template:
             mock_template.TemplateResponse.return_value = "error_page"
 
-            with patch("src.geneweb.presentation.web.routers.stats.logger") as mock_logger:
+            with patch(
+                "src.geneweb.presentation.web.routers.stats.logger"
+            ) as mock_logger:
                 result = await stats.statistics_page(
                     genealogy_name="test_genealogy",
                     request=mock_request,

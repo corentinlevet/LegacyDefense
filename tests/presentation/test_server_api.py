@@ -1,12 +1,13 @@
 """Tests pour server_api.py"""
 
-import pytest
 from unittest.mock import Mock, patch
 
+import pytest
+
 from src.geneweb.presentation.api.server_api import (
+    ServerConfigRequest,
     get_server_config_api,
     update_server_config_api,
-    ServerConfigRequest,
 )
 
 
@@ -31,6 +32,7 @@ class TestGetServerConfigAPI:
             assert result["default_lang"] == "fr"
             assert result["only"] == ""
             assert result["log"] == ""
+
 
 class TestUpdateServerConfigAPI:
     """Tests pour update_server_config_api"""
@@ -61,4 +63,5 @@ class TestUpdateServerConfigAPI:
         ):
             result = update_server_config_api(request, mock_db)
 
+            assert result["message"] == "Server configuration updated successfully"
             assert result["message"] == "Server configuration updated successfully"

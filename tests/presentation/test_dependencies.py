@@ -2,14 +2,15 @@
 Tests pour les dépendances FastAPI.
 """
 
-import pytest
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import MagicMock, Mock, patch
 
-from src.geneweb.presentation.dependencies import get_db, get_app_service
+import pytest
+
 from src.geneweb.application.services import ApplicationService
 from src.geneweb.infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )
+from src.geneweb.presentation.dependencies import get_app_service, get_db
 
 
 class TestGetDb:
@@ -89,9 +90,7 @@ class TestGetAppService:
 
     @patch("src.geneweb.presentation.dependencies.SQLGenealogyRepository")
     @patch("src.geneweb.presentation.dependencies.ApplicationService")
-    def test_get_app_service_initialization(
-        self, mock_app_service, mock_repo_class
-    ):
+    def test_get_app_service_initialization(self, mock_app_service, mock_repo_class):
         """Test que get_app_service initialise correctement le service."""
         mock_db = MagicMock()
         mock_repo = MagicMock()

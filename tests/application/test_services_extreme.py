@@ -1,8 +1,9 @@
 """Tests additionnels massifs pour services.py pour atteindre 70%+"""
 
-import pytest
-from unittest.mock import Mock, MagicMock, patch, AsyncMock
 from datetime import date
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import pytest
 
 from src.geneweb.application.services import ApplicationService
 
@@ -133,9 +134,7 @@ class TestApplicationServiceGetOccupations:
         """Test récupération de plusieurs professions"""
         mock_genealogy = Mock(id=1)
         mock_repo.get_by_name = Mock(return_value=mock_genealogy)
-        mock_repo.get_occupations = Mock(
-            return_value=["Engineer", "Doctor", "Teacher"]
-        )
+        mock_repo.get_occupations = Mock(return_value=["Engineer", "Doctor", "Teacher"])
 
         result = await app_service.get_occupations("test")
 

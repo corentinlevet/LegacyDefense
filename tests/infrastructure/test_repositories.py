@@ -2,17 +2,18 @@
 Tests pour les repositories SQL.
 """
 
-import pytest
 from unittest.mock import MagicMock, Mock, call
+
+import pytest
 from sqlalchemy.orm import Session
 
+from src.geneweb.infrastructure.models import Event, Family, Genealogy, Person
 from src.geneweb.infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )
 from src.geneweb.infrastructure.repositories.sql_person_repository import (
     SQLPersonRepository,
 )
-from src.geneweb.infrastructure.models import Genealogy, Person, Family, Event
 
 
 @pytest.fixture
@@ -128,7 +129,9 @@ class TestSQLGenealogyRepository:
         # Simuler les résultats de différentes requêtes
         mock_results = [
             Mock(scalars=lambda: Mock(all=lambda: ["Paris", "Lyon"])),  # birth_place
-            Mock(scalars=lambda: Mock(all=lambda: ["Paris", "Marseille"])),  # death_place
+            Mock(
+                scalars=lambda: Mock(all=lambda: ["Paris", "Marseille"])
+            ),  # death_place
             Mock(scalars=lambda: Mock(all=lambda: ["Lyon"])),  # baptism_place
             Mock(scalars=lambda: Mock(all=lambda: ["Nice"])),  # burial_place
             Mock(scalars=lambda: Mock(all=lambda: ["Bordeaux"])),  # marriage_place

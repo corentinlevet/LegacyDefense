@@ -2,13 +2,14 @@
 Tests supplémentaires massifs pour atteindre 70%+ de coverage.
 """
 
-import pytest
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import pytest
 from sqlalchemy.orm import Session
 
 from src.geneweb.application.services import ApplicationService
-from src.geneweb.infrastructure.models import Person, Family
+from src.geneweb.infrastructure.models import Family, Person
 from src.geneweb.infrastructure.repositories.sql_genealogy_repository import (
     SQLGenealogyRepository,
 )
@@ -251,9 +252,7 @@ class TestApplicationServiceBirthAnniversaries:
         mock_session_local.return_value = mock_db
 
         target_date = date(2025, 6, 15)
-        person = Mock(
-            id=1, first_name="June", surname="Baby", birth_date="1990-06-15"
-        )
+        person = Mock(id=1, first_name="June", surname="Baby", birth_date="1990-06-15")
 
         mock_query = Mock()
         mock_filter = Mock()
@@ -261,7 +260,9 @@ class TestApplicationServiceBirthAnniversaries:
         mock_filter.all.return_value = [person]
         mock_db.query.return_value = mock_query
 
-        result = await app_service.get_birth_anniversaries("test", target_date=target_date)
+        result = await app_service.get_birth_anniversaries(
+            "test", target_date=target_date
+        )
 
         assert result is not None
         assert len(result) == 1
@@ -285,9 +286,7 @@ class TestApplicationServiceBirthAnniversaries:
         person1 = Mock(
             id=1, first_name="Alice", surname="Zulu", birth_date="1990-06-15"
         )
-        person2 = Mock(
-            id=2, first_name="Bob", surname="Alpha", birth_date="1985-06-15"
-        )
+        person2 = Mock(id=2, first_name="Bob", surname="Alpha", birth_date="1985-06-15")
 
         mock_query = Mock()
         mock_filter = Mock()
@@ -295,7 +294,9 @@ class TestApplicationServiceBirthAnniversaries:
         mock_filter.all.return_value = [person1, person2]
         mock_db.query.return_value = mock_query
 
-        result = await app_service.get_birth_anniversaries("test", target_date=target_date)
+        result = await app_service.get_birth_anniversaries(
+            "test", target_date=target_date
+        )
 
         assert result is not None
         assert len(result) == 2
@@ -342,7 +343,7 @@ class TestApplicationServiceOldestCouples:
             birth_date="22/03/1932",
             death_date=None,
         )
-        
+
         family = Mock(
             id=1,
             marriage_date="15/06/1950",

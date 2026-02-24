@@ -1,21 +1,20 @@
 """Tests pour les endpoints API de genealogy_api.py"""
 
+from io import BytesIO
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
 import pytest
 from fastapi import HTTPException, UploadFile
-from unittest.mock import Mock, MagicMock, patch, AsyncMock
-from io import BytesIO
 
-from src.geneweb.presentation.api.genealogy_api import (
-    create_genealogy_api,
-    get_all_genealogies_api,
-    import_gedcom_file,
-    export_gedcom_api,
-    get_genealogy_config_api,
-    update_genealogy_config_api,
-)
 from src.geneweb.presentation.api.genealogy_api import (
     CreateGenealogyRequest,
     GenealogyConfigRequest,
+    create_genealogy_api,
+    export_gedcom_api,
+    get_all_genealogies_api,
+    get_genealogy_config_api,
+    import_gedcom_file,
+    update_genealogy_config_api,
 )
 
 
@@ -157,7 +156,7 @@ class TestExportGedcomAPI:
         mock_service = Mock()
         gedcom_content = "0 HEAD\n1 SOUR GeneWeb\n0 TRLR"
         mock_service.export_gedcom = Mock(return_value=gedcom_content)
-        
+
         mock_genealogy = Mock(id=1, name="test_gen")
         mock_db = MagicMock()
         mock_query = Mock()

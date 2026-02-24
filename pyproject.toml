@@ -5,12 +5,7 @@ skip = [".venv", "__pycache__", ".mypy_cache", ".pytest_cache"]
 
 [tool.coverage.run]
 source = ["src"]
-omit = [
-    "*/tests/*",
-    "*/__pycache__/*",
-    "*/migrations/*",
-    "alembic/*",
-]
+omit = ["*/tests/*", "*/__pycache__/*", "*/migrations/*", "alembic/*"]
 
 [tool.coverage.report]
 fail_under = 65
@@ -27,3 +22,12 @@ exclude_lines = [
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[tool.bandit]
+targets = ["src"]
+exclude_dirs = ["tests", ".venv", "__pycache__"]
+skips = [
+    "B101",  # assert statements are fine in tests
+    "B105",  # false positive: empty-string config fields ("passwd" key names) and genealogy token "od"
+    "B110",  # intentional try/except/pass for date-parsing fallbacks
+]
